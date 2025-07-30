@@ -42,10 +42,10 @@ const NewsApi = {
             }
         });
     },
-    getOutstanding: (id) => {
+    getOutstanding: () => {
         return axiosInstance.get("/api/v1/news/outstanding");
     },
-    getTopNew: (id) => {
+    getTopNew: () => {
         return axiosInstance.get("/api/v1/news/top-new");
     },
     getOutstandingList: (id) => {

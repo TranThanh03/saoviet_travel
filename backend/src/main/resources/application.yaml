@@ -11,9 +11,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/toursaoviet
-    username: root
-    password: 123
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   thymeleaf:
@@ -29,20 +29,19 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-#    show-sql: true
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: saoviett99@gmail.com
-    password: kcfgjlujzodvfixi
-    fromName: SaoViet
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    fromName: ${MAIL_FROM_NAME}
     properties:
       mail:
         smtp:
@@ -51,23 +50,23 @@ spring:
             enable: true
 
 gemini:
-  api-key: "AIzaSyBTF86yFwr2ujLX0Lv8182Zc27XCs-yHck"
-  url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%s"
+  api-key: ${GEMINI_API_KEY}
+  url: ${GEMINI_URL}
 
 jwt:
-  signerKey: "q7Tw92RvdkeKfQJl+7mhtwfnQJuJRoseRNLfA3rrPlE+sKvBao2hyhGCu46opa4Q"
+  signerKey: ${JWT_SIGNER_KEY}
 
 momo:
-  partnerCode: "MOMOBKUN20180529"
-  accessKey: "klm05TvNBzhg7h7j"
-  secretKey: "at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa"
+  partnerCode: ${MOMO_PARTNER_CODE}
+  accessKey: ${MOMO_ACCESS_KEY}
+  secretKey: ${MOMO_SECRET_KEY}
 
 vnpay:
-  tmnCode: "N1XOQX99"
-  hashSecret: "VFXDH25HO55AOL3CB0IUGYX1XKLSAOXF"
+  tmnCode: ${VNPAY_TMN_CODE}
+  hashSecret: ${VNPAY_HASH_SECRET}
 
 base:
-  url: "http://localhost:3000"
+  url: ${BASE_URL}
 
 app:
   name: SaoViet

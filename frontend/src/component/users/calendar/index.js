@@ -44,6 +44,10 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
 
                 if (token) {
                     const response = await AuthApi.introspect();
+                
+                    if (response?.code != 9998) {
+                        ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+                    }
                 } else {
                     ErrorToast("Vui lòng đăng nhập để đặt tour.");
                     setTimeout(() => {
@@ -53,7 +57,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
             } catch (error) {
                 console.error("Failed to fetch schedule: ", error);
 
-                if (error.response?.status === 401) {
+                if (error.request?.status === 401) {
                     ErrorToast("Vui lòng đăng nhập để đặt tour.");
 
                     setTimeout(() => {

@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, use } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './index.scss';
 import formatCurrency from 'utils/formatCurrency';

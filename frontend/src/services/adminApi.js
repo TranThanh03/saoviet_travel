@@ -1,7 +1,7 @@
 import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 import getToken from "utils/getToken";
 
-const CustomerApi = {
+const AdminApi = {
     infor: () => {
         return axiosInstanceAdmin.get("/api/v1/admin/infor", {
             headers: {
@@ -25,4 +25,4 @@ const CustomerApi = {
     },
 };
 
-export default CustomerApi;
+export default AdminApi;

@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { featuredTravel, contentImg1, contentImg2, popularPost1, popularPost2, popularPost3, noImage } from 'assets';
+import { noImage } from 'assets';
 import { sanitizeHtml } from 'utils/sanitizeHtml';
 import './detail.scss';
 import { NewsApi } from 'services';

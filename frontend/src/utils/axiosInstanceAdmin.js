@@ -58,11 +58,11 @@ axiosInstanceAdmin.interceptors.response.use(
 
             window.location.href = "/manage/error/404";
         } 
-        else if (error.response?.status === 401) {
+        else if (error.request?.status === 401) {
             window.location.href = "/manage/auth/login";
         }
         else if (error.code === "ERR_NETWORK") {
-            window.location.href = "/manage/error/500";
+            window.location.href = "/manage/auth/login";
         }
 
         return Promise.reject(error.response || error.message);

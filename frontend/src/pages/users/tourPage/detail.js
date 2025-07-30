@@ -96,6 +96,7 @@ const TourDetailPage = () => {
                 }
             } else {
                 ErrorToast("Vui lòng đăng nhập để đặt tour.");
+                
                 setTimeout(() => {
                     navigate("/auth/login");
                 }, 1500);
@@ -103,7 +104,7 @@ const TourDetailPage = () => {
         } catch (error) {
             console.error("Failed to fetch schedule: ", error);
 
-            if (error.response?.status === 401) {
+            if (error.request?.status === 401) {
                 ErrorToast("Vui lòng đăng nhập để đặt tour.");
 
                 setTimeout(() => {

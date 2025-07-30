@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import formatCurrency from 'utils/formatCurrency';
 import formatDatetime from 'utils/formatDatetime';
 import { noImage } from 'assets';
-import { BookingApi, TourApi } from 'services';
+import { BookingApi } from 'services';
 import { ErrorToast, SuccessToast } from 'component/notifi';
 import { ToastContainer } from 'react-toastify';
 

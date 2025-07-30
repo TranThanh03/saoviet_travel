@@ -87,7 +87,7 @@ public class AuthenticationController {
 
         String jwtToken = authenticationService.authenticateAdmin(request);
 
-        ResponseCookie cookie = ResponseCookie.from("tokenAdmin", jwtToken)
+        ResponseCookie cookie = ResponseCookie.from("token-admin", jwtToken)
                 .secure(false)
                 .sameSite("Strict")
                 .path("/")
@@ -124,7 +124,7 @@ public class AuthenticationController {
         String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         authenticationService.logout(token);
 
-        ResponseCookie cookie = ResponseCookie.from("tokenAdmin", "")
+        ResponseCookie cookie = ResponseCookie.from("token-admin", "")
                 .secure(false)
                 .sameSite("Strict")
                 .path("/")

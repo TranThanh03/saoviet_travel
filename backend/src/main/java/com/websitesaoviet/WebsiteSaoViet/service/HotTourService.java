@@ -1,5 +1,7 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.websitesaoviet.WebsiteSaoViet.entity.HotTour;
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
@@ -46,27 +48,53 @@ public class HotTourService {
         String destination = "";
 
         if (hotTour == null) {
-            Object response = chatbotService.sendPrompt(message);
+            String text = chatbotService.sendPrompt(message);
 
-            if (response instanceof Map) {
-                Map<String, Object> map = (Map<String, Object>) response;
-                List<String> destinations = (List<String>) map.get("destination");
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> mapJson = null;
+            try {
+                mapJson = objectMapper.readValue(text, Map.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
-                if (destinations != null && !destinations.isEmpty()) {
-                    destination =  String.join(", ", destinations);
-                    createHotTour(destination);
+            Object destinationObj = mapJson.get("destination");
+
+            if (destinationObj instanceof List) {
+                List<?> list = (List<?>) destinationObj;
+
+                if (!list.isEmpty() && list.get(0) instanceof String) {
+                    List<String> destinations = (List<String>) destinationObj;
+
+                    if (!destinations.isEmpty()) {
+                        destination = String.join(", ", destinations);
+                        createHotTour(destination);
+                    }
                 }
             }
         } else if (currentDay.isAfter(hotTour.getCreatedTime().plusWeeks(1))) {
-            Object response = chatbotService.sendPrompt(message);
+            String text = chatbotService.sendPrompt(message);
 
-            if (response instanceof Map) {
-                Map<String, Object> map = (Map<String, Object>) response;
-                List<String> destinations = (List<String>) map.get("destination");
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> mapJson = null;
+            try {
+                mapJson = objectMapper.readValue(text, Map.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
 
-                if (destinations != null && !destinations.isEmpty()) {
-                    destination =  String.join(", ", destinations);
-                    updateHotTour(hotTour.getId(), destination);
+            Object destinationObj = mapJson.get("destination");
+
+            if (destinationObj instanceof List) {
+                List<?> list = (List<?>) destinationObj;
+
+                if (!list.isEmpty() && list.get(0) instanceof String) {
+                    List<String> destinations = (List<String>) destinationObj;
+
+                    if (!destinations.isEmpty()) {
+                        destination = String.join(", ", destinations);
+                        updateHotTour(hotTour.getId(), destination);
+                    }
                 }
             }
         } else {
