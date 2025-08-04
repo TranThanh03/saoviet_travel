@@ -1,10 +1,10 @@
 import { memo, useState, useEffect } from 'react';
 import { TourApi } from 'services';
-import TourList from 'component/users/tour/TourList.js';
+import TourList from 'components/users/tour/TourList.js';
 import { tourBanner } from 'assets';
-import Banner from 'component/banner';
+import Banner from 'components/banner';
 import './index.scss';
-import TourSidebar from 'component/users/tour/TourSidebar.js';
+import TourSidebar from 'components/users/tour/TourSidebar.js';
 
 const TourPage = () => {
     const [tours, setTours] = useState([]);

@@ -1,13 +1,13 @@
 import { useState, useEffect, memo, useCallback } from "react";
 import "./detail.scss";
-import { BookingApi, CheckoutApi } from "services";
-import formatCurrency from "utils/formatCurrency.js";
-import formatDatetime from "utils/formatDatetime.js";
+import { BookingApi, CheckoutApi } from "@services";
+import formatCurrency from "@utils/formatCurrency.js";
+import formatDatetime from "@utils/formatDatetime.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { noImage, momo, vnpay, cash } from "assets";
+import { noImage, momo, vnpay, cash } from "@assets";
 import { FaArrowLeft, FaChair, FaCheck, FaCreditCard, FaTimes } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { ToastContainer } from "react-toastify";
 
 const CalendarDetailPage = () => {

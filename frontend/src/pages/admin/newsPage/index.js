@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { NewsApi } from "services";
+import { NewsApi } from "@services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "component/pagination";
-import formatDatetime from "utils/formatDatetime.js";
-import { noImage } from "assets";
+import Pagination from "@components/pagination";
+import formatDatetime from "@utils/formatDatetime.js";
+import { noImage } from "@assets";
 
 const NewsPage = () => {
     const [news, setNews] = useState([]);

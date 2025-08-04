@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 import './index.scss';
 import { useNavigate } from 'react-router-dom';
-import { userAvatar } from 'assets';
-import { AdminApi } from 'services';
-import { SuccessToast } from 'component/notifi';
+import { userAvatar } from '@assets';
+import { AdminApi } from '@services';
+import { SuccessToast } from '@components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const ProfilePage = () => {

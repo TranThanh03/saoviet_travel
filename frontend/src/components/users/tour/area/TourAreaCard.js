@@ -1,9 +1,10 @@
-import { noImage } from 'assets';
+import { noImage } from '@assets';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import formatCurrency from 'utils/formatCurrency.js';
+import formatCurrency from '@utils/formatCurrency.js';
+import formatDatetime from '@utils/formatDatetime.js';
 
-const TourCard = ({ tour }) => {
+const TourAreaCard = ({ tour }) => {
     return (
         <div className="tour-card-custom col-xl-4 col-md-6">
             <div className="destination-item tour-grid style-three bgc-lighter block_tours equal-block-fix" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
@@ -33,6 +34,18 @@ const TourCard = ({ tour }) => {
                         <li><i className="far fa-clock"></i> {tour.quantityDay} ngày {tour.quantityDay-1} đêm</li>
                         <li><i className="far fa-user"></i> {tour.people}</li>
                     </ul>
+                    <ul className="blog-meta">
+                        <li>
+                            <i class="fa-solid fa-plane-departure me-2"></i>
+                            {tour.startDate ? formatDatetime(tour.startDate) : ''}
+                        </li>
+                    </ul>
+                    <ul className="blog-meta">
+                        <li>
+                            <i class="fas fa-plane-arrival me-2"></i>
+                            {tour.endDate ? formatDatetime(tour.endDate) : ''}
+                        </li>
+                    </ul>
                     <div className="destination-footer">
                         <span className="price">
                             <span>{formatCurrency(tour.adultPrice)}</span> / người
@@ -47,4 +60,4 @@ const TourCard = ({ tour }) => {
     );
 };
 
-export default memo(TourCard);
+export default memo(TourAreaCard);

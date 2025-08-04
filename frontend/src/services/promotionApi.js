@@ -1,6 +1,6 @@
-import axiosInstance from "utils/axiosInstance.js";
-import axiosInstanceAdmin from "utils/axiosInstanceAdmin.js";
-import getToken from "utils/getToken.js";
+import axiosInstance from "@utils/axiosInstance.js";
+import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
+import getToken from "@utils/getToken.js";
 
 const PromotionApi = {
     getAll: (params) => {

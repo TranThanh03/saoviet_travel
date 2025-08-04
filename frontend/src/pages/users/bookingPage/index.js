@@ -6,7 +6,7 @@ import { ScheduleApi, CustomerApi, CheckoutApi, PromotionApi } from 'services';
 import formatDatetime from 'utils/formatDatetime.js';
 import Swal from 'sweetalert2';
 import { cash, momo, vnpay, voucherImg } from 'assets';
-import { ErrorToast } from 'component/notifi';
+import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 import dayjs from 'dayjs';
 

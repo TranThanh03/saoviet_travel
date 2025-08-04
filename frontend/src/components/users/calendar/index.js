@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from "react";
 import "./index.scss";
-import { AuthApi, ScheduleApi } from "services";
+import { AuthApi, ScheduleApi } from "@services";
 import { useNavigate } from "react-router-dom";
-import getToken from "utils/getToken.js";
-import { ErrorToast } from "component/notifi";
+import getToken from "@utils/getToken.js";
+import { ErrorToast } from "@components/notifi";
 
 const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     const [currentMonthIndex, setCurrentMonthIndex] = useState(0);

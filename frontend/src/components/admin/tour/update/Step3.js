@@ -1,9 +1,9 @@
 import { memo, forwardRef, useRef, useEffect } from "react";
 import "./step3.scss";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { TourApi } from "services";
 
-const Step3 = forwardRef(({ formData, setFormData, setImgPreview }, ref) => {
+const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => {
     const textEditorRefs = useRef([]);
 
     const destroyEditors = () => {
@@ -33,6 +33,7 @@ const Step3 = forwardRef(({ formData, setFormData, setImgPreview }, ref) => {
             };
         });
     
+
         if (JSON.stringify(newItinerary) !== JSON.stringify(formData.itinerary)) {
             setFormData({ ...formData, itinerary: newItinerary });
         }
@@ -61,8 +62,8 @@ const Step3 = forwardRef(({ formData, setFormData, setImgPreview }, ref) => {
         return () => {
             destroyEditors();
         };
-    }, [formData.quantityDay]);    
-
+    }, [formData.quantityDay]);
+    
     const renderItineraries = () => {
         const days = parseInt(formData.quantityDay) || 0;
 
@@ -108,27 +109,19 @@ const Step3 = forwardRef(({ formData, setFormData, setImgPreview }, ref) => {
         }
 
         try {
-            const response = await TourApi.create(formData);
+            const response = await TourApi.update(id, formData);
 
-            if (response?.code === 1500) {
-                SuccessToast("Thêm tour mới thành công.")
-
-                setFormData({
-                    name: '',
-                    destination: '',
-                    area: 'b',
-                    quantityDay: '',
-                    description: '',
-                    image: [],
-                    itinerary: []
-                });
+            if (response?.code === 1503) {
+                SuccessToast("Cập nhật tour mới thành công.")
 
                 setImgPreview({
                     image: [],
                     previewURLs: []
                 });
+            } else if (response?.code === 1062) {
+                ErrorToast("Tour đang có lịch trình chưa diễn ra. Không thể cập nhật!");
             } else {
-                ErrorToast(response.message || "Thêm tour không thành công.");
+                ErrorToast(response.message || "Cập nhật tour không thành công.");
             }
         } catch (error) {
             console.error("Failed to create tour: ", error);
@@ -142,7 +135,7 @@ const Step3 = forwardRef(({ formData, setFormData, setImgPreview }, ref) => {
 
             <div className="btn-control">
                 <button type="button" className="btn btn-submit" onClick={handleSubmit}>
-                    Thêm
+                    Cập nhật
                 </button>
             </div>
         </div>

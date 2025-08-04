@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { TourApi } from "services";
+import { TourApi } from "@services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "component/pagination";
+import Pagination from "@components/pagination";
 
 const TourPage = () => {
     const [tours, setTours] = useState([]);

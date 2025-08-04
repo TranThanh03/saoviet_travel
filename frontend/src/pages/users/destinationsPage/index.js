@@ -1,9 +1,9 @@
 import { memo, useState, useEffect } from 'react';
 import { desBanner } from 'assets';
-import AnimatedCounter from 'component/counter';
-import Banner from 'component/banner';
-import TourAreaSidebar from 'component/users/tour/area/TourAreaSidebar.js';
-import TourAreaList from 'component/users/tour/area/TourAreaList.js';
+import AnimatedCounter from 'components/counter';
+import Banner from 'components/banner';
+import TourAreaSidebar from 'components/users/tour/area/TourAreaSidebar.js';
+import TourAreaList from 'components/users/tour/area/TourAreaList.js';
 import { TourApi } from 'services';
 
 const DestinationsPage = () => {

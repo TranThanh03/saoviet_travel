@@ -1,9 +1,9 @@
-import { ROUTERS } from "./utils/router.js";
+import { ROUTERS } from "@utils/router.js";
 import { Routes, Route, createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import * as usersPage from "pages/users";
-import * as adminPage from "pages/admin";
-import * as errorPage from "component/error";
+import * as usersPage from "@pages/users";
+import * as adminPage from "@pages/admin";
+import * as errorPage from "@components/error/index.js";
 
 const NotFoundRedirect = () => {
     const navigate = useNavigate();

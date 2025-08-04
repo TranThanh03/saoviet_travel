@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { CustomerApi } from "services";
-import formatDatetime from "utils/formatDatetime.js";
+import { CustomerApi } from "@services";
+import formatDatetime from "@utils/formatDatetime.js";
 import { FaTrash, FaLock, FaLockOpen, FaSearch, FaShieldAlt } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "component/pagination";
+import Pagination from "@components/pagination";
 
 const CustomerPage = () => {
     const [customers, setCustomers] = useState([]);

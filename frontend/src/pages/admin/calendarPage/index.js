@@ -1,12 +1,12 @@
 import React, { useState, useEffect, memo, useCallback } from "react";
 import "./style.scss";
-import { BookingApi } from "services";
-import formatCurrency from "utils/formatCurrency.js";
-import formatDatetime from "utils/formatDatetime.js";
+import { BookingApi } from "@services";
+import formatCurrency from "@utils/formatCurrency.js";
+import formatDatetime from "@utils/formatDatetime.js";
 import { Link } from "react-router-dom";
 import { FaEye, FaSearch } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
-import Pagination from "component/pagination";
+import Pagination from "@components/pagination";
 
 const CalendarPage = () => {
     const [calendars, setCalendars] = useState([]);

@@ -1,6 +1,6 @@
 import Select from "react-select";
 import { memo, useEffect, useState } from "react";
-import { TourApi } from "services";
+import { TourApi } from "@services";
 
 const TourSelector = ({ formData, setFormData, setDataDate }) => {
     const [tours, setTours] = useState([{

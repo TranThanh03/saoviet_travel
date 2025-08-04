@@ -1,4 +1,4 @@
-import axiosInstance from "utils/axiosInstance.js";
+import axiosInstance from "@utils/axiosInstance.js";
 
 const ChatbotApi = {
     generateCode: () => {

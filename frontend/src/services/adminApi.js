@@ -1,5 +1,5 @@
-import axiosInstanceAdmin from "utils/axiosInstanceAdmin.js";
-import getToken from "utils/getToken.js";
+import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
+import getToken from "@utils/getToken.js";
 
 const AdminApi = {
     infor: () => {

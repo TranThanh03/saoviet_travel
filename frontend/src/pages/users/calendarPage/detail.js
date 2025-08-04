@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import formatCurrency from 'utils/formatCurrency.js';
 import formatDatetime from 'utils/formatDatetime.js';
 import { BookingApi } from 'services';
-import { ErrorToast, SuccessToast } from 'component/notifi';
+import { ErrorToast, SuccessToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const CalendarDetailPage = () => {

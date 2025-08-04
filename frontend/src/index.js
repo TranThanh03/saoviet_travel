@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RouterCustom from './router.js';
-import './style/style.scss';
-import Loading from 'component/loading';
+import './styles/style.scss';
+import Loading from '@components/loading/index.js';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 

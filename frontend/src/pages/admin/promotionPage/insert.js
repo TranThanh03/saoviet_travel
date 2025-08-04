@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { PromotionApi } from "services";
+import { PromotionApi } from "@services";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./insert.scss";
 import DatePicker from "react-datepicker";
 import { ToastContainer } from "react-toastify";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 
 const PromotionInsertPage = () => {
     const [formData, setFormData] = useState({

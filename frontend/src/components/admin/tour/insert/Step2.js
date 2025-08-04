@@ -1,10 +1,10 @@
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { useState, memo, forwardRef, useEffect } from "react";
 import "./step2.scss";
 
 const Step2 = forwardRef(({ formData, setFormData, imgPreview, setImgPreview }, ref) => {
     const [uploading, setUploading] = useState(false);
-
+    
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     const maxSize = 5 * 1024 * 1024;
     const maxFiles = 4;
@@ -148,7 +148,7 @@ const Step2 = forwardRef(({ formData, setFormData, imgPreview, setImgPreview }, 
             }
         });
     }, [uploading]);
-    
+
     return (
         <div className="step-2">
             <div className="form-group">

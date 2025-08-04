@@ -1,11 +1,11 @@
-import { userAvatar } from 'assets';
+import { userAvatar } from '@assets';
 import { memo, useState, useEffect } from 'react';
 import "./index.scss";
-import formatDatetime from 'utils/formatDatetime.js';
-import { SuccessToast, ErrorToast } from 'component/notifi';
+import formatDatetime from '@utils/formatDatetime.js';
+import { SuccessToast, ErrorToast } from '@components/notifi';
 import { ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
-import { ReviewApi } from 'services';
+import { ReviewApi } from '@services';
 
 const ReviewList = ({ tourId, bookingId }) => {
     const [reviews, setReviews] = useState([]);

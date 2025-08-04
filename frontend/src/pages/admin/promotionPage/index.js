@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { PromotionApi } from "services";
+import { PromotionApi } from "@services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "component/pagination";
-import formatCurrency from "utils/formatCurrency.js";
-import formatDatetime from "utils/formatDatetime.js";
+import Pagination from "@components/pagination";
+import formatCurrency from "@utils/formatCurrency.js";
+import formatDatetime from "@utils/formatDatetime.js";
 
 const PromotionPage = () => {
     const [promotions, setPromotions] = useState([]);

@@ -5,10 +5,10 @@ import { AuthApi, TourApi } from 'services';
 import formaterCurrency from 'utils/formatCurrency.js';
 import { sanitizeHtml } from 'utils/sanitizeHtml.js';
 import { noImage } from 'assets';
-import ReviewList from "component/users/review/index.js";
-import CalendarCustom from "component/users/calendar/index.js";
+import ReviewList from "components/users/review/index.js";
+import CalendarCustom from "components/users/calendar/index.js";
 import formatDatetime from 'utils/formatDatetime.js';
-import { ErrorToast } from 'component/notifi';
+import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 import getToken from 'utils/getToken.js';
 

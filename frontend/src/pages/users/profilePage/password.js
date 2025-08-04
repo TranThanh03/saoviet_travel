@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import './password.scss';
 import { userPassword } from 'assets';
 import { CustomerApi } from 'services';
-import { SuccessToast } from 'component/notifi';
+import { SuccessToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const PasswordPage = () => {

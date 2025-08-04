@@ -1,4 +1,4 @@
-import Loading from 'component/loading';
+import Loading from 'components/loading';
 import { memo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CustomerApi } from 'services';

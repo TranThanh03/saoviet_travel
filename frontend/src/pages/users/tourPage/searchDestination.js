@@ -1,6 +1,6 @@
 import { tourBanner } from 'assets';
-import Banner from 'component/banner';
-import TourList from 'component/users/tour/TourList.js';
+import Banner from 'components/banner';
+import TourList from 'components/users/tour/TourList.js';
 import { memo, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TourApi } from 'services';

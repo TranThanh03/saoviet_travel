@@ -1,8 +1,8 @@
 import { memo, useState } from 'react';
 import './password.scss';
-import { userPassword } from 'assets';
-import { AdminApi } from 'services';
-import { SuccessToast } from 'component/notifi';
+import { userPassword } from '@assets';
+import { AdminApi } from '@services';
+import { SuccessToast } from '@components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const PasswordPage = () => {

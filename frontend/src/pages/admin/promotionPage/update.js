@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { PromotionApi } from "services";
+import { PromotionApi } from "@services";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./update.scss";
 import DatePicker from "react-datepicker";
 import { ToastContainer } from "react-toastify";
-import { ErrorToast, SuccessToast } from "component/notifi";
+import { ErrorToast, SuccessToast } from "@components/notifi";
 import { pick } from "lodash";
 
 const PromotionUpdatePage = () => {

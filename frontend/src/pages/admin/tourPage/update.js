@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./update.scss";
 import { useNavigate, useParams } from "react-router-dom";
-import Step1 from "component/admin/tour/update/Step1.js";
-import Step2 from "component/admin/tour/update/Step2.js";
-import Step3 from "component/admin/tour/update/Step3.js";
+import Step1 from "@components/admin/tour/update/Step1.js";
+import Step2 from "@components/admin/tour/update/Step2.js";
+import Step3 from "@components/admin/tour/update/Step3.js";
 import StepZilla from 'react-stepzilla';
 import { ToastContainer } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";
-import { TourApi } from "services";
+import { TourApi } from "@services";
 import { pick } from "lodash";
-import { ErrorToast } from "component/notifi";
+import { ErrorToast } from "@components/notifi";
 
 const TourUpdatePage = () => {
     const { id } = useParams();
