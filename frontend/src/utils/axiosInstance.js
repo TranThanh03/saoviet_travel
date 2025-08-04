@@ -2,7 +2,7 @@ import axios from 'axios';
 import { setLoading } from './loading.js';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: 'https://75726f6a9e81.ngrok-free.app',
     timeout: 5000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
