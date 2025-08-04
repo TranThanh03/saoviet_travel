@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './register.scss';
 import { CustomerApi } from 'services';
-import { SuccessToast } from 'component/notifi/index';
+import { SuccessToast } from 'component/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const RegisterPage = () => {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setLoading } from './loading';
+import { setLoading } from './loading.js';
 
 const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080',

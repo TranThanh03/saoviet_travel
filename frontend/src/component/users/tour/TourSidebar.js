@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { pShape3, tourCta } from 'assets';
-import PriceFilter from './PriceFilter';
+import PriceFilter from './PriceFilter.js';
 import './TourSidebar.scss';
 
 const TourSidebar = ({ filters, setFilters }) => {

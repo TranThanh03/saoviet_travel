@@ -1,9 +1,9 @@
 import { memo, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './index.scss';
-import formatCurrency from 'utils/formatCurrency';
+import formatCurrency from 'utils/formatCurrency.js';
 import { ScheduleApi, CustomerApi, CheckoutApi, PromotionApi } from 'services';
-import formatDatetime from 'utils/formatDatetime';
+import formatDatetime from 'utils/formatDatetime.js';
 import Swal from 'sweetalert2';
 import { cash, momo, vnpay, voucherImg } from 'assets';
 import { ErrorToast } from 'component/notifi';

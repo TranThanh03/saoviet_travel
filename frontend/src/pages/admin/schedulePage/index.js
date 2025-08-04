@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import { ScheduleApi } from "services";
-import formatDatetime from "utils/formatDatetime";
+import formatDatetime from "utils/formatDatetime.js";
 import "./index.scss";
-import formatCurrency from "utils/formatCurrency";
+import formatCurrency from "utils/formatCurrency.js";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "component/notifi";
 import { ToastContainer } from "react-toastify";

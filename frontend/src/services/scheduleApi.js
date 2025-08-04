@@ -1,6 +1,6 @@
-import axiosInstance from "utils/axiosInstance";
-import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
-import getToken from "utils/getToken";
+import axiosInstance from "utils/axiosInstance.js";
+import axiosInstanceAdmin from "utils/axiosInstanceAdmin.js";
+import getToken from "utils/getToken.js";
 
 const AssignmentApi = {
     getAll: (params) => {

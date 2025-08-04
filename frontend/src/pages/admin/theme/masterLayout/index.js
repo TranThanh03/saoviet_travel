@@ -2,7 +2,7 @@ import { memo, useState, useEffect, createContext } from "react";
 import Footer from "../footer";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthApi } from "services";
-import getToken from "utils/getToken";
+import getToken from "utils/getToken.js";
 import Sidebar from "../sidebar";
 import Header from "../header";
 

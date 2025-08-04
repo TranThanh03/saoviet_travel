@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import PriceFilter from '../PriceFilter';
+import PriceFilter from '../PriceFilter.js';
 import './TourAreaSidebar.scss';
 import DatePicker from 'react-datepicker';
 

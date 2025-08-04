@@ -1,8 +1,8 @@
 import { useState, useEffect, memo, useCallback } from "react";
 import "./detail.scss";
 import { BookingApi, CheckoutApi } from "services";
-import formatCurrency from "utils/formatCurrency";
-import formatDatetime from "utils/formatDatetime";
+import formatCurrency from "utils/formatCurrency.js";
+import formatDatetime from "utils/formatDatetime.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { noImage, momo, vnpay, cash } from "assets";

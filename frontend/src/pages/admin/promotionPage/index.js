@@ -7,8 +7,8 @@ import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "component/notifi";
 import { ToastContainer } from "react-toastify";
 import Pagination from "component/pagination";
-import formatCurrency from "utils/formatCurrency";
-import formatDatetime from "utils/formatDatetime";
+import formatCurrency from "utils/formatCurrency.js";
+import formatDatetime from "utils/formatDatetime.js";
 
 const PromotionPage = () => {
     const [promotions, setPromotions] = useState([]);

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "./insert.scss";
 import { useNavigate } from "react-router-dom";
-import Step1 from "component/admin/tour/insert/Step1";
-import Step2 from "component/admin/tour/insert/Step2";
-import Step3 from "component/admin/tour/insert/Step3";
+import Step1 from "component/admin/tour/insert/Step1.js";
+import Step2 from "component/admin/tour/insert/Step2.js";
+import Step3 from "component/admin/tour/insert/Step3.js";
 import StepZilla from 'react-stepzilla';
 import { ToastContainer } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";

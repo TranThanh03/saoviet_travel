@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import "./index.scss";
-import formatCurrency from "utils/formatCurrency";
+import formatCurrency from "utils/formatCurrency.js";
 import { BookingApi, TourApi } from "services";
-import formatDatetime from "utils/formatDatetime";
+import formatDatetime from "utils/formatDatetime.js";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {

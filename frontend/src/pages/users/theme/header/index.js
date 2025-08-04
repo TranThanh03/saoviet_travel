@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaAngleDown, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { logo } from "assets";
 import { AuthApi } from "services";
-import getToken from "utils/getToken";
+import getToken from "utils/getToken.js";
 import "./style.scss";
 
 const Header = () => {

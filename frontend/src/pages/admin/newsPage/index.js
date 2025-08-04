@@ -7,7 +7,7 @@ import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "component/notifi";
 import { ToastContainer } from "react-toastify";
 import Pagination from "component/pagination";
-import formatDatetime from "utils/formatDatetime";
+import formatDatetime from "utils/formatDatetime.js";
 import { noImage } from "assets";
 
 const NewsPage = () => {

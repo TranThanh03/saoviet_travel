@@ -1,8 +1,8 @@
 import { noImage } from 'assets';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import formatCurrency from 'utils/formatCurrency';
-import formatDatetime from 'utils/formatDatetime';
+import formatCurrency from 'utils/formatCurrency.js';
+import formatDatetime from 'utils/formatDatetime.js';
 
 const TourAreaCard = ({ tour }) => {
     return (

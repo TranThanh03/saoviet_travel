@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import RouterCustom from './router';
+import RouterCustom from './router.js';
 import './style/style.scss';
 import Loading from 'component/loading';
 import AOS from 'aos';

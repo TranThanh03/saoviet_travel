@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import TourAreaCard from './TourAreaCard';
+import TourAreaCard from './TourAreaCard.js';
 import Pagination from 'component/pagination';
 
 const TourAreaList = ({ tours, totalPages, currentPage, setCurrentPage }) => {

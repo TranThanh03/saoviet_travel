@@ -1,4 +1,4 @@
-import { ROUTERS } from "./utils/router";
+import { ROUTERS } from "./utils/router.js";
 import { Routes, Route, createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import * as usersPage from "pages/users";

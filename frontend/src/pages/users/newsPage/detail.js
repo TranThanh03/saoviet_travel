@@ -1,10 +1,10 @@
 import { memo, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { noImage } from 'assets';
-import { sanitizeHtml } from 'utils/sanitizeHtml';
+import { sanitizeHtml } from 'utils/sanitizeHtml.js';
 import './detail.scss';
 import { NewsApi } from 'services';
-import formatDatetime from 'utils/formatDatetime';
+import formatDatetime from 'utils/formatDatetime.js';
 
 const NewsDetailPage = () => {
     const { id } = useParams();

@@ -2,15 +2,15 @@ import { memo, useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './detail.scss';
 import { AuthApi, TourApi } from 'services';
-import formaterCurrency from 'utils/formatCurrency';
-import { sanitizeHtml } from 'utils/sanitizeHtml';
+import formaterCurrency from 'utils/formatCurrency.js';
+import { sanitizeHtml } from 'utils/sanitizeHtml.js';
 import { noImage } from 'assets';
-import ReviewList from "component/users/review/index";
-import CalendarCustom from "component/users/calendar/index";
-import formatDatetime from 'utils/formatDatetime';
+import ReviewList from "component/users/review/index.js";
+import CalendarCustom from "component/users/calendar/index.js";
+import formatDatetime from 'utils/formatDatetime.js';
 import { ErrorToast } from 'component/notifi';
 import { ToastContainer } from 'react-toastify';
-import getToken from 'utils/getToken';
+import getToken from 'utils/getToken.js';
 
 const TourDetailPage = () => {
     const { id } = useParams();
