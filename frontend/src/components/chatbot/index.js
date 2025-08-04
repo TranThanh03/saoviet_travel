@@ -89,12 +89,12 @@ const Chatbot = () => {
         
         if (!input.trim()) return;
 
-        setMessages([...messages, { senderType: 'customer', content: input }]);
+        setMessages([...messages, { senderType: 'customer', content: input.trim() }]);
         setInput('');
 
         try {
             setIsLoading(true);
-            const response = await ChatbotApi.ask(messages[0]?.id, input);
+            const response = await ChatbotApi.ask(messages[0]?.id, input.trim());
 
             if (response?.code === 2200) {
                 if (response?.result) {
