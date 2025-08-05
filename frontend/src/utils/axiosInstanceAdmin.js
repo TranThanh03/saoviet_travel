@@ -3,7 +3,7 @@ import { setLoading } from './loading.js';
 
 const axiosInstanceAdmin = axios.create({
     baseURL: 'https://saoviet-travel.onrender.com',
-    timeout: 5000,
+    timeout: 15000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
 });
