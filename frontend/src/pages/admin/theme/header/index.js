@@ -2,12 +2,12 @@ import { memo, useState, useContext } from 'react';
 import './style.scss';
 import { Link } from 'react-router-dom';
 import { AuthApi } from 'services';
-import { AuthContext } from '../masterLayout';
+import { AuthAdminContext } from '../masterLayout';
 import { FaUserCircle, FaAngleDown, FaBars } from 'react-icons/fa';
 
 const Header = ({ isSidebar, setIsSidebar }) => {
     const [isShow, setIsShow] = useState(false);
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated } = useContext(AuthAdminContext);
 
     const handleLogout = async () => {
         try {

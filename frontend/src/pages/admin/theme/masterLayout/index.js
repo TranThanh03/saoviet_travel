@@ -5,7 +5,7 @@ import { AuthApi } from "services";
 import Sidebar from "../sidebar";
 import Header from "../header";
 
-export const AuthContext = createContext(null);
+export const AuthAdminContext = createContext(null);
 
 const MasterLayout = ({ children }) => {
     const location = useLocation();
@@ -49,7 +49,7 @@ const MasterLayout = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ authenticated }}>
+        <AuthAdminContext.Provider value={{ authenticated }}>
             <link rel="stylesheet" href="/admin/css/custom-css.css" />
             <link rel="stylesheet" href="/admin/css/custom.css" />
 
@@ -65,7 +65,7 @@ const MasterLayout = ({ children }) => {
                     </div>
                 </div>     
             </div>
-        </AuthContext.Provider>
+        </AuthAdminContext.Provider>
     );
 };
 

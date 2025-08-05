@@ -1,8 +1,11 @@
-import { memo } from 'react';
+import { createContext, memo, useEffect, useState } from 'react';
 import Header from '../header';
 import Footer from '../footer';
 import { useLocation } from 'react-router-dom';
 import Chatbot from 'components/chatbot';
+import { AuthApi } from 'services';
+
+export const AuthContext = createContext(null);
 
 const MasterLayout = ({ children, ...props }) => {
     const location = useLocation();

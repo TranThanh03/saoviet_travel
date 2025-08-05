@@ -20,7 +20,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
         }
     ]);
     const navigate = useNavigate();
-    const { authenticated } = useContext(AuthContext); AuthContext
+    const { authenticated } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchData = async () => {
