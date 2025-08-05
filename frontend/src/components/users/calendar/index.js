@@ -99,7 +99,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
         if (price < 1000000) {
             return `${price / 1000}K`;
         } else {
-            return `${(price / 1000000).toFixed(1)}M`;
+            return `${(price / 1000000).toFixed(2)}M`;
         }
     };
 
