@@ -18,7 +18,6 @@ const CalendarPage = () => {
 
     const [bookings, setBookings] = useState([]);
     const navigate = useNavigate();
-    const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -77,12 +76,6 @@ const CalendarPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <>

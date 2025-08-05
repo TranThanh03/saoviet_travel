@@ -1,19 +1,18 @@
 import { useState, useEffect, memo, useCallback } from "react";
 import "./detail.scss";
-import { BookingApi, CheckoutApi } from "@services";
-import formatCurrency from "@utils/formatCurrency.js";
-import formatDatetime from "@utils/formatDatetime.js";
+import { BookingApi, CheckoutApi } from "services";
+import formatCurrency from "utils/formatCurrency.js";
+import formatDatetime from "utils/formatDatetime.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { noImage, momo, vnpay, cash } from "@assets";
+import { noImage, momo, vnpay, cash } from "assets";
 import { FaArrowLeft, FaChair, FaCheck, FaCreditCard, FaTimes } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
 
 const CalendarDetailPage = () => {
     const [calendar, setCalendar] = useState([]);
     const { id } = useParams();
-    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const [totalCost, setTotalCost] = useState(0);
 
@@ -49,13 +48,9 @@ const CalendarDetailPage = () => {
         catch (error) {
             console.error("Failed to fetch calendar: ", error);
         }
-        finally {
-            setIsLoading(false);
-        }
     }, [id]);
 
     useEffect(() => {
-        setIsLoading(true);
         fetchCalendar();
     }, [id]);
 
@@ -200,12 +195,6 @@ const CalendarDetailPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <>

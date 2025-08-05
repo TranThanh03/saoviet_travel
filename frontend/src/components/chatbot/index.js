@@ -1,12 +1,12 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import './style.scss';
 import { FaPaperPlane } from 'react-icons/fa';
-import { ChatbotApi } from '@services';
+import { ChatbotApi } from 'services';
 import { Link } from 'react-router-dom';
 import { noImage } from 'assets';
-import formatCurrency from '@utils/formatCurrency.js';
-import formatDatetime from '@utils/formatDatetime.js';
-import { ErrorToast } from '@components/notifi';
+import formatCurrency from 'utils/formatCurrency.js';
+import formatDatetime from 'utils/formatDatetime.js';
+import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const Chatbot = () => {

@@ -1,7 +1,7 @@
 import { memo, useState, useContext } from 'react';
 import './style.scss';
 import { Link } from 'react-router-dom';
-import { AuthApi } from '@services';
+import { AuthApi } from 'services';
 import { AuthContext } from '../masterLayout';
 import { FaUserCircle, FaAngleDown, FaBars } from 'react-icons/fa';
 

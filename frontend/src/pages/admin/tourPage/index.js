@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { TourApi } from "@services";
+import { TourApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
+import Pagination from "components/pagination";
 
 const TourPage = () => {
     const [tours, setTours] = useState([]);
@@ -14,7 +14,6 @@ const TourPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
-    const [isLoading, setIsLoading] = useState(true);
     const areasClassMap = {
         "b": "Miền Bắc",
         "t": "Miền Trung",
@@ -35,8 +34,6 @@ const TourPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch tours: ", error);
-        } finally {
-            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -81,12 +78,6 @@ const TourPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="tour-manage-page">

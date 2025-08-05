@@ -1,6 +1,6 @@
 import { memo, forwardRef, useRef, useEffect } from "react";
 import "./step3.scss";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { TourApi } from "services";
 
 const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => {

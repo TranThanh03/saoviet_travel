@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
-import { ScheduleApi } from "@services";
-import formatDatetime from "@utils/formatDatetime.js";
+import { ScheduleApi } from "services";
+import formatDatetime from "utils/formatDatetime.js";
 import "./index.scss";
-import formatCurrency from "@utils/formatCurrency.js";
+import formatCurrency from "utils/formatCurrency.js";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
+import Pagination from "components/pagination";
 import { Link } from "react-router-dom";
 
 const SchedulePage = () => {
@@ -19,7 +19,6 @@ const SchedulePage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
-    const [isLoading, setIsLoading] = useState(true);
     const statusClassMap = {
         "Chưa diễn ra": "not-started",
         "Đang diễn ra": "ongoing",
@@ -43,9 +42,6 @@ const SchedulePage = () => {
         }
         catch (error) {
             console.error("Failed to fetch schedules: ", error);
-        }
-        finally {
-            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -125,12 +121,6 @@ const SchedulePage = () => {
         setEditSchedule(schedule);
         setShowEdit(true);
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <>

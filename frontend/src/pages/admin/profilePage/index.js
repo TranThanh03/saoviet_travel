@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 import './index.scss';
 import { useNavigate } from 'react-router-dom';
-import { userAvatar } from '@assets';
-import { AdminApi } from '@services';
-import { SuccessToast } from '@components/notifi';
+import { userAvatar } from 'assets';
+import { AdminApi } from 'services';
+import { SuccessToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 
 const ProfilePage = () => {
@@ -11,7 +11,6 @@ const ProfilePage = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ fullName: '', phone: '', email: '' });
-    const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -84,12 +83,6 @@ const ProfilePage = () => {
             setError('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
         }
     };
-
-    if (!isLoading) {
-        return (
-            <div style={{ height: 1000 }}></div>
-        );
-    }
 
     return (
         <>

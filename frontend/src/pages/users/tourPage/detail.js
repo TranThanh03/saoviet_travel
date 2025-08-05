@@ -18,7 +18,6 @@ const TourDetailPage = () => {
     const [searchParams] = useSearchParams();
     const bookingId = searchParams.get('bookingId');
     const [iShow, setIsShow] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [similarTours, setSimilarTours] = useState([])
     const [data, setData] = useState({
         id: "",
@@ -40,8 +39,6 @@ const TourDetailPage = () => {
     
     useEffect(() => {
         const fetchTour = async () => {
-            setIsLoading(true);
-            
             try {
                 const response = await TourApi.getById(id);
 
@@ -53,8 +50,6 @@ const TourDetailPage = () => {
             } catch (error) {
                 console.error("Failed to fetch tour: ", error);
                 navigate("/error/404");
-            } finally {
-                setIsLoading(false);
             }
         }
 
@@ -103,12 +98,6 @@ const TourDetailPage = () => {
                 ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
             }
         }
-    }
-
-    if (isLoading) {
-        return (
-            <div style={{ height: 1000 }}></div>
-        );
     }
 
     return (

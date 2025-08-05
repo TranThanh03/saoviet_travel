@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./update.scss";
 import { useNavigate, useParams } from "react-router-dom";
-import Step1 from "@components/admin/tour/update/Step1.js";
-import Step2 from "@components/admin/tour/update/Step2.js";
-import Step3 from "@components/admin/tour/update/Step3.js";
+import Step1 from "components/admin/tour/update/Step1.js";
+import Step2 from "components/admin/tour/update/Step2.js";
+import Step3 from "components/admin/tour/update/Step3.js";
 import StepZilla from 'react-stepzilla';
 import { ToastContainer } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";
-import { TourApi } from "@services";
+import { TourApi } from "services";
 import { pick } from "lodash";
-import { ErrorToast } from "@components/notifi";
+import { ErrorToast } from "components/notifi";
 
 const TourUpdatePage = () => {
     const { id } = useParams();
@@ -28,7 +28,6 @@ const TourUpdatePage = () => {
     });
     const [code, setCode] = useState("");
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
 
     const steps = [
         { name: 'Nhập thông tin', component: <Step1 formData={formData} setFormData={setFormData} /> },
@@ -38,8 +37,6 @@ const TourUpdatePage = () => {
 
     useEffect(() => {
         const fetchTour = async () => {
-            setIsLoading(true);
-
             try {
                 const resCheck = await TourApi.checkNotStarted(id);
                 const response = await TourApi.getById(id);
@@ -61,19 +58,11 @@ const TourUpdatePage = () => {
             } catch (error) {
                 console.error("Failed to fetch tour: ", error);
                 navigate("/manage/error/404");
-            }  finally {
-                setIsLoading(false);
             }
         }
 
         fetchTour();
     }, [id])
-
-    if (isLoading) {
-        return (
-            <div style={{ height: 1000 }}></div>
-        );
-    }
 
     return (
         <>

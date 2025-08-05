@@ -11,7 +11,6 @@ const SearchPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 6;
-    const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState({
         keyword: '',
         sort: 'default'
@@ -45,20 +44,11 @@ const SearchPage = () => {
                 }
             } catch (error) {
                 console.error("Failed to fetch tours:", error);
-            } finally {
-                setIsLoading(false);
             }
         };
 
         fetchTourList();
     }, [location.search, search.sort, currentPage]);
-
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="tour-page">

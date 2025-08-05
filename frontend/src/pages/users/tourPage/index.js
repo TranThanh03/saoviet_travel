@@ -11,7 +11,6 @@ const TourPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(9);
     const [totalPages, setTotalPages] = useState(1);
-    const [isLoading, setIsLoading] = useState(true);
     const [filters, setFilters] = useState({
         price: null,
         area: null,
@@ -30,8 +29,6 @@ const TourPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch tours: ", error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -51,12 +48,6 @@ const TourPage = () => {
             ...prevFilters,
             sort: newSort
         }));
-    }
-
-    if (isLoading) {
-        return (
-            <div style={{ height: 1000 }}></div>
-        );
     }
 
     return (

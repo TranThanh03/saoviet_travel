@@ -54,14 +54,11 @@ const BookingPage = () => {
     const [vouchers, setVouchers] = useState([]);
     const [isActive, setIsActive] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true);
-
                 const resUser = await CustomerApi.infor();
                 const resSchedule = await ScheduleApi.getScheduleTourById(id);
 
@@ -83,9 +80,6 @@ const BookingPage = () => {
             catch(error) {
                 console.error("Failed to fetch data: " + error);
                 navigate("/error/404");
-            }
-            finally {
-                setIsLoading(false);
             }
         };
 
@@ -207,12 +201,6 @@ const BookingPage = () => {
                 ErrorToast("Đã xảy ra lỗi không xác định. Vui lòng thử lại!")
             }
         }
-    }
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
     }
 
     return (

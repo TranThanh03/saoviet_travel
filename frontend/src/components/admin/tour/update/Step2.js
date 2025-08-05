@@ -1,4 +1,4 @@
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { useState, memo, forwardRef, useEffect } from "react";
 import "./step2.scss";
 

@@ -22,11 +22,8 @@ axiosInstance.interceptors.request.use(
         };
 
         if (!config.metadata.skipLoading) {
-            const timer = setTimeout(() => {
-                setLoading(true);
-            }, 250);
+            setLoading(true);
             config.metadata.timer = timer;
-
             pendingRequests.add(config);
         }
 

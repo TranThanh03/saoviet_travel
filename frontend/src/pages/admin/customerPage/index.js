@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { CustomerApi } from "@services";
-import formatDatetime from "@utils/formatDatetime.js";
+import { CustomerApi } from "services";
+import formatDatetime from "utils/formatDatetime.js";
 import { FaTrash, FaLock, FaLockOpen, FaSearch, FaShieldAlt } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
+import Pagination from "components/pagination";
 
 const CustomerPage = () => {
     const [customers, setCustomers] = useState([]);
@@ -14,7 +14,6 @@ const CustomerPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 6;
-    const [isLoading, setIsLoading] = useState(true);
     const statusClassMap = {
         "Đang hoạt động": "activate",
         "Chưa kích hoạt": "inactivate",
@@ -35,8 +34,6 @@ const CustomerPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch customers: ", error);
-        } finally {
-            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -169,12 +166,6 @@ const CustomerPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="customer-manage-page">

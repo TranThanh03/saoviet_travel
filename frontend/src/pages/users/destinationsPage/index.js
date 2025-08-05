@@ -18,7 +18,6 @@ const DestinationsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize] = useState(9);
     const [totalPages, setTotalPages] = useState(1);
-    const [isLoading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
         price: null,
         area: null,
@@ -60,12 +59,6 @@ const DestinationsPage = () => {
             [field]: value,
         });
     };
-
-    if (isLoading) {
-        return (
-            <div style={{ height: 1000 }}></div>
-        );
-    }
 
     return (
         <div className='destinations-page'>

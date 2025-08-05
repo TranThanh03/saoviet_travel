@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import "./update.scss";
-import { NewsApi } from "@services";
+import { NewsApi } from "services";
 import { useNavigate, useParams } from "react-router-dom";
-import { noImage } from "@assets";
+import { noImage } from "assets";
 import { FaArrowLeft } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { pick } from "lodash";
 
 const NewsUpdatePage = () => {

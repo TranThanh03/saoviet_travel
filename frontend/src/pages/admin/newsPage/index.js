@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { NewsApi } from "@services";
+import { NewsApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
-import formatDatetime from "@utils/formatDatetime.js";
-import { noImage } from "@assets";
+import Pagination from "components/pagination";
+import formatDatetime from "utils/formatDatetime.js";
+import { noImage } from "assets";
 
 const NewsPage = () => {
     const [news, setNews] = useState([]);
@@ -16,7 +16,6 @@ const NewsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
-    const [isLoading, setIsLoading] = useState(true);
 
     const fetchNews = useCallback(async () => {
         try {
@@ -32,8 +31,6 @@ const NewsPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch news: ", error);
-        } finally {
-            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -73,12 +70,6 @@ const NewsPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="news-manage-page">

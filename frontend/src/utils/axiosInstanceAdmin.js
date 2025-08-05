@@ -12,12 +12,10 @@ const pendingRequests = new Set();
 
 axiosInstanceAdmin.interceptors.request.use(
     (config) => {
-            config.metadata = { startTime: new Date().getTime() };
-            const timer = setTimeout(() => {
-                setLoading(true);
-            }, 250);
-            config.metadata.timer = timer;
-            pendingRequests.add(config);
+        config.metadata = { startTime: new Date().getTime() };
+        setLoading(true);
+        config.metadata.timer = timer;
+        pendingRequests.add(config);
 
         return config;
     },

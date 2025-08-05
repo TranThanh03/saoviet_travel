@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import "./index.scss";
-import { PromotionApi } from "@services";
+import { PromotionApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
-import formatCurrency from "@utils/formatCurrency.js";
-import formatDatetime from "@utils/formatDatetime.js";
+import Pagination from "components/pagination";
+import formatCurrency from "utils/formatCurrency.js";
+import formatDatetime from "utils/formatDatetime.js";
 
 const PromotionPage = () => {
     const [promotions, setPromotions] = useState([]);
@@ -16,7 +16,6 @@ const PromotionPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
-    const [isLoading, setIsLoading] = useState(true);
     const statusClassMap = {
         "Chưa diễn ra": "not-started",
         "Đang diễn ra": "ongoing",
@@ -39,8 +38,6 @@ const PromotionPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch promotions: ", error);
-        } finally {
-            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -80,12 +77,6 @@ const PromotionPage = () => {
             }
         }
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="promotion-manage-page">

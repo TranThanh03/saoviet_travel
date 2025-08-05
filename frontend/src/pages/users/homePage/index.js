@@ -1,13 +1,13 @@
 import React, { useState, useEffect, memo } from 'react';
 import './style.scss';
 import { hAuthor1, hAuthor2, hAuthor3, hBoxTwo, hCta1, hCta2, hCta3, hShape1, hShape2, hShape3, hShape4, hShape5, hShape6, hShape7, noImage, slide1, slide2, slide3, slide4, slide5, tourCta } from 'assets';
-import SlideShow from '@components/users/home/SlideShow.js';
-import SearchForm from '@components/users/home/SearchForm.js';
-import AnimatedCounter from '@components/counter';
+import SlideShow from 'components/users/home/SlideShow.js';
+import SearchForm from 'components/users/home/SearchForm.js';
+import AnimatedCounter from 'components/counter';
 import { Link } from 'react-router-dom';
-import { TourApi } from '@services';
-import formatNumberShort from '@utils/formatNumberShort.js';
-import formatCurrency from '@utils/formatCurrency.js';
+import { TourApi } from 'services';
+import formatNumberShort from 'utils/formatNumberShort.js';
+import formatCurrency from 'utils/formatCurrency.js';
 
 const slides = [slide1, slide2, slide3, slide4, slide5];
 

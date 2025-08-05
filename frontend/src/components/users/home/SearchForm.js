@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import "./SearchForm.scss";
 import { useNavigate } from "react-router-dom";
-import { ErrorToast } from "@components/notifi";
+import { ErrorToast } from "components/notifi";
 import { ToastContainer } from "react-toastify";
 
 const SearchForm = () => {

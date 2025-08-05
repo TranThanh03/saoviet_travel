@@ -1,7 +1,7 @@
 import { noImage } from 'assets';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import formatCurrency from '@utils/formatCurrency.js';
+import formatCurrency from 'utils/formatCurrency.js';
 
 const TourCard = ({ tour }) => {
     return (

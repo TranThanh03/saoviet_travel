@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import "./index.scss";
-import formatCurrency from "@utils/formatCurrency.js";
-import { BookingApi, TourApi } from "@services";
-import formatDatetime from "@utils/formatDatetime.js";
+import formatCurrency from "utils/formatCurrency.js";
+import { BookingApi, TourApi } from "services";
+import formatDatetime from "utils/formatDatetime.js";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
     const [infoCounts, setInfoCounts] = useState({});
     const [bookingsLatest, setBookingsLatest] = useState([]);
     const [popularTours, setPopularTours] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear);
     const years = [];
@@ -42,8 +41,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchInfoCount = async () => {
-            setIsLoading(true);
-
             try {
                 const response = await BookingApi.infoCount();
 
@@ -54,9 +51,6 @@ const DashboardPage = () => {
             catch (error) {
                 console.error("Failed to fetch count: ", error);
             }
-            finally {
-                setIsLoading(false);
-            }
         };
 
         fetchInfoCount();
@@ -64,8 +58,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchBookingStatusCount = async () => {
-            setIsLoading(true);
-
             try {
                 const response = await BookingApi.statusCount();
 
@@ -84,9 +76,6 @@ const DashboardPage = () => {
             catch(error) {
                 console.error("Failed to fetch booking status: ", error);
             }
-            finally {
-                setIsLoading(false);
-            }
         }
 
         fetchBookingStatusCount();
@@ -94,8 +83,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchTourAreaCount = async () => {
-            setIsLoading(true);
-
             try {
                 const response = await TourApi.areaCount();
 
@@ -114,9 +101,6 @@ const DashboardPage = () => {
             catch(error) {
                 console.error("Failed to fetch tour area: ", error);
             }
-            finally {
-                setIsLoading(false);
-            }
         }
 
         fetchTourAreaCount();
@@ -124,8 +108,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchBookingsLatest = async () => {
-            setIsLoading(true);
-
             try {
                 const response = await BookingApi.latest();
 
@@ -135,9 +117,6 @@ const DashboardPage = () => {
             } 
             catch (error) {
                 console.error("Failed to fetch bookings latest: ", error);
-            }
-            finally {
-                setIsLoading(false);
             }
         };
 
@@ -174,9 +153,6 @@ const DashboardPage = () => {
             catch (error) {
                 console.error("Failed to fetch statistics: ", error);
             }
-            finally {
-                setIsLoading(false);
-            }
         };
 
         fetchBookingStatistic();
@@ -184,8 +160,6 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchPopularTours = async () => {
-            setIsLoading(true);
-
             try {
                 const response = await BookingApi.popularTours();
 
@@ -196,19 +170,10 @@ const DashboardPage = () => {
             catch (error) {
                 console.error("Failed to fetch popular tours: ", error);
             }
-            finally {
-                setIsLoading(false);
-            }
         };
 
         fetchPopularTours();
     }, [])
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="dashboard-container-page">

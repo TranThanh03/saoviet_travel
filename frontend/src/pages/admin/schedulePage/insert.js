@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { ScheduleApi } from "@services";
+import { ScheduleApi } from "services";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./insert.scss";
 import DatePicker from "react-datepicker";
 import { ToastContainer } from "react-toastify";
-import { ErrorToast, SuccessToast } from "@components/notifi";
-import TourSelector from "@components/admin/select";
+import { ErrorToast, SuccessToast } from "components/notifi";
+import TourSelector from "components/admin/select";
 
 const ScheduleInsertPage = () => {
     const [formData, setFormData] = useState({

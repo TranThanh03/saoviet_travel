@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import "./insert.scss";
-import { NewsApi } from "@services";
+import { NewsApi } from "services";
 import { useNavigate } from "react-router-dom";
-import { noImage } from "@assets";
+import { noImage } from "assets";
 import { FaArrowLeft } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
-import { ErrorToast, SuccessToast } from "@components/notifi";
+import { ErrorToast, SuccessToast } from "components/notifi";
 
 const NewsInsertPage = () => {
     const textEditorRef = useRef(null);

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, memo, useCallback } from "react";
 import "./style.scss";
-import { BookingApi } from "@services";
-import formatCurrency from "@utils/formatCurrency.js";
-import formatDatetime from "@utils/formatDatetime.js";
+import { BookingApi } from "services";
+import formatCurrency from "utils/formatCurrency.js";
+import formatDatetime from "utils/formatDatetime.js";
 import { Link } from "react-router-dom";
 import { FaEye, FaSearch } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
-import Pagination from "@components/pagination";
+import Pagination from "components/pagination";
 
 const CalendarPage = () => {
     const [calendars, setCalendars] = useState([]);
@@ -14,7 +14,6 @@ const CalendarPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
-    const [isLoading, setIsLoading] = useState(true);
 
     const paymentClassMap = {
         "Đã thanh toán": "paid",
@@ -42,9 +41,6 @@ const CalendarPage = () => {
         catch (error) {
             console.error("Failed to fetch calendars: ", error);
         }
-        finally {
-            setIsLoading(false);
-        }
     }, [search, currentPage, pageSize]);
 
     useEffect(() => {
@@ -55,12 +51,6 @@ const CalendarPage = () => {
         setCurrentPage(0);
         fetchCalendars();
     };
-
-    if (isLoading) {
-        return (
-            <div style={{height: 1000}}></div>
-        );
-    }
 
     return (
         <div className="calendar-manage-page">
