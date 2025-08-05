@@ -10,7 +10,7 @@ import CalendarCustom from "components/users/calendar/index";
 import formatDatetime from 'utils/formatDatetime';
 import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
-import { AuthContext } from "../masterLayout";
+import { AuthContext } from "pages/users/theme/masterLayout";
 
 const TourDetailPage = () => {
     const { id } = useParams();
