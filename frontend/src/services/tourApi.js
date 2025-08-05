@@ -50,7 +50,7 @@ const TourApi = {
         return axiosInstance.get("/api/v1/tours/similar", { params });
     },
     getList: () => {
-        return axiosInstanceAdmin.get("/api/v1/tours/list");
+        return axiosInstanceAdmin.get("/api/v1/tours/list/summary");
     },
     getHot: () => {
         return axiosInstance.get("/api/v1/tours/hot");
