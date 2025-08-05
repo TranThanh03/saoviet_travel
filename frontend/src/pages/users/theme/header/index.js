@@ -7,8 +7,8 @@ import "./style.scss";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [authenticated, setAuthenticated] = useState(false);
     const [isShow, setShow] = useState(false);
+    const { authenticated } = useContext(AuthContext);
     const [showSearch, setShowSearch] = useState(false);
     const [placeholder, setPlaceholder] = useState("Tìm kiếm tour");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -43,22 +43,6 @@ const Header = () => {
         const searchValue = queryParams.get('p') || '';
         setSearchQuery(searchValue);
     }, [location.search])
-
-    useEffect(() => {
-        const fetchAuth = async () => {
-            try {
-                const response = await AuthApi.introspect();
-                
-                if (response?.code === 9998) {
-                    setAuthenticated(response?.result);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchAuth();
-    }, []);
 
     const handleLogout = async () => {
         try {

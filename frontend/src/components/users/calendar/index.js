@@ -19,6 +19,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
         }
     ]);
     const navigate = useNavigate();
+    const { authenticated } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,30 +38,12 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     }, [tourId]);
 
     useEffect(() => {
-        const fetchAuth = async () => {
-            try {
-                const response = await AuthApi.introspect();
+        if (isShow && !authenticated) {
+            ErrorToast("Vui lòng đăng nhập để đặt tour.");
 
-                if (response?.code !== 9998) {
-                    ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-                }
-            } catch (error) {
-                console.error("Failed to fetch schedule: ", error);
-
-                if (error.request?.status === 401) {
-                    ErrorToast("Vui lòng đăng nhập để đặt tour.");
-
-                    setTimeout(() => {
-                        navigate("/auth/login");
-                    }, 1500);
-                } else {
-                    ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-                }
-            }
-        };
-
-        if (isShow) {
-            fetchAuth();
+            setTimeout(() => {
+                navigate("/auth/login");
+            }, 1500);
         }
     }, [isShow]);
 

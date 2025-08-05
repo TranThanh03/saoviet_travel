@@ -28,6 +28,7 @@ const TourDetailPage = () => {
         quantityPeople: 0,
         totalPeople: 0
     });
+    const { authenticated } = useContext(AuthContext);
 
     const handleDateSelect = (data) => {
         setData(data);
@@ -76,27 +77,28 @@ const TourDetailPage = () => {
 
     const handleBooking = async () => {
         try {
-            const response = await AuthApi.introspect();
-
-            if (response?.code === 9998 && response?.result) {
+            if (authenticated) {
                 if (data.startDate !== '' && data.id !== '') {
-                    navigate(`/booking/${data.id}`);
+                    const response = await AuthApi.introspect();
+
+                    if (response?.code === 9998 && response?.result) {
+                        navigate(`/booking/${data.id}`);
+                    } else {
+                        ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+                    }
                 } else {
                     ErrorToast("Vui lòng chọn ngày khởi hành trước.");
                 }
-            }
-        } catch (error) {
-            console.error("Failed to fetch schedule: ", error);
-
-            if (error.request?.status === 401) {
+            } else {
                 ErrorToast("Vui lòng đăng nhập để đặt tour.");
 
                 setTimeout(() => {
                     navigate("/auth/login");
                 }, 1500);
-            } else {
-                ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-            }
+            }  
+        } catch (error) {
+            console.error("Failed to fetch schedule: ", error);
+            ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
         }
     }
 

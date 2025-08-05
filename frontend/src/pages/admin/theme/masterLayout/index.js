@@ -57,7 +57,7 @@ const MasterLayout = ({ children }) => {
                 <div className={isValidPath ? 'container body' : ''}>
                     <div className="main_container">
                         {!isLoginPage && isValidPath && <Sidebar />}
-                        {!isLoginPage && isValidPath && <Header authenticated={authenticated} isSidebar={isSidebar} setIsSidebar={setIsSidebar} />}
+                        {!isLoginPage && isValidPath && <Header isSidebar={isSidebar} setIsSidebar={setIsSidebar} />}
                         <div className="right_col min-vh-100">
                             {children}
                         </div>
