@@ -10,6 +10,8 @@ const axiosInstance = axios.create({
 
 const pendingRequests = new Set();
 
+const getRequestKey = (config) => `${config.method}-${config.url}`;
+
 const shouldSkipLoading = (url = '') => {
     return url.includes('/api/v1/chatbot') || url.includes('/api/v1/auth/introspect');
 };
@@ -30,12 +32,10 @@ axiosInstance.interceptors.request.use(
             config.metadata.timer = timer;
         }
 
-        pendingRequests.add(config);
+        pendingRequests.add(getRequestKey(config));
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
             clearTimeout(config.metadata.timer);
         }
 
-        pendingRequests.delete(config);
+        pendingRequests.delete(getRequestKey(config));
 
         if (!config.metadata?.skipLoading && pendingRequests.size === 0) {
             setLoading(false);
@@ -56,20 +56,21 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         const config = error.config || {};
+        config.metadata = config.metadata || {};
 
-        if (config.metadata?.timer) {
+        if (config.metadata.timer) {
             clearTimeout(config.metadata.timer);
         }
 
-        pendingRequests.delete(config);
+        pendingRequests.delete(getRequestKey(config));
 
-        if (!config.metadata?.skipLoading && pendingRequests.size === 0) {
+        if (!config.metadata.skipLoading && pendingRequests.size === 0) {
             setLoading(false);
         }
 
-        if (error.response?.data?.code === 4445) {
-            const url = error.config?.url || '';
+        const url = config.url || '';
 
+        if (error.response?.data?.code === 4445) {
             if (shouldSkipLoading(url)) {
                 return Promise.reject(error.response || error.message);
             }
