@@ -320,7 +320,7 @@ const BookingPage = () => {
 
                                 {isActive && (
                                     <div className="voucher-dropdown">
-                                        {vouchers.map((voucher) => (
+                                        {vouchers.length > 0 ? (vouchers.map((voucher) => (
                                             <div key={voucher.id} className="voucher-item" onClick={() => handleVoucherClick(voucher)}>
                                                 <img src={voucherImg} alt="Voucher" className="voucher-image" />
                                                 <div className="voucher-info">
@@ -333,7 +333,11 @@ const BookingPage = () => {
                                                     </p>
                                                 </div>
                                             </div>
-                                        ))}
+                                        ))) : (
+                                            <div className="voucher-item">
+                                                Không có.
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
