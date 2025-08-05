@@ -10,32 +10,24 @@ const axiosInstance = axios.create({
 
 const pendingRequests = new Set();
 
-const getRequestKey = (config) => `${config.method}-${config.url}`;
-
-const shouldSkipLoading = (url = '') => {
-    return url.includes('/api/v1/chatbot') || url.includes('/api/v1/auth/introspect');
-};
-
 axiosInstance.interceptors.request.use(
     (config) => {
-        const url = config.url || '';
-
         config.metadata = {
             startTime: new Date().getTime(),
-            skipLoading: shouldSkipLoading(url),
+            skipLoading: false,
         };
 
-        if (!config.metadata.skipLoading) {
-            const timer = setTimeout(() => {
-                setLoading(true);
-            }, 250);
-            config.metadata.timer = timer;
-        }
+        const timer = setTimeout(() => {
+            setLoading(true);
+        }, 250);
+        config.metadata.timer = timer;
 
-        pendingRequests.add(getRequestKey(config));
+        pendingRequests.add(config);
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        return Promise.reject(error);
+    }
 );
 
 axiosInstance.interceptors.response.use(
@@ -46,9 +38,9 @@ axiosInstance.interceptors.response.use(
             clearTimeout(config.metadata.timer);
         }
 
-        pendingRequests.delete(getRequestKey(config));
+        pendingRequests.delete(config);
 
-        if (!config.metadata?.skipLoading && pendingRequests.size === 0) {
+        if (pendingRequests.size === 0) {
             setLoading(false);
         }
 
@@ -56,36 +48,20 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         const config = error.config || {};
-        config.metadata = config.metadata || {};
 
-        if (config.metadata.timer) {
+        if (config.metadata?.timer) {
             clearTimeout(config.metadata.timer);
         }
 
-        pendingRequests.delete(getRequestKey(config));
+        pendingRequests.delete(config);
 
-        if (!config.metadata.skipLoading && pendingRequests.size === 0) {
+        if (pendingRequests.size === 0) {
             setLoading(false);
         }
 
-        const url = config.url || '';
-
-        console.error('AXIOS ERROR', {
-            url: url,
-            error: error.response || error.message
-        });
-
-        if (error.response?.status === 401) {
-            return;
-        }
-        else if (error.response?.data?.code === 4445) {
-            if (shouldSkipLoading(url)) {
-                return Promise.reject(error.response || error.message);
-            }
-
+        if (error.response?.data?.code === 4445) {
             window.location.href = "/error/404";
-        }
-        else if (error.code === "ERR_NETWORK") {
+        } else if (error.code === "ERR_NETWORK") {
             window.location.href = "/error/500";
         }
 
