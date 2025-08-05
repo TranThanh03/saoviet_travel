@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
 const pendingRequests = new Set();
 
 const shouldSkipLoading = (url = '') => {
-    return url.includes('/api/v1/auth/introspect') || url.includes('/api/v1/chatbot');
+    return url.includes('/api/v1/chatbot');
 };
 
 axiosInstance.interceptors.request.use(
