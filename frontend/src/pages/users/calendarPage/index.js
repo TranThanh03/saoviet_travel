@@ -21,8 +21,6 @@ const CalendarPage = () => {
 
     useEffect(() => {
         const fetchBookings = async () => {
-            setLoading(true);
-
             try {
                 const response = await BookingApi.getByCustomerId();
 
@@ -36,9 +34,6 @@ const CalendarPage = () => {
                 if (error?.status === 401) {
                     navigate("/auth/login");
                 }
-            }
-            finally {
-                setLoading(false);
             }
         };
 

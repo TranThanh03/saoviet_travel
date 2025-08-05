@@ -34,9 +34,6 @@ const ProfilePage = () => {
                 console.error("Failed to fetch admin: ", error);
                 navigate("/manage/error/404");
             }
-            finally {
-                setLoading(true);
-            }
         };
 
         fetchData();

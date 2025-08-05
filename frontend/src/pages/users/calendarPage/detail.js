@@ -25,8 +25,6 @@ const CalendarDetailPage = () => {
 
     useEffect(() => {
         const fetchBooking = async () => {
-            setLoading(true);
-
             try {
                 const response = await BookingApi.getById(id);
 
@@ -40,9 +38,6 @@ const CalendarDetailPage = () => {
                 console.error("Failed to fetch bookings: ", error);
 
                 navigate("/error/404");
-            }
-            finally {
-                setLoading(false);
             }
         };
 

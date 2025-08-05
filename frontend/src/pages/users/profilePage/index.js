@@ -34,9 +34,6 @@ const ProfilePage = () => {
                 console.error("Failed to fetch user data:", error);
                 navigate("/error/404");
             }
-            finally {
-                setLoading(true);
-            }
         };
 
         fetchData();

@@ -17,13 +17,11 @@ const shouldSkipLoading = (url = '') => {
 axiosInstance.interceptors.request.use(
     (config) => {
         config.metadata = {
-            startTime: new Date().getTime(),
             skipLoading: shouldSkipLoading(config.url),
         };
 
         if (!config.metadata.skipLoading) {
             setLoading(true);
-            config.metadata.timer = timer;
             pendingRequests.add(config);
         }
 
@@ -39,10 +37,6 @@ axiosInstance.interceptors.response.use(
         const config = response.config;
 
         if (!config.metadata?.skipLoading) {
-            if (config.metadata?.timer) {
-                clearTimeout(config.metadata.timer);
-            }
-
             pendingRequests.delete(config);
 
             if (pendingRequests.size === 0) {
@@ -56,10 +50,6 @@ axiosInstance.interceptors.response.use(
         const config = error.config || {};
 
         if (!config.metadata?.skipLoading) {
-            if (config.metadata?.timer) {
-                clearTimeout(config.metadata.timer);
-            }
-
             pendingRequests.delete(config);
 
             if (pendingRequests.size === 0) {

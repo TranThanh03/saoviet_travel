@@ -12,9 +12,8 @@ const pendingRequests = new Set();
 
 axiosInstanceAdmin.interceptors.request.use(
     (config) => {
-        config.metadata = { startTime: new Date().getTime() };
+        config.metadata = {};
         setLoading(true);
-        config.metadata.timer = timer;
         pendingRequests.add(config);
 
         return config;
@@ -26,10 +25,6 @@ axiosInstanceAdmin.interceptors.request.use(
 
 axiosInstanceAdmin.interceptors.response.use(
     (response) => {
-        if (response.config.metadata?.timer) {
-            clearTimeout(response.config.metadata.timer);
-        }
-
         pendingRequests.delete(response.config);
 
         if (pendingRequests.size === 0) {
@@ -39,27 +34,21 @@ axiosInstanceAdmin.interceptors.response.use(
         return response.data;
     },
     (error) => {
-        if (error.config?.metadata?.timer) {
-            clearTimeout(error.config.metadata.timer);
-        }
-
-        pendingRequests.delete(error.config);
+        pendingRequests.delete(error.config || {});
 
         if (pendingRequests.size === 0) {
             setLoading(false);
         }
 
         if (error.response?.data?.code === 4445) {
-            if (error.config.url.includes("/api/v1/auth/admin/introspect")) {
+            if (error.config?.url?.includes("/api/v1/auth/admin/introspect")) {
                 return Promise.reject(error.response || error.message);
             }
 
             window.location.href = "/manage/error/404";
-        } 
-        else if (error.request?.status === 401) {
+        } else if (error.request?.status === 401) {
             window.location.href = "/manage/auth/login";
-        }
-        else if (error.code === "ERR_NETWORK") {
+        } else if (error.code === "ERR_NETWORK") {
             window.location.href = "/manage/auth/login";
         }
 

@@ -37,8 +37,6 @@ const DestinationsPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch tours: ", error);
-        } finally {
-            setLoading(false);
         }
     };
 
