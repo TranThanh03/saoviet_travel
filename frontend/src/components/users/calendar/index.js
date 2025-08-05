@@ -1,8 +1,9 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import "./index.scss";
-import { AuthApi, ScheduleApi } from "services";
+import { ScheduleApi } from "services";
 import { useNavigate } from "react-router-dom";
 import { ErrorToast } from "components/notifi";
+import { AuthContext } from "pages/users/theme/masterLayout";
 
 const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
@@ -19,7 +20,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
         }
     ]);
     const navigate = useNavigate();
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated } = useContext(AuthContext); AuthContext
 
     useEffect(() => {
         const fetchData = async () => {

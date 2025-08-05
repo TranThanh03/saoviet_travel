@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useContext } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './detail.scss';
 import { AuthApi, TourApi } from 'services';
@@ -10,6 +10,7 @@ import CalendarCustom from "components/users/calendar/index";
 import formatDatetime from 'utils/formatDatetime';
 import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
+import { AuthContext } from "../masterLayout";
 
 const TourDetailPage = () => {
     const { id } = useParams();

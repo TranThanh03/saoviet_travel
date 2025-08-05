@@ -1,9 +1,10 @@
-import React, { memo, useState, useEffect, useRef, useMemo } from "react";
+import React, { memo, useState, useEffect, useRef, useMemo, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaAngleDown, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { logo } from "assets";
 import { AuthApi } from "services";
 import "./style.scss";
+import { AuthContext } from "../masterLayout";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState("");
