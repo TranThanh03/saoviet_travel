@@ -3,7 +3,7 @@ import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
 const TourApi = {
     getAll: (params) => {
-        return axiosInstance.get("/api/v1/tours", { params });
+        return axiosInstanceAdmin.get("/api/v1/tours", { params });
     },
     getById: (id) => {
         return axiosInstance.get(`/api/v1/tours/${id}`);
@@ -50,7 +50,7 @@ const TourApi = {
         return axiosInstance.get("/api/v1/tours/similar", { params });
     },
     getList: () => {
-        return axiosInstance.get("/api/v1/tours/list");
+        return axiosInstanceAdmin.get("/api/v1/tours/list");
     },
     getHot: () => {
         return axiosInstance.get("/api/v1/tours/hot");
