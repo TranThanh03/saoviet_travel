@@ -10,19 +10,26 @@ const axiosInstance = axios.create({
 
 const pendingRequests = new Set();
 
+const shouldSkipLoading = (url = '') => {
+    return url.includes('/api/v1/auth/introspect') || url.includes('/api/v1/chatbot');
+};
+
 axiosInstance.interceptors.request.use(
     (config) => {
         config.metadata = {
             startTime: new Date().getTime(),
-            skipLoading: false,
+            skipLoading: shouldSkipLoading(config.url),
         };
 
-        const timer = setTimeout(() => {
-            setLoading(true);
-        }, 250);
-        config.metadata.timer = timer;
+        if (!config.metadata.skipLoading) {
+            const timer = setTimeout(() => {
+                setLoading(true);
+            }, 250);
+            config.metadata.timer = timer;
 
-        pendingRequests.add(config);
+            pendingRequests.add(config);
+        }
+
         return config;
     },
     (error) => {
@@ -34,14 +41,16 @@ axiosInstance.interceptors.response.use(
     (response) => {
         const config = response.config;
 
-        if (config.metadata?.timer) {
-            clearTimeout(config.metadata.timer);
-        }
+        if (!config.metadata?.skipLoading) {
+            if (config.metadata?.timer) {
+                clearTimeout(config.metadata.timer);
+            }
 
-        pendingRequests.delete(config);
+            pendingRequests.delete(config);
 
-        if (pendingRequests.size === 0) {
-            setLoading(false);
+            if (pendingRequests.size === 0) {
+                setLoading(false);
+            }
         }
 
         return response.data;
@@ -49,14 +58,16 @@ axiosInstance.interceptors.response.use(
     (error) => {
         const config = error.config || {};
 
-        if (config.metadata?.timer) {
-            clearTimeout(config.metadata.timer);
-        }
+        if (!config.metadata?.skipLoading) {
+            if (config.metadata?.timer) {
+                clearTimeout(config.metadata.timer);
+            }
 
-        pendingRequests.delete(config);
+            pendingRequests.delete(config);
 
-        if (pendingRequests.size === 0) {
-            setLoading(false);
+            if (pendingRequests.size === 0) {
+                setLoading(false);
+            }
         }
 
         if (error.response?.data?.code === 4445) {
