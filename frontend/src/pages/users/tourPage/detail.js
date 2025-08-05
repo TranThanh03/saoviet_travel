@@ -223,7 +223,7 @@ const TourDetailPage = () => {
                                         <div className="date">
                                             <b>Ngày khởi hành:</b>
                                             <div className="date-input">
-                                                <i className="fa-solid fa-calendar-days cursor-pointer" onClick={() => setIsShow(true)}></i>
+                                                <i className="fa-solid fa-calendar-days cursor-pointer" style={{ color: "#ffc10e" }} onClick={() => setIsShow(true)}></i>
                                                 <input type="text" value={data.startDate ? formatDatetime(data.startDate) : ""} disabled />
                                             </div>
                                         </div>
