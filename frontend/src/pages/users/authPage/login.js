@@ -1,13 +1,15 @@
-import { memo, useState } from 'react';
+import { memo, useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 import { logo } from 'assets';
 import { AuthApi } from 'services';
+import { AuthContext } from '../theme/masterLayout';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    const { fetchAuth } = useContext(AuthContext);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -27,6 +29,7 @@ const LoginPage = () => {
             const response = await AuthApi.login(formData);
 
             if (response?.code === 9999) {
+                await fetchAuth();
                 navigate('/');
             } else {
                 setErrorMessage(response.message);
