@@ -1,46 +1,24 @@
-import axiosInstance from "@utils/axiosInstance.js";
-import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
-import getToken from "@utils/getToken.js";
+import axiosInstance from "utils/axiosInstance";
+import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
 const TourApi = {
     getAll: (params) => {
-        return axiosInstance.get("/api/v1/tours", { 
-            params,
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstance.get("/api/v1/tours", { params });
     },
     getById: (id) => {
         return axiosInstance.get(`/api/v1/tours/${id}`);
     },
     checkNotStarted: (id) => {
-        return axiosInstanceAdmin.get(`/api/v1/tours/not-started/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get(`/api/v1/tours/not-started/${id}`);
     },
     create: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/tours", data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.post("/api/v1/tours", data);
     },
     update: (id, data) => {
-        return axiosInstanceAdmin.put(`/api/v1/tours/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.put(`/api/v1/tours/${id}`, data);
     },
     delete: (id) => {
-        return axiosInstanceAdmin.delete(`/api/v1/tours/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.delete(`/api/v1/tours/${id}`);
     },
     filter: (data, params) => {
         return axiosInstance.post("/api/v1/tours/filter", data, {
@@ -72,11 +50,7 @@ const TourApi = {
         return axiosInstance.get("/api/v1/tours/similar", { params });
     },
     getList: () => {
-        return axiosInstance.get("/api/v1/tours/list", { 
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstance.get("/api/v1/tours/list");
     },
     getHot: () => {
         return axiosInstance.get("/api/v1/tours/hot");

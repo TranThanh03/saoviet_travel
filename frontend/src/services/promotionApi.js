@@ -1,46 +1,24 @@
-import axiosInstance from "@utils/axiosInstance.js";
-import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
-import getToken from "@utils/getToken.js";
+import axiosInstance from "utils/axiosInstance";
+import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
 const PromotionApi = {
     getAll: (params) => {
-        return axiosInstanceAdmin.get("/api/v1/promotions",  {
-            params,
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get("/api/v1/promotions", { params });
     },
     getById: (id) => {
-        return axiosInstanceAdmin.get(`/api/v1/promotions/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get(`/api/v1/promotions/${id}`);
     },
     getList: () => {
         return axiosInstance.get("/api/v1/promotions/list");
     },
     create: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/promotions", data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.post("/api/v1/promotions", data);
     },
     update: (id, data) => {
-        return axiosInstanceAdmin.put(`/api/v1/promotions/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.put(`/api/v1/promotions/${id}`, data);
     },
     delete: (id) => {
-        return axiosInstanceAdmin.delete(`/api/v1/promotions/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.delete(`/api/v1/promotions/${id}`);
     },
 };
 

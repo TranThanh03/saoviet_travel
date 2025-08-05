@@ -1,8 +1,7 @@
 import { memo, useState, useEffect, createContext } from "react";
 import Footer from "../footer";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuthApi } from "@services";
-import getToken from "@utils/getToken.js";
+import { AuthApi } from "services";
 import Sidebar from "../sidebar";
 import Header from "../header";
 
@@ -28,18 +27,11 @@ const MasterLayout = ({ children }) => {
 
         const fetchAuth = async () => {
             try {
-                const tokenAdmin = getToken(true);
+                const response = await AuthApi.introspectAdmin();
 
-                if (tokenAdmin) {
-                    const response = await AuthApi.introspectAdmin();
-
-                    if (response?.code === 9995) {
-                        setAuthenticated(response?.result);
-                        setIsLoading(false);
-                    }
-                    else {
-                        navigate("/manage/auth/login");
-                    }
+                if (response?.code === 9995) {
+                    setAuthenticated(response?.result);
+                    setIsLoading(false);
                 }
                 else {
                     navigate("/manage/auth/login");

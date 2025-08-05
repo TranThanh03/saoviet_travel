@@ -1,46 +1,24 @@
-import axiosInstance from "@utils/axiosInstance.js";
-import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
-import getToken from "@utils/getToken.js";
+import axiosInstance from "utils/axiosInstance";
+import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
 const NewsApi = {
     getAll: (params) => {
-        return axiosInstanceAdmin.get("/api/v1/news",  {
-            params,
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get("/api/v1/news", { params });
     },
     getById: (id) => {
         return axiosInstance.get(`/api/v1/news/${id}`);
     },
     getByIdAndAdmin: (id) => {
-        return axiosInstanceAdmin.get(`/api/v1/news/detail/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get(`/api/v1/news/detail/${id}`);
     },
     create: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/news", data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.post("/api/v1/news", data);
     },
     update: (id, data) => {
-        return axiosInstanceAdmin.put(`/api/v1/news/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.put(`/api/v1/news/${id}`, data);
     },
     delete: (id) => {
-        return axiosInstanceAdmin.delete(`/api/v1/news/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.delete(`/api/v1/news/${id}`);
     },
     getOutstanding: () => {
         return axiosInstance.get("/api/v1/news/outstanding");

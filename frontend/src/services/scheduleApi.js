@@ -1,69 +1,36 @@
-import axiosInstance from "@utils/axiosInstance.js";
-import axiosInstanceAdmin from "@utils/axiosInstanceAdmin.js";
-import getToken from "@utils/getToken.js";
+import axiosInstance from "utils/axiosInstance";
+import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
-const AssignmentApi = {
+const ScheduleApi = {
     getAll: (params) => {
-        return axiosInstanceAdmin.get("/api/v1/schedules", { 
-            params,
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get("/api/v1/schedules", { params });
     },
     getById: (id) => {
-        return axiosInstanceAdmin.get(`/api/v1/schedules/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get(`/api/v1/schedules/${id}`);
     },
     create: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/schedules", data, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.post("/api/v1/schedules", data);
     },
     update: (id, params) => {
         return axiosInstanceAdmin.put(`/api/v1/schedules/${id}`,
             {},
             {
-                params,
-                headers: {
-                    Authorization: `Bearer ${getToken(true)}`
-                }
+                params: params,
             }
         );
     },
     delete: (id) => {
-        return axiosInstanceAdmin.delete(`/api/v1/schedules/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.delete(`/api/v1/schedules/${id}`);
     },
     getByTourId: (id) => {
-        return axiosInstance.get(`/api/v1/schedules/tour/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken()}`
-            }
-        });
+        return axiosInstance.get(`/api/v1/schedules/tour/${id}`);
     },
     getScheduleTourById: (id) => {
-        return axiosInstance.get(`/api/v1/schedules/schedule-tour/${id}`, {
-            headers: {
-                Authorization: `Bearer ${getToken()}`
-            }
-        });
+        return axiosInstance.get(`/api/v1/schedules/schedule-tour/${id}`);
     },
     getStartDateByTourId: (tourId) => {
-        return axiosInstanceAdmin.get(`/api/v1/schedules/start-date/${tourId}`, {
-            headers: {
-                Authorization: `Bearer ${getToken(true)}`
-            }
-        });
+        return axiosInstanceAdmin.get(`/api/v1/schedules/start-date/${tourId}`);
     },
 };
 
-export default AssignmentApi;
+export default ScheduleApi;

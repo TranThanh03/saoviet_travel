@@ -2,15 +2,14 @@ import { memo, useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './detail.scss';
 import { AuthApi, TourApi } from 'services';
-import formaterCurrency from 'utils/formatCurrency.js';
-import { sanitizeHtml } from 'utils/sanitizeHtml.js';
+import formaterCurrency from 'utils/formatCurrency';
+import { sanitizeHtml } from 'utils/sanitizeHtml';
 import { noImage } from 'assets';
-import ReviewList from "components/users/review/index.js";
-import CalendarCustom from "components/users/calendar/index.js";
-import formatDatetime from 'utils/formatDatetime.js';
+import ReviewList from "components/users/review/index";
+import CalendarCustom from "components/users/calendar/index";
+import formatDatetime from 'utils/formatDatetime';
 import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
-import getToken from 'utils/getToken.js';
 
 const TourDetailPage = () => {
     const { id } = useParams();
@@ -82,24 +81,14 @@ const TourDetailPage = () => {
 
     const handleBooking = async () => {
         try {
-            const token = getToken();
+            const response = await AuthApi.introspect();
 
-            if (token) {
-                const response = await AuthApi.introspect();
-
-                if (response?.code === 9998 && response?.result) {
-                    if (data.startDate !== '' && data.id !== '') {
-                        navigate(`/booking/${data.id}`);
-                    } else {
-                        ErrorToast("Vui lòng chọn ngày khởi hành trước.");
-                    }
+            if (response?.code === 9998 && response?.result) {
+                if (data.startDate !== '' && data.id !== '') {
+                    navigate(`/booking/${data.id}`);
+                } else {
+                    ErrorToast("Vui lòng chọn ngày khởi hành trước.");
                 }
-            } else {
-                ErrorToast("Vui lòng đăng nhập để đặt tour.");
-                
-                setTimeout(() => {
-                    navigate("/auth/login");
-                }, 1500);
             }
         } catch (error) {
             console.error("Failed to fetch schedule: ", error);

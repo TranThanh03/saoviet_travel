@@ -1,9 +1,8 @@
 import { memo, useEffect, useState } from "react";
 import "./index.scss";
-import { AuthApi, ScheduleApi } from "@services";
+import { AuthApi, ScheduleApi } from "services";
 import { useNavigate } from "react-router-dom";
-import getToken from "@utils/getToken.js";
-import { ErrorToast } from "@components/notifi";
+import { ErrorToast } from "components/notifi";
 
 const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
@@ -40,19 +39,10 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     useEffect(() => {
         const fetchAuth = async () => {
             try {
-                const token = getToken();
+                const response = await AuthApi.introspect();
 
-                if (token) {
-                    const response = await AuthApi.introspect();
-                
-                    if (response?.code != 9998) {
-                        ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-                    }
-                } else {
-                    ErrorToast("Vui lòng đăng nhập để đặt tour.");
-                    setTimeout(() => {
-                        navigate("/auth/login");
-                    }, 1500);
+                if (response?.code !== 9998) {
+                    ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
                 }
             } catch (error) {
                 console.error("Failed to fetch schedule: ", error);

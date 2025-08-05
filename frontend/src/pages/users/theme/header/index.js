@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaAngleDown, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { logo } from "assets";
 import { AuthApi } from "services";
-import getToken from "utils/getToken.js";
 import "./style.scss";
 
 const Header = () => {
@@ -48,14 +47,10 @@ const Header = () => {
     useEffect(() => {
         const fetchAuth = async () => {
             try {
-                const token = getToken();
-
-                if (token) {
-                    const response = await AuthApi.introspect();
-                    
-                    if (response?.code === 9998) {
-                        setAuthenticated(response?.result);
-                    }
+                const response = await AuthApi.introspect();
+                
+                if (response?.code === 9998) {
+                    setAuthenticated(response?.result);
                 }
             } catch (error) {
                 console.error(error);
