@@ -70,13 +70,22 @@ axiosInstance.interceptors.response.use(
 
         const url = config.url || '';
 
-        if (error.response?.data?.code === 4445) {
+        console.error('AXIOS ERROR', {
+            url: url,
+            error: error.response || error.message
+        });
+
+        if (error.response?.status === 401) {
+            return;
+        }
+        else if (error.response?.data?.code === 4445) {
             if (shouldSkipLoading(url)) {
                 return Promise.reject(error.response || error.message);
             }
 
             window.location.href = "/error/404";
-        } else if (error.code === "ERR_NETWORK") {
+        }
+        else if (error.code === "ERR_NETWORK") {
             window.location.href = "/error/500";
         }
 
