@@ -2,7 +2,7 @@ import axios from 'axios';
 import { setLoading } from './loading.js';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://saoviet-travel.onrender.com',
+    baseURL: process.env.REACT_APP_BASE_URL,
     timeout: 15000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
