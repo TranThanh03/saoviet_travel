@@ -16,7 +16,7 @@ const Step2 = forwardRef(({ formData, setFormData, imgPreview, setImgPreview }, 
         formDataCloudinary.append("folder", "saoviet");
 
         try {
-            const response = await fetch("https://api.cloudinary.com/v1_1/doie0qiiq/image/upload", {
+            const response = await fetch(process.env.REACT_APP_UPLOAD_IMAGES_URL, {
                 method: "POST",
                 body: formDataCloudinary
             });
