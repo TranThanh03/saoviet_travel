@@ -32,6 +32,7 @@ const Chatbot = () => {
     useEffect(() => {
         const fetchGenerateCode = async () => {
             try {
+                setIsLoading(true);
                 const codeValue = localStorage.getItem("code");
         
                 if (codeValue !== null) {
@@ -49,6 +50,8 @@ const Chatbot = () => {
                 }
             } catch (error) {
                 console.error("Failed to fetch generate code:", error);
+            } finally {
+                setIsLoading(false);
             }
         };        
 
@@ -60,6 +63,7 @@ const Chatbot = () => {
     useEffect(() => {
         const fetchMessages = async () => {
             try {
+                setIsLoading(true);
                 const response = await ChatbotApi.getMessages(code);
 
                 if (response?.code === 2202) {
@@ -75,6 +79,8 @@ const Chatbot = () => {
                     ...prev,
                     { senderType: 'chatbot', content: 'Xin chào! Tôi là trợ lý ảo của Sao Việt, bạn cần hỗ trợ gì?' }
                 ]);
+            } finally {
+                setIsLoading(false);
             }
         }
 

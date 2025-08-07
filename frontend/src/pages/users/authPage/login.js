@@ -4,6 +4,7 @@ import './login.scss';
 import { logo } from 'assets';
 import { AuthApi } from 'services';
 import { AuthContext } from '../theme/masterLayout';
+import PasswordInput from 'components/passwordInput';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -42,7 +43,7 @@ const LoginPage = () => {
     return (
         <div className='login-page'>
             <div className="container d-flex justify-content-center align-items-center min-vh-100">
-                <div className="row border rounded-5 p-3 bg-while shadow box-area bg-custom">
+                <div className="row border rounded-5 p-3 shadow box-area bg-custom">
                     <div className="col-md-6 rounded-4 d-flex justify-content-center align-items-center flex-column left-box">
                         <div className="featured-image my-3">
                             <img src={logo} className="img-fluid" alt="Logo" />
@@ -63,7 +64,7 @@ const LoginPage = () => {
                                     <p><b>Tài khoản</b></p>
                                     <input
                                         type="text"
-                                        className="form-control form-control-lg bg-light fs-6"
+                                        className="form-control form-control-lg fs-6"
                                         placeholder="SDT hoặc Email"
                                         id="username"
                                         name="username"
@@ -74,14 +75,12 @@ const LoginPage = () => {
 
                                 <div className="input-group mb-1">
                                     <p><b>Mật khẩu</b></p>
-                                    <input
-                                        type="password"
-                                        className="form-control form-control-lg bg-light fs-6"
-                                        placeholder="******"
-                                        id="password"
-                                        name="password"
+                                    <PasswordInput
                                         value={formData.password}
                                         onChange={handleInputChange}
+                                        name = 'password'
+                                        id = 'password'
+                                        placeholder = '******'
                                     />
                                 </div>
 

@@ -4,6 +4,7 @@ import './register.scss';
 import { CustomerApi } from 'services';
 import { SuccessToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
+import PasswordInput from 'components/passwordInput';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -75,7 +76,7 @@ const RegisterPage = () => {
     return (
         <div className="register-page">
             <div className="container d-flex justify-content-center align-items-center min-vh-100">
-                <div className="row border rounded-4 p-3 bg-white shadow my-2 bg-custom">
+                <div className="row border rounded-4 p-3 shadow my-2 bg-custom">
                     <h2 className="text-center fw-bold">Đăng ký</h2>
 
                     <form onSubmit={handleRegister}>
@@ -122,29 +123,25 @@ const RegisterPage = () => {
                         </div>
 
                         <div className="form-floating mb-3">
-                            <input
-                                type="password"
-                                className="form-control"
-                                id="pwd"
-                                name="password"
+                            <PasswordInput
                                 value={formData.password}
                                 onChange={handleInputChange}
+                                name = 'password'
+                                id = 'password'
+                                label = 'Mật khẩu'
                             />
-                            <label htmlFor="pwd">Mật khẩu</label>
                             
                             {errors.password && <p className="text-danger mt-1">{errors.password}</p>}
                         </div>
 
                         <div className="form-floating mb-3">
-                            <input
-                                type="password"
-                                className="form-control"
-                                id="repeatpw"
-                                name="repeatpw"
+                            <PasswordInput
                                 value={formData.repeatpw}
                                 onChange={handleInputChange}
+                                name = 'repeatpw'
+                                id = 'repeatpw'
+                                label = 'Nhập lại mật khẩu'
                             />
-                            <label htmlFor="repeatpw">Nhập lại mật khẩu</label>
                             
                             {errors.repeatpw && <p className="text-danger mt-1">{errors.repeatpw}</p>}
                         </div>

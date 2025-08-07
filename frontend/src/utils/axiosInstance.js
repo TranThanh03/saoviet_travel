@@ -60,6 +60,10 @@ axiosInstance.interceptors.response.use(
         if (error.response?.data?.code === 4445) {
             window.location.href = "/error/404";
         } else if (error.code === "ERR_NETWORK") {
+            if (error.config?.url?.includes("/api/v1/auth/introspect")) {
+                return Promise.reject(error.response || error.message);
+            }
+
             window.location.href = "/error/500";
         }
 
