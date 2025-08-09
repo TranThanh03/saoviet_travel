@@ -224,14 +224,19 @@ const Chatbot = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="chatbot-input d-flex border-top p-2">
-                        <input type="text" className="form-control me-2" placeholder="Nhập tin nhắn..." value={input} onChange={(e) => setInput(e.target.value)}
-                            onClick={handleSend}
+                    <form className="chatbot-input d-flex border-top p-2"
+                        onSubmit={(e) => {
+                            handleSend(e);
+                        }}
+                    >
+                        <input type="text" className="form-control me-2" placeholder="Nhập tin nhắn..."  value={input}
+                            onChange={(e) => setInput(e.target.value)}
                         />
-                            <span className="btn btn-primary d-flex align-items-center" onClick={handleSend}>
-                                <FaPaperPlane />
-                            </span>
-                    </div>
+
+                        <button type="submit" className="btn btn-primary d-flex align-items-center">
+                            <FaPaperPlane />
+                        </button>
+                    </form>
                 </div>
             )}
 

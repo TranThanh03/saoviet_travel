@@ -11,7 +11,7 @@ const Header = () => {
     const [isShow, setShow] = useState(false);
     const { authenticated } = useContext(AuthContext);
     const [showSearch, setShowSearch] = useState(false);
-    const [placeholder, setPlaceholder] = useState("Tìm kiếm tour");
+    const [placeholder, setPlaceholder] = useState("Tìm kiếm Tours theo điểm đến");
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -67,7 +67,7 @@ const Header = () => {
             setShowSearch(!showSearch);
             navigate(`/tour/search?p=${encodeURIComponent(searchQuery)}`);
         } else {
-            setPlaceholder("Vui lòng nhập tour...");
+            setPlaceholder("Vui lòng nhập điểm đến...");
         }
     };
 
@@ -127,7 +127,7 @@ const Header = () => {
 
                         <div className="d-flex align-items-center gap-3">
                             <div className="nav-search">
-                                <button type="button" className="btn btn-custom p-0 text-dark" onClick={() => {setShowSearch(!showSearch); setPlaceholder("Tìm kiếm tour")}}>
+                                <button type="button" className="btn btn-custom p-0 text-dark" onClick={() => {setShowSearch(!showSearch)}}>
                                     <FaSearch size={15}/>
                                 </button>
                                 {showSearch && (
