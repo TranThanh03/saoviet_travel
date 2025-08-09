@@ -24,15 +24,15 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ApiResponse<String> authenticate(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response) {
+    public ApiResponse<String> authenticate(@RequestBody AuthenticationRequest request,
+                                            HttpServletResponse response) {
 
         String jwtToken = authenticationService.authenticate(request);
 
         ResponseCookie cookie = ResponseCookie.from("token", jwtToken)
-                .secure(false)
-                .sameSite("Strict")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(60 * 60)
                 .build();
@@ -46,8 +46,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/introspect")
-    public ApiResponse<Boolean> introspectToken(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    public ApiResponse<Boolean> introspectToken(@CookieValue("token") String token) {
         var result = authenticationService.introspect(token);
 
         return ApiResponse.<Boolean>builder()
@@ -57,17 +56,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<String> logout(
-            @RequestHeader("Authorization") String authorizationHeader,
-            HttpServletResponse response)
-            throws ParseException, JOSEException {
+    ApiResponse<String> logout(@CookieValue("token") String token,
+                                HttpServletResponse response) throws ParseException, JOSEException {
 
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         authenticationService.logout(token);
 
         ResponseCookie cookie = ResponseCookie.from("token", "")
-                .secure(false)
-                .sameSite("Strict")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build();
@@ -81,15 +78,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/admin/login")
-    public ApiResponse<String> authenticateAdmin(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response) {
+    public ApiResponse<String> authenticateAdmin(@RequestBody AuthenticationRequest request,
+                                                 HttpServletResponse response) {
 
         String jwtToken = authenticationService.authenticateAdmin(request);
 
         ResponseCookie cookie = ResponseCookie.from("token-admin", jwtToken)
-                .secure(false)
-                .sameSite("Strict")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(60 * 60)
                 .build();
@@ -103,9 +100,7 @@ public class AuthenticationController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/introspect")
-    public ApiResponse<Boolean> introspectTokenAdmin(@RequestHeader("Authorization") String authorizationHeader) {
-
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    public ApiResponse<Boolean> introspectTokenAdmin(@CookieValue("token-admin") String token) {
         var result = authenticationService.introspect(token);
 
         return ApiResponse.<Boolean>builder()
@@ -116,17 +111,15 @@ public class AuthenticationController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/logout")
-    ApiResponse<String> logoutAdmin(
-            @RequestHeader("Authorization") String authorizationHeader,
-            HttpServletResponse response)
-            throws ParseException, JOSEException {
+    ApiResponse<String> logoutAdmin(@CookieValue("token-admin") String token,
+                                    HttpServletResponse response) throws ParseException, JOSEException {
 
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         authenticationService.logout(token);
 
         ResponseCookie cookie = ResponseCookie.from("token-admin", "")
-                .secure(false)
-                .sameSite("Strict")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build();

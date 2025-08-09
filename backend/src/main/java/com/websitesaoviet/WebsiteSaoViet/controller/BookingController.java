@@ -33,8 +33,7 @@ public class BookingController {
     CustomerService customerService;
 
     @GetMapping("/list")
-    ResponseEntity<ApiResponse<List<BookingSummaryResponse>>> getBookingsByCustomerId(@RequestHeader("Authorization") String authorizationHeader){
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<List<BookingSummaryResponse>>> getBookingsByCustomerId(@CookieValue("token") String token){
         String id = authenticationService.getIdByToken(token);
 
         ApiResponse<List<BookingSummaryResponse>> apiResponse = ApiResponse.<List<BookingSummaryResponse>>builder()

@@ -25,8 +25,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/infor")
-    ResponseEntity<ApiResponse<AdminResponse>> getAdminByToken(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<AdminResponse>> getAdminByToken(@CookieValue("token-admin") String token) {
         String id = authenticationService.getIdByToken(token);
 
         ApiResponse<AdminResponse> apiResponse = ApiResponse.<AdminResponse>builder()
@@ -39,8 +38,9 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("")
-    ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid AdminUpdateRequest request) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(@CookieValue("token-admin") String token,
+                                                            @RequestBody @Valid AdminUpdateRequest request) {
+
         String id = authenticationService.getIdByToken(token);
 
         ApiResponse<AdminResponse> apiResponse = ApiResponse.<AdminResponse>builder()
@@ -54,8 +54,9 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/password")
-    ResponseEntity<ApiResponse<String>> changePassword(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid PasswordChangeRequest request) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<String>> changePassword(@CookieValue("token-admin") String token,
+                                                            @RequestBody @Valid PasswordChangeRequest request) {
+
         String id = authenticationService.getIdByToken(token);
 
         adminService.changePassword(id, request);

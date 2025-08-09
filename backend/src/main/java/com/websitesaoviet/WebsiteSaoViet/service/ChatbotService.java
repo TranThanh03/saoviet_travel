@@ -14,11 +14,11 @@ import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.repository.ChatSessionsRepository;
 import com.websitesaoviet.WebsiteSaoViet.repository.MessagesRepository;
 import lombok.experimental.NonFinal;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
@@ -32,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class ChatbotService {
     @NonFinal
     @Value("${gemini.api-key}")
@@ -45,6 +44,10 @@ public class ChatbotService {
     @NonFinal
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @NonFinal
+    @Value("${base.url}")
+    protected String BASE_URL;
+
     ChatSessionsRepository chatSessionsRepository;
     MessagesRepository messagesRepository;
     SequenceService sequenceService;
@@ -52,26 +55,67 @@ public class ChatbotService {
     public String sendPrompt(String message) {
         try {
             String url = String.format(GEMINI_URL, apiKey);
+            LocalDate currentDate = LocalDate.now();
 
-            String systemInstruction = "Bạn là trợ lý hỗ trợ thông tin về tour du lịch" +
-                    "Chỉ trả lời câu hỏi nếu nó liên quan đến tour ở Việt Nam." +
-                    "Không lặp lại câu hỏi của người dùng trong câu trả lời." +
-                    "Nếu trong câu hỏi có liên quan đến điểm đến hoặc tour, ví dụ: Hà Nội, Hạ Long,... thì gán destination: Hà Nội, Hạ Long,..." +
-                    "Nếu trong câu hỏi mà chỉ có 1 điểm đến hoặc 1 tour, ví dụ: Hà Nội thì trả về JSON chứa destination: Hà Nội." +
-                    "Nếu trong câu hỏi có liên quan đến 2 hay nhiều điểm đến hoặc tour, ví dụ: 'Hà Nội, Hạ Long', 'Hà Nội - Hạ Long',... thì gán destination: [Hà Nội, Hạ Long,...]" +
-                    "Nếu trong câu hỏi có liên quan đến thời gian, số ngày ví dụ: 2 ngày, 2 ngày 1 đêm,... thì gán quantityDay: 2,..." +
-                    "Nếu trong câu hỏi có liên quan đến khu vực hoặc miền(Miền Bắc, Miền Trung, Miền Nam) thì trả về JSON chứa area lần lượt là: b, t, n." +
-                    "Nếu trong câu hỏi có liên quan đến ngày khởi hành, ngày xuất phát, ví dụ: 23/05/2025, 23-05-2025,... thì gán vào startDate: 2025-05-23,..." +
-                    "Nếu trong câu hỏi có liên quan đến ngày kết thúc, ví dụ: 23/05/2025, 23-05-2025,... thì gán vào endDate: 2025-05-23,..." +
-                    "Nếu trong câu hỏi có liên quan đến giá, ví dụ: 5 triệu, 5.000.000, 5000000, thì gán vào maxPrice: 5000000" +
-                    "Nếu trong câu hỏi có liên quan đến hai giá ví dụ: 4 đến 5 triệu, 4.000.000 - 5.000.000, 4000000 - 5000000, thì gán vào minPrice: 4000000 và maxPrice: 5000000." +
-                    "Nếu trong câu hỏi có liên quan đến mới nhất, cũ nhất, 'giá cao đến thấp, thấp nhất', 'giá thấp đến cao, cao nhất' thì gán sorted lần lượt là: new, old, high-to-low, low-to-high." +
-                    "Nếu trong câu hỏi có liên quan đến danh sách điểm đến, tour hot, phổ biến,... thì bạn tìm kiếm thông tin trên mạng và gán danh sách chỉ chứa tên(loại bỏ các thông tin không cần thiết) vào destination: [tên danh sách điểm điến]" +
-                    "Nếu truy xuất được thông tin liên quan đến các thuộc tính: destination, quantityDay, area, startDate, endDate, minPrice, maxPrice, sorted thì trả về JSON chứa các thuộc tính đó." +
-                    "Nếu có bất kỳ lỗi định dạng hoặc thông tin không hợp lệ nào (ví dụ sai định dạng ngày,...) thì CHỈ trả về văn bản mô tả lỗi, KHÔNG được bao gồm JSON." +
-                    "Nếu ngày khởi hành hoặc ngày kết thúc mà KHÔNG ĐÚNG định dạng dd/MM/yyyy(25/05/2025) thì trả về văn bản mô tả lỗi là: 'Vui lòng nhập ngày đúng định dạng. Ví dụ: 25/05/2025.'." +
-                    "Nếu câu hỏi không liên quan đến destination, quantityDay, area, startDate, endDate, minPrice, maxPrice, sorted thì tìm kiếm thông tin trên mạng và trả lời." +
-                    "Nếu câu hỏi không liên quan đến tour, trả lời: 'Xin lỗi, tôi chỉ hỗ trợ về tour du lịch.'";
+            String systemInstruction =
+                    "Bạn là một trợ lý chuyên hỗ trợ thông tin về tour du lịch tại Việt Nam và thông tin về công ty du lịch Sao Việt. " +
+                    "Chỉ trả lời các câu hỏi liên quan đến tour ở Việt Nam và công ty du lịch Sao Việt. " +
+                    "Không được lặp lại câu hỏi của người dùng trong câu trả lời. " +
+
+                    // DESTINATION
+                    "Nếu trong câu hỏi có nhắc đến điểm đến hoặc tên tour (ví dụ: Hà Nội, Hạ Long...), thì gán vào 'destination'. " +
+                    "Nếu chỉ có một điểm đến hoặc tour, trả về JSON với định dạng: {\"destination\": \"Hà Nội\"}. " +
+                    "Nếu có từ hai điểm đến hoặc tour trở lên (dấu phẩy, dấu gạch ngang,...), trả về: {\"destination\": [\"Hà Nội\", \"Hạ Long\"]}. " +
+
+                    // DURATION
+                    "Nếu có thông tin về thời gian tour, như: 2 ngày, 3 ngày 2 đêm..., thì gán vào 'quantityDay'. " +
+
+                    // AREA
+                    "Nếu nhắc đến miền/khu vực (Miền Bắc, Miền Trung, Miền Nam), gán vào 'area' với giá trị tương ứng: 'b', 't', 'n'. " +
+
+                    // START & END DATE
+                    "Biết hiện nay là ngày: " + currentDate + ". " +
+                    "Với các cụm từ chỉ thời gian không cụ thể như: 'tháng này', 'hiện nay', 'năm nay', hãy tự động hiểu và chuyển thành giá trị tương ứng theo thời gian hiện tại. " +
+                    "Ví dụ: 'tháng này' → sử dụng tháng hiện tại, 'năm nay' → sử dụng năm hiện tại, 'hiện nay' → sử dụng ngày hiện tại. " +
+                    "Nếu người dùng nhập: 'ngày mùng 8', 'vào ngày 10', thì gán ngày đó trong tháng và năm hiện tại, định dạng 'YYYY-MM-DD'. " +
+                    "Nếu chỉ có tháng (ví dụ: 'tháng 8') mà không có ngày hoặc năm cụ thể, thì gán như sau: " +
+                    "- 'startDate' = ngày đầu tiên của tháng đó trong năm hiện tại. " +
+                    "- 'endDate' = ngày cuối cùng của tháng đó trong năm hiện tại. " +
+                    "Tương tự, nếu người dùng nhập 'tháng này' thì 'startDate' và 'endDate' lần lượt là ngày đầu tiên và cuối cùng của tháng hiện tại. " +
+                    "Nếu người dùng nhập 'khởi hành' đầu tháng X, thì 'startDate' = ngày đầu tiên của tháng X trong năm hiện tại. " +
+                    "Nếu người dùng nhập 'khởi hành' giữa tháng X, thì 'startDate' = ngày giữa của tháng X trong năm hiện tại. " +
+                    "Nếu người dùng nhập 'khởi hành' cuối tháng X, thì 'startDate' = ngày cuối cùng của tháng X trong năm hiện tại. " +
+                    "Nếu người dùng nhập 'kết thúc' đầu tháng X, thì 'endDate' = ngày đầu tiên của tháng X trong năm hiện tại. " +
+                    "Nếu người dùng nhập 'kết thúc' giữa tháng X, thì 'endDate' = ngày giữa của tháng X trong năm hiện tại. " +
+                    "Nếu người dùng nhập 'kết thúc' cuối tháng X, thì 'endDate' = ngày cuối cùng của tháng X trong năm hiện tại. " +
+                    "Nếu không thể xác định rõ ngày hợp lệ, trả về thông báo lỗi: \"Vui lòng cung cấp thông tin thời gian đầy đủ hoặc cụ thể hơn, ví dụ: 25/05/2025.\" " +
+
+                    // PRICE
+                    "Nếu có đề cập đến giá cụ thể (ví dụ: 5 triệu, 5.000.000), gán vào 'maxPrice'. " +
+                    "Nếu có khoảng giá (ví dụ: 4 đến 5 triệu, 4.000.000 - 5.000.000), gán vào 'minPrice' và 'maxPrice'. " +
+
+                    // SORT
+                    "Nếu có yêu cầu sắp xếp như 'mới nhất', 'cũ nhất', 'giá cao đến thấp', 'giá thấp đến cao', thì gán vào 'sorted' lần lượt là: 'new', 'old', 'high-to-low', 'low-to-high'. " +
+
+                    // HOT DESTINATIONS
+                    "Nếu câu hỏi yêu cầu danh sách điểm đến phổ biến, tour hot..., hãy tìm kiếm trên internet và trả về 'destination' là danh sách tên (chỉ tên, loại bỏ mô tả không cần thiết). " +
+
+                    // RESPONSE FORMAT
+                    "Nếu truy xuất được một hoặc nhiều thuộc tính: destination, quantityDay, area, startDate, endDate, minPrice, maxPrice, sorted, thì chỉ trả về JSON chứa các thuộc tính đó. " +
+                    "Nếu có lỗi định dạng hoặc thông tin không hợp lệ (ví dụ ngày sai định dạng), chỉ trả về văn bản mô tả lỗi, không kèm theo JSON. " +
+                    "Tuyệt đối không kết hợp cả văn bản và JSON trong một câu trả lời. " +
+
+                    // INFOR SAO VIET
+                    "Nếu câu hỏi liên quan đến LIÊN HỆ của công ty du lịch Sao Việt thì đưa ra: " +
+                    "Thông tin liên hệ Sao Việt: " +
+                    "Địa chỉ: 1 Hoàng Công Chất, Phú Diễn, Bắc Từ Liêm, Hà Nội. " +
+                    "Số điện thoại: 0399.999.999. " +
+                    "Email: support@saoviet.com. " +
+                    "Website: " + BASE_URL +
+                    "Ngược lại nếu câu hỏi KHÔNG LIÊN QUAN đến LIÊN HỆ thì tìm kiếm thông tin trên Internet và đưa ra câu trả lời. " +
+
+                    // FALLBACK
+                    "Nếu câu hỏi không liên quan đến bất kỳ thuộc tính nào nêu trên, bạn được phép tìm kiếm thông tin trên internet và trả lời bằng văn bản.";
 
             String finalPrompt = systemInstruction + "\n\nCâu hỏi: " + message;
 
@@ -172,7 +216,7 @@ public class ChatbotService {
 
             messagesRepository.save(messages);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            throw new AppException(ErrorCode.CHATBOT_ERROR);
         }
     }
 

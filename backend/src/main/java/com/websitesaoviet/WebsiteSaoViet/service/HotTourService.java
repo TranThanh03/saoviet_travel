@@ -43,8 +43,8 @@ public class HotTourService {
 
     public String checkHotTour() {
         HotTour hotTour = hotTourRepository.findSingleHotTour();
-        LocalDate currentDay = LocalDate.now();
-        String message = "Danh sách top 10 các điểm đến phổ biến nhất hiện nay?";
+        LocalDate currentDate = LocalDate.now();
+        String message = "Danh sách top 10 các điểm đến phổ biến nhất ngày " + currentDate + "?";
         String destination = "";
 
         if (hotTour == null) {
@@ -72,7 +72,7 @@ public class HotTourService {
                     }
                 }
             }
-        } else if (currentDay.isAfter(hotTour.getCreatedTime().plusWeeks(1))) {
+        } else if (currentDate.isAfter(hotTour.getCreatedTime().plusWeeks(1))) {
             String text = chatbotService.sendPrompt(message);
 
             ObjectMapper objectMapper = new ObjectMapper();

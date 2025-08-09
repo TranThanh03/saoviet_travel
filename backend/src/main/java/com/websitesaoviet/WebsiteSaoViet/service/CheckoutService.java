@@ -37,7 +37,7 @@ public class CheckoutService {
 
     @NonFinal
     @Value("${base.url}")
-    protected String baseUrl;
+    protected String BASE_URL;
 
     public CheckoutResponse createCheckout(String bookingId, String checkoutCode, String method,
                                            LocalDateTime currentTime, String status) {
@@ -54,8 +54,8 @@ public class CheckoutService {
     }
 
     public String processMomoCheckout(String orderId, String customerId, Double amount, CheckoutProcessionRequest request) {
-        String redirectUrl = "http://localhost:3000/booking/message";
-        String ipnUrl = "http://localhost:3000/booking/message";
+        String redirectUrl = BASE_URL + "/booking/message";
+        String ipnUrl = BASE_URL + "/booking/message";
         String promotionId = request.getPromotionId().trim();
 
         String extraData = "scheduleId=" + request.getScheduleId() + ";customerId=" + customerId + ";quantityAdult=" + request.getQuantityAdult() + ";quantityChildren=" + request.getQuantityChildren() + ";promotionId=" + promotionId;

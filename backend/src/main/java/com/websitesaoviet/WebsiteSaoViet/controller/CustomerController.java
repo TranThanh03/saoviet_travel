@@ -18,7 +18,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -72,8 +71,7 @@ public class CustomerController {
     }
 
     @GetMapping("/infor")
-    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@CookieValue("token") String token) {
         String id = authenticationService.getIdByToken(token);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
@@ -85,8 +83,9 @@ public class CustomerController {
     }
 
     @PutMapping("")
-    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CustomerUpdateRequest request) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(@CookieValue("token") String token,
+                                                                 @RequestBody @Valid CustomerUpdateRequest request) {
+
         String id = authenticationService.getIdByToken(token);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
@@ -116,8 +115,9 @@ public class CustomerController {
     }
 
     @PutMapping("/password")
-    ResponseEntity<ApiResponse<String>> changePassword(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid PasswordChangeRequest request) {
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+    ResponseEntity<ApiResponse<String>> changePassword(@CookieValue("token") String token,
+                                                       @RequestBody @Valid PasswordChangeRequest request) {
+
         String id = authenticationService.getIdByToken(token);
 
         customerService.changePassword(id, request);

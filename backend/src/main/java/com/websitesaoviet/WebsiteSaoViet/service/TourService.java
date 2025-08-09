@@ -338,7 +338,6 @@ public class TourService {
                 case "low-to-high" -> Sort.by(Sort.Direction.ASC, "adult_price");
                 case "new" -> Sort.by(Sort.Direction.DESC, "created_time");
                 case "old" -> Sort.by(Sort.Direction.ASC, "created_time");
-                case "default" -> Sort.by(Sort.Direction.DESC, "quantity_order");
                 default -> Sort.unsorted();
             };
         }
@@ -462,7 +461,7 @@ public class TourService {
         Map<String, Object> map = (Map<String, Object>) response;
         Double minPrice = null;
         Double maxPrice = null;
-        String destination = null;
+        String destination = "";
         String area = null;
         Integer quantityDay = null;
         LocalDate startDate = null;
@@ -523,12 +522,12 @@ public class TourService {
 
         if (startDate != null) {
             comparator = comparator == null
-                    ? Comparator.comparing(o -> ((Date) o[6]))
-                    : comparator.thenComparing(o -> ((Date) o[6]));
+                    ? Comparator.comparing(o -> (Date) o[6])
+                    : comparator.thenComparing(o -> (Date) o[6]);
         } else if (endDate != null) {
             comparator = comparator == null
-                    ? Comparator.comparing(o -> ((Date) o[7]))
-                    : comparator.thenComparing(o -> ((Date) o[7]));
+                    ? Comparator.comparing((Object[] o) -> (Date) o[7]).reversed()
+                    : comparator.thenComparing((Object[] o) -> (Date) o[7], Comparator.reverseOrder());
         }
 
         if (map.get("destination") != null) {

@@ -24,12 +24,10 @@ public class ReviewController {
     AuthenticationService authenticationService;
 
     @PostMapping("/{bookingId}")
-    ResponseEntity<ApiResponse<ReviewResponse>> createReview(
-            @PathVariable String bookingId,
-            @RequestHeader("Authorization") String authorizationHeader,
-            @RequestBody @Valid ReviewCreationRequest request) {
+    ResponseEntity<ApiResponse<ReviewResponse>> createReview(@PathVariable String bookingId,
+                                                             @CookieValue("token") String token,
+                                                             @RequestBody @Valid ReviewCreationRequest request) {
 
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         String customerId = authenticationService.getIdByToken(token);
 
         ApiResponse<ReviewResponse> apiResponse = ApiResponse.<ReviewResponse>builder()
@@ -62,11 +60,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<String>> deleteReview(
-            @PathVariable String id,
-            @RequestHeader("Authorization") String authorizationHeader){
+    ResponseEntity<ApiResponse<String>> deleteReview(@PathVariable String id,
+                                                     @CookieValue("token") String token){
 
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         String customerId = authenticationService.getIdByToken(token);
 
         reviewService.deleteReview(id, customerId);
@@ -80,11 +76,9 @@ public class ReviewController {
     }
 
     @GetMapping("/check/{bookingId}")
-    ResponseEntity<ApiResponse<Boolean>> checkReview(
-            @PathVariable String bookingId,
-            @RequestHeader("Authorization") String authorizationHeader) {
+    ResponseEntity<ApiResponse<Boolean>> checkReview(@PathVariable String bookingId,
+                                                     @CookieValue("token") String token) {
 
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         String customerId = authenticationService.getIdByToken(token);
 
         ApiResponse<Boolean> apiResponse = ApiResponse.<Boolean>builder()

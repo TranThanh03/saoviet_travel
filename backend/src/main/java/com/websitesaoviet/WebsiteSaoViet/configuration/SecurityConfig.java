@@ -1,5 +1,7 @@
 package com.websitesaoviet.WebsiteSaoViet.configuration;
 
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,27 +24,32 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] GET_PUBLIC_ENDPOINTS = {
-            "/tours", "/tours/area-count", "/tours/popular", "/tours/three-popular",
-            "/tours/{id:[0-9a-f\\-]{36}}", "/tours/similar", "/tours/hot",
-            "/reviews/{id:[0-9a-f\\-]{36}}",
+    public static final String[] GET_PUBLIC_ENDPOINTS = {
+            "/tours/area-count", "/tours/popular", "/tours/three-popular",
+            "/tours/*", "/tours/similar", "/tours/hot",
+            "/reviews/*",
             "/promotions/list",
-            "/news/{id:[0-9a-f\\-]{36}}", "/news/outstanding", "/news/top-new",
-            "/news/list-outstanding/{id:[0-9a-f\\-]{36}}", "/news/list-top-new/{id:[0-9a-f\\-]{36}}",
-            "/chatbot/{code}", "/chatbot/generat-code",
+            "/news/*", "/news/outstanding", "/news/top-new",
+            "/news/list-outstanding/*", "/news/list-top-new/*",
+            "/chatbot/*", "/chatbot/generat-code",
+            "/schedules/tour/*"
     };
 
-    private final String[] POST_PUBLIC_ENDPOINTS = {
+    public static final String[] POST_PUBLIC_ENDPOINTS = {
             "/auth/login", "/auth/register", "/auth/admin/login",
             "/customers",
             "/tours/filter", "/tours/filter-area",
             "/tours/search", "/tours/search-destination",
-            "/chatbot/{id}",
+            "/chatbot/*",
     };
 
-    private final String[] PATCH_PUBLIC_ENDPOINTS = {
-            "/customers/activate/{id}",
+    public static final String[] PATCH_PUBLIC_ENDPOINTS = {
+            "/customers/activate/*",
     };
+
+    @NonFinal
+    @Value("${base.url}")
+    protected String BASE_URL;
 
     @Bean
     public CustomJwtDecoder customJwtDecoder() {
@@ -65,6 +73,11 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
+        httpSecurity.addFilterBefore(
+                new CookieJwtAuthenticationFilter(customJwtDecoder(), jwtAuthenticationConverter()),
+                UsernamePasswordAuthenticationFilter.class
+        );
+
         return httpSecurity.build();
     }
 
@@ -83,7 +96,7 @@ public class SecurityConfig {
     @Order(0)
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("https://saoviettravel.vercel.app"));
+        corsConfiguration.setAllowedOrigins(List.of(BASE_URL));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

@@ -202,7 +202,7 @@ public class TourController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/list")
+    @GetMapping("/list/summary")
     ResponseEntity<ApiResponse<List<ListToursResponse>>> getListTours() {
         ApiResponse<List<ListToursResponse>> apiResponse = ApiResponse.<List<ListToursResponse>>builder()
                 .code(1513)

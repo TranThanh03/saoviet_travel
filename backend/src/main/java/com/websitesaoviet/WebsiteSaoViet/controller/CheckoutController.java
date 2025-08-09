@@ -28,9 +28,9 @@ public class CheckoutController {
     PromotionService promotionService;
 
     @PostMapping("/process")
-    ResponseEntity<ApiResponse<UrlCheckoutResponse>> processCheckout(
-            @RequestHeader("Authorization") String authorizationHeader,
-            @Valid @RequestBody CheckoutProcessionRequest request) {
+    ResponseEntity<ApiResponse<UrlCheckoutResponse>> processCheckout(@CookieValue("token") String token,
+                                                                     @Valid @RequestBody CheckoutProcessionRequest request) {
+
         if (request.getQuantityAdult() + request.getQuantityChildren() <= 0) {
             throw new AppException(ErrorCode.QUANTITY_PEOPLE_INVALID);
         }
@@ -61,7 +61,6 @@ public class CheckoutController {
         Random random = new Random();
         String orderId = System.currentTimeMillis() + "" + random.nextInt(1000);
         int responseCode;
-        String token = authenticationService.extractTokenFromHeader(authorizationHeader);
         String customerId = authenticationService.getIdByToken(token);
 
         switch (request.getMethod()) {

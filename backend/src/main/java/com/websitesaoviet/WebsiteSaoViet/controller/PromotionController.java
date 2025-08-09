@@ -80,7 +80,8 @@ public class PromotionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    ResponseEntity<ApiResponse<PromotionResponse>> updateUser(@PathVariable String id, @RequestBody @Valid PromotionUpdateRequest request) {
+    ResponseEntity<ApiResponse<PromotionResponse>> updateUser(@PathVariable String id,
+                                                              @RequestBody @Valid PromotionUpdateRequest request) {
         ApiResponse<PromotionResponse> apiResponse = ApiResponse.<PromotionResponse>builder()
                 .code(1704)
                 .message("Cập nhật thông tin khuyến mãi thành công.")
