@@ -12,7 +12,7 @@ const ReviewList = ({ tourId, bookingId }) => {
     const [avgRating, setAvgRating] = useState(0);
     const [ratingStats, setRatingStats] = useState({});
     const [newReview, setNewReview] = useState({
-        rating: 5,
+        rating: 0,
         comment: ''
     });
     const [isReviewed, setReviewed] = useState(false);
