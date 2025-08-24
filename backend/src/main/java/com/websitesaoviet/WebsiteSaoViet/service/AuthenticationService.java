@@ -217,6 +217,7 @@ public class AuthenticationService {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new AppException(ErrorCode.TOKEN_NOT_EXITED);
         }
+        
         return authorizationHeader.substring(7);
     }
 

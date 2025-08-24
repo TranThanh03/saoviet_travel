@@ -42,12 +42,11 @@ public class ReviewController {
     @GetMapping("/{tourId}")
     ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviews(
             @PathVariable String tourId,
-            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+            @CookieValue(value = "token", required = false) String token) {
 
         String customerId = null;
 
-        if (authorizationHeader != null && !authorizationHeader.isBlank()) {
-            String token = authenticationService.extractTokenFromHeader(authorizationHeader);
+        if (token != null) {
             customerId = authenticationService.getIdByToken(token);
         }
 
