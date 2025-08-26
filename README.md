@@ -1,6 +1,6 @@
 # 🌍 Sao Việt Travel
 
-**Sao Việt Travel** là một nền tảng đặt tour du lịch trực tuyến giúp khách hàng dễ dàng tìm kiếm, đặt tour và quản lý lịch trình.  
+**Sao Việt Travel** là một nền tảng đặt tour du lịch trực tuyến giúp khách hàng dễ dàng tìm kiếm và đặt tour.  
 Website được xây dựng với mục tiêu mang lại trải nghiệm thuận tiện, hiện đại và an toàn cho cả **khách hàng** và **quản trị viên**.  
 
 🔗 **Truy cập website:** [https://saoviettravel.site](https://saoviettravel.site)
@@ -49,4 +49,4 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 
 ## 📧 Liên hệ
 
-Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ, vui lòng liên hệ qua email: [](thanhhkh3@gmail.com).
+Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ, vui lòng liên hệ qua email: [thanhhkh3@gmail.com](thanhhkh3@gmail.com).
