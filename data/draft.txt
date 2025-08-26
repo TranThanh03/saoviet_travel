@@ -1,7 +1,3 @@
-//create https
-ngrok http 8080
-ngrok start --all
-
 //admin
 "phone": "0399999999",
 "email": "admin@gmail.com",
@@ -17,6 +13,3 @@ NGUYEN VAN A
 9704 0000 0000 0018
 03/07
 OTP
-
-//mysql
-Event scheduler status: enable
