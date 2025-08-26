@@ -65,7 +65,7 @@ public class CheckoutService {
     }
 
     public String processVnpayCheckout(String orderId, String customerId, Double amount, CheckoutProcessionRequest request) {
-        String redirectUrl = "http://localhost:3000/booking/message";
+        String redirectUrl = BASE_URL + "/booking/message";
         String promotionId = request.getPromotionId().trim();
 
         String extraData = "scheduleId=" + request.getScheduleId() + ";customerId=" + customerId + ";quantityAdult=" + request.getQuantityAdult() + ";quantityChildren=" + request.getQuantityChildren() + ";promotionId=" + promotionId;
