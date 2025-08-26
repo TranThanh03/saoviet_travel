@@ -40,8 +40,10 @@ const SearchDestinationPage = () => {
                         startDate: sd,
                         endDate: ed
                     },
-                    currentPage, 
-                    pageSize
+                    {
+                        page: currentPage,
+                        size: pageSize
+                    }
                 );
 
                 if (response?.code === 1510) {

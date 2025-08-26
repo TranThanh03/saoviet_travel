@@ -34,8 +34,10 @@ const SearchPage = () => {
                         ...search,
                         keyword: searchQuery
                     },
-                    currentPage,
-                    pageSize
+                    { 
+                        page: currentPage,
+                        size: pageSize
+                    }
                 );
 
                 if (response?.code === 1509) {
