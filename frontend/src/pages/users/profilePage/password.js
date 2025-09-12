@@ -15,7 +15,7 @@ const PasswordPage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value.trim() }));
         setError(null);
     };
 
