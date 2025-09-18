@@ -14,6 +14,7 @@ const LoginPage = () => {
     const { fetchAuth } = useContext(AuthContext);
     const [captchaToken, setCaptchaToken] = useState(null);
     const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -35,6 +36,7 @@ const LoginPage = () => {
         }
 
         setRefreshCaptCha(false);
+        setLoading(true);
 
         try {
             const response = await AuthApi.login({
@@ -52,6 +54,8 @@ const LoginPage = () => {
             }
         } catch (error) {
             setErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -110,8 +114,18 @@ const LoginPage = () => {
                                 {isRefreshCaptcha && <Recaptcha setCaptchaToken={setCaptchaToken}/>}
 
                                 <div className="mt-3">
-                                    <button type="submit" className={`btn btn-lg btn-primary w-100 fs-6 ${checkFormData() ? '' : 'inactive'}`} disabled={!checkFormData()}>
-                                        Đăng nhập
+                                    <button 
+                                        type="submit"
+                                        className={`btn btn-lg btn-primary w-100 fs-6 ${checkFormData() ? '' : 'inactive'}`}
+                                        disabled={!checkFormData() || loading}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            </>
+                                        ) : (
+                                            "Đăng nhập"
+                                        )}
                                     </button>
                                 </div>
                             </form>
