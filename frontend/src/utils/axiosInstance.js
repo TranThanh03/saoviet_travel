@@ -9,9 +9,14 @@ const axiosInstance = axios.create({
 });
 
 const pendingRequests = new Set();
+const skipEndpoints = [
+    '/api/v1/chatbot',
+    '/api/v1/auth/login',
+    '/api/v1/customers'
+];
 
 const shouldSkipLoading = (url = '') => {
-    return url.includes('/api/v1/chatbot');
+    return skipEndpoints.some(endpoint => url.includes(endpoint));
 };
 
 axiosInstance.interceptors.request.use(

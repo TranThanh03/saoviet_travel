@@ -7,6 +7,7 @@ import './styles/style.scss';
 import Loading from '@components/loading/index.js';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

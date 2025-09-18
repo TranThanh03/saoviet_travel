@@ -9,12 +9,24 @@ const axiosInstanceAdmin = axios.create({
 });
 
 const pendingRequests = new Set();
+const skipEndpoints = [
+    '/api/v1/auth/admin/login'
+];
+
+const shouldSkipLoading = (url = '') => {
+    return skipEndpoints.some(endpoint => url.includes(endpoint));
+};
 
 axiosInstanceAdmin.interceptors.request.use(
     (config) => {
-        config.metadata = {};
-        setLoading(true);
-        pendingRequests.add(config);
+        config.metadata = {
+            skipLoading: shouldSkipLoading(config.url),
+        };
+
+        if (!config.metadata.skipLoading) {
+            setLoading(true);
+            pendingRequests.add(config);
+        }
 
         return config;
     },
@@ -25,28 +37,40 @@ axiosInstanceAdmin.interceptors.request.use(
 
 axiosInstanceAdmin.interceptors.response.use(
     (response) => {
-        pendingRequests.delete(response.config);
+        const config = response.config;
 
-        if (pendingRequests.size === 0) {
-            setLoading(false);
+        if (!config.metadata?.skipLoading) {
+            pendingRequests.delete(config);
+
+            if (pendingRequests.size === 0) {
+                setLoading(false);
+            }
         }
 
         return response.data;
     },
     (error) => {
-        pendingRequests.delete(error.config || {});
+        const config = error.config || {};
 
-        if (pendingRequests.size === 0) {
-            setLoading(false);
+        if (!config.metadata?.skipLoading) {
+            pendingRequests.delete(config);
+
+            if (pendingRequests.size === 0) {
+                setLoading(false);
+            }
         }
 
         if (error.response?.data?.code === 4445) {
-            if (error.config?.url?.includes("/api/v1/auth/admin/introspect")) {
+            if (config.url?.includes("/api/v1/auth/admin/introspect")) {
                 return Promise.reject(error.response || error.message);
             }
 
             window.location.href = "/manage/error/404";
         } else if (error.request?.status === 401) {
+            if (config.url?.includes("/api/v1/auth/admin/login")) {
+                return Promise.reject(error.response || error.message);
+            }
+
             window.location.href = "/manage/auth/login";
         } else if (error.code === "ERR_NETWORK") {
             window.location.href = "/manage/auth/login";

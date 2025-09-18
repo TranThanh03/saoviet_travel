@@ -4,11 +4,14 @@ import './login.scss';
 import { logo } from 'assets';
 import { AuthApi } from 'services';
 import PasswordInput from 'components/passwordInput';
+import RecaptchaCb from 'components/recaptcha/checkbox';
 
 const LoginPage = () => {
-    const [formData, setFormData] = useState({ username: '', password: '' });
+    const [formData, setFormData] = useState({ username: '', password: '', recaptcha: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
+    const [captchaToken, setCaptchaToken] = useState(null);
+    const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -24,8 +27,18 @@ const LoginPage = () => {
             return;
         }
 
+        if (!captchaToken) {
+            setErrorMessage("Vui lòng xác nhận reCAPTCHA!");
+            return;
+        }
+
+        setRefreshCaptCha(false);
+
         try {
-            const response = await AuthApi.loginAdmin(formData);
+            const response = await AuthApi.loginAdmin({
+                ...formData,
+                recaptcha: captchaToken
+            });
 
             if (response?.code === 9996) {
                 navigate('/manage/dashboard');
@@ -35,11 +48,17 @@ const LoginPage = () => {
             }
             else {
                 setErrorMessage(response.message);
+                setCaptchaToken(null);
+                setRefreshCaptCha(true);
             }
         } catch (error) {
             setErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
         }
     };
+
+    const checkFormData = () => {
+        return !!(captchaToken && formData.username && formData.password);
+    }
 
     return (
         <div className='login-manage-page'>
@@ -89,8 +108,10 @@ const LoginPage = () => {
                                     {errorMessage}
                                 </div>
 
+                                {isRefreshCaptcha && <RecaptchaCb setCaptchaToken={setCaptchaToken}/>}
+
                                 <div className="mt-3">
-                                    <button type="submit" className="btn btn-lg btn-primary w-100 fs-6 rounded-2">
+                                    <button type="submit" className={`btn btn-lg btn-primary w-100 fs-6 rounded-2 ${checkFormData() ? '' : 'inactive'}`} disabled={!checkFormData()}>
                                         Đăng nhập
                                     </button>
                                 </div>
