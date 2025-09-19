@@ -3,8 +3,12 @@ package com.websitesaoviet.WebsiteSaoViet.controller;
 import com.nimbusds.jose.JOSEException;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.common.AuthenticationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
+import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
+import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
+import com.websitesaoviet.WebsiteSaoViet.service.RecaptchaService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,10 +26,15 @@ import java.time.Duration;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
     AuthenticationService authenticationService;
+    RecaptchaService recaptchaService;
 
     @PostMapping("/login")
-    public ApiResponse<String> authenticate(@RequestBody AuthenticationRequest request,
+    public ApiResponse<String> authenticate(@RequestBody @Valid AuthenticationRequest request,
                                             HttpServletResponse response) {
+
+        if (!recaptchaService.verifyCB(request.getRecaptcha())) {
+            throw new AppException(ErrorCode.RECAPTCHA_FAILED);
+        }
 
         String jwtToken = authenticationService.authenticate(request);
 
@@ -78,8 +87,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/admin/login")
-    public ApiResponse<String> authenticateAdmin(@RequestBody AuthenticationRequest request,
+    public ApiResponse<String> authenticateAdmin(@RequestBody @Valid AuthenticationRequest request,
                                                  HttpServletResponse response) {
+
+        if (!recaptchaService.verifyCB(request.getRecaptcha())) {
+            throw new AppException(ErrorCode.RECAPTCHA_FAILED);
+        }
 
         String jwtToken = authenticationService.authenticateAdmin(request);
 

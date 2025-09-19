@@ -1,5 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.dto.request.common;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PasswordChangeRequest {
+    @NotNull(message = "NOT_NULL")
     String currentPassword;
 
     @Size(min = 8, message = "PASSWORD_INVALID")

@@ -97,7 +97,10 @@ public enum ErrorCode {
     TOUR_NOT_STARTED(1062, "Tour có lịch trình chưa diễn ra!", HttpStatus.OK),
     HOTTOUR_NOT_EXITED(1063, "Hot tour không tồn tại!", HttpStatus.OK),
     CHATBOT_ERROR(1064, "Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.", HttpStatus.OK),
-    CHATBOT_DATE_INVALID(1065, "Vui lòng nhập thời gian đúng định dạng. Ví dụ: 25/05/2025 hoặc 05/2025.", HttpStatus.OK)
+    CHATBOT_DATE_INVALID(1065, "Vui lòng nhập thời gian đúng định dạng. Ví dụ: 25/05/2025 hoặc 05/2025.", HttpStatus.OK),
+
+    NOT_NULL(1066, "Vui lòng không bỏ trống!", HttpStatus.OK),
+    RECAPTCHA_FAILED(1067, "Xác thực reCAPTCHA thất bại!", HttpStatus.OK)
     ;
     
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

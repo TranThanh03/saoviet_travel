@@ -1,6 +1,7 @@
 package com.websitesaoviet.WebsiteSaoViet.dto.request.user;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,4 +25,7 @@ public class CustomerCreationRequest {
 
     @Size(min = 8, message = "PASSWORD_INVALID")
     String password;
+
+    @NotNull(message = "NOT_NULL")
+    String recaptcha;
 }

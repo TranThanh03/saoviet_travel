@@ -11,6 +11,7 @@ import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
 import com.websitesaoviet.WebsiteSaoViet.service.BookingService;
 import com.websitesaoviet.WebsiteSaoViet.service.CustomerService;
+import com.websitesaoviet.WebsiteSaoViet.service.RecaptchaService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,14 @@ public class CustomerController {
     CustomerService customerService;
     AuthenticationService authenticationService;
     BookingService bookingService;
+    RecaptchaService recaptchaService;
 
     @PostMapping()
     ResponseEntity<ApiResponse<CustomerCreateResponse>> createCustomer(@RequestBody @Valid CustomerCreationRequest request) {
+        if (!recaptchaService.verifyINV(request.getRecaptcha())) {
+            throw new AppException(ErrorCode.RECAPTCHA_FAILED);
+        }
+
         ApiResponse<CustomerCreateResponse> apiResponse = ApiResponse.<CustomerCreateResponse>builder()
                 .code(1300)
                 .message("Thêm khách hàng mới thành công.")

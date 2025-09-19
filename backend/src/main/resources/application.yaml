@@ -66,6 +66,10 @@ vnpay:
   tmnCode: ${VNPAY_TMN_CODE}
   hashSecret: ${VNPAY_HASH_SECRET}
 
+recaptcha:
+  cbSecret: ${RECAPTCHA_CB_SECRET}
+  invSecret: ${RECAPTCHA_INV_SECRET}
+
 base:
   url: ${BASE_URL}
 
