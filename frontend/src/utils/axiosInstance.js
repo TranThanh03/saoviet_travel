@@ -16,7 +16,13 @@ const skipEndpoints = [
 ];
 
 const shouldSkipLoading = (url = '') => {
-    return skipEndpoints.some(endpoint => url.includes(endpoint));
+    return skipEndpoints.some(endpoint => {
+        if (endpoint === '/api/v1/customers') {
+            return url === endpoint;
+        } else {
+            return url.includes(endpoint);
+        }
+    });
 };
 
 axiosInstance.interceptors.request.use(
