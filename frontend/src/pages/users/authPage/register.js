@@ -1,4 +1,4 @@
-import { memo, useState, useRef } from 'react';
+import { memo, useState, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import './register.scss';
 import { CustomerApi } from 'services';
@@ -6,6 +6,7 @@ import { SuccessToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
 import PasswordInput from 'components/passwordInput';
 import RecaptchaInv from 'components/recaptcha/invisible';
+import debounce from 'lodash.debounce';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ const RegisterPage = () => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const recaptchaRef = useRef();
+    const formRef = useRef(formData);
+    formRef.current = formData;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -27,22 +30,24 @@ const RegisterPage = () => {
         setErrors((prev) => ({ ...prev, [name]: '' }));
     };
 
-    const validateForm = () => {
+    const validateForm = (data) => {
         let newErrors = {};
 
-        if (!formData.fullName.trim()) newErrors.fullName = 'Họ và tên không được để trống!';
-        if (!formData.phone.trim()) newErrors.phone = 'Số điện thoại không được để trống!';
-        if (!formData.email.trim()) newErrors.email = 'Email không được để trống!';
-        if (!formData.password.trim()) newErrors.password = 'Mật khẩu không được để trống!';
-        if (!formData.repeatpw.trim()) newErrors.repeatpw = 'Vui lòng nhập lại mật khẩu!';
-        else if (formData.password !== formData.repeatpw) newErrors.repeatpw = 'Mật khẩu không khớp!';
+        if (!data.fullName.trim()) newErrors.fullName = 'Họ và tên không được để trống!';
+        if (!data.phone.trim()) newErrors.phone = 'Số điện thoại không được để trống!';
+        if (!data.email.trim()) newErrors.email = 'Email không được để trống!';
+        if (!data.password.trim()) newErrors.password = 'Mật khẩu không được để trống!';
+        if (!data.repeatpw.trim()) newErrors.repeatpw = 'Vui lòng nhập lại mật khẩu!';
+        else if (data.password !== data.repeatpw) newErrors.repeatpw = 'Mật khẩu không khớp!';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleRegister = async () => {
-        if (!validateForm()) return;
+        const data = formRef.current;
+
+        if (!validateForm(data)) return;
 
         setLoading(true);
 
@@ -56,7 +61,7 @@ const RegisterPage = () => {
             }
 
             const response = await CustomerApi.create({
-                ...formData,
+                ...data,
                 recaptcha: captchaToken
             });
 
@@ -76,6 +81,7 @@ const RegisterPage = () => {
                 if (response?.code === 1006 || response?.code === 1009) newErrors.email = response.message;
                 if (response?.code === 1007) newErrors.password = response.message;
                 if (response?.code === 1010 || response?.code === 1011) newErrors.fullName = response.message;
+                if (response?.code === 1067) newErrors.general = response.message;
                 setErrors(newErrors);
             }
         } catch (error) {
@@ -85,9 +91,14 @@ const RegisterPage = () => {
         }
     };
 
+    const debouncedRegister = useMemo(
+        () => debounce(handleRegister, 1000, { leading: true, trailing: false }),
+        []
+    );
+
     const checkFormData = () => {
         return !!(formData.fullName && formData.phone && formData.email && formData.password && formData.repeatpw);
-    }
+    };
 
     return (
         <div className="register-page">
@@ -139,9 +150,9 @@ const RegisterPage = () => {
                             <PasswordInput
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                name='password'
-                                id='password'
-                                label='Mật khẩu'
+                                name="password"
+                                id="password"
+                                label="Mật khẩu"
                             />
                             {errors.password && <p className="text-danger mt-1">{errors.password}</p>}
                         </div>
@@ -150,9 +161,9 @@ const RegisterPage = () => {
                             <PasswordInput
                                 value={formData.repeatpw}
                                 onChange={handleInputChange}
-                                name='repeatpw'
-                                id='repeatpw'
-                                label='Nhập lại mật khẩu'
+                                name="repeatpw"
+                                id="repeatpw"
+                                label="Nhập lại mật khẩu"
                             />
                             {errors.repeatpw && <p className="text-danger mt-1">{errors.repeatpw}</p>}
                         </div>
@@ -162,19 +173,23 @@ const RegisterPage = () => {
                         <button
                             type="button"
                             className="btn btn-lg btn-primary w-100 fs-6 mb-3"
-                            onClick={handleRegister}
+                            onClick={debouncedRegister}
                             disabled={!checkFormData() || loading}
                         >
                             {loading ? (
                                 <>
-                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span
+                                        className="spinner-border spinner-border-sm me-2"
+                                        role="status"
+                                        aria-hidden="true"
+                                    ></span>
                                 </>
                             ) : (
-                                "Đăng ký"
+                                'Đăng ký'
                             )}
                         </button>
 
-                        <RecaptchaInv ref={recaptchaRef}/>
+                        <RecaptchaInv ref={recaptchaRef} />
                     </form>
 
                     <p>

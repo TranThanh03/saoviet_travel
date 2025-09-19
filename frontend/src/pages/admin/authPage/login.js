@@ -22,6 +22,7 @@ const LoginPage = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setErrorMessage('');
         
         if (!formData.username || !formData.password) {
             setErrorMessage('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
