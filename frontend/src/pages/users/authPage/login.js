@@ -35,7 +35,6 @@ const LoginPage = () => {
             return;
         }
 
-        setRefreshCaptCha(false);
         setLoading(true);
 
         try {
@@ -50,12 +49,12 @@ const LoginPage = () => {
             } else {
                 setErrorMessage(response.message);
                 setCaptchaToken(null);
-                setRefreshCaptCha(true);
             }
         } catch (error) {
             setErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
         } finally {
             setLoading(false);
+            setRefreshCaptCha(prev => !prev);
         }
     };
 
@@ -111,7 +110,7 @@ const LoginPage = () => {
                                     {errorMessage}
                                 </div>
 
-                                {isRefreshCaptcha && <Recaptcha setCaptchaToken={setCaptchaToken}/>}
+                                <Recaptcha key={isRefreshCaptcha} setCaptchaToken={setCaptchaToken}/>
 
                                 <div className="mt-3">
                                     <button 
