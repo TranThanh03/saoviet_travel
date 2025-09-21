@@ -7,11 +7,14 @@ import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
 import com.websitesaoviet.WebsiteSaoViet.service.RecaptchaService;
+import com.websitesaoviet.WebsiteSaoViet.util.DomainUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +31,10 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     RecaptchaService recaptchaService;
 
+    @NonFinal
+    @Value("${base.url}")
+    protected String BASE_URL;
+
     @PostMapping("/login")
     public ApiResponse<String> authenticate(@RequestBody @Valid AuthenticationRequest request,
                                             HttpServletResponse response) {
@@ -42,6 +49,7 @@ public class AuthenticationController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
+                .domain(DomainUtil.extractDomain(BASE_URL))
                 .path("/")
                 .maxAge(60 * 60)
                 .build();
@@ -74,6 +82,7 @@ public class AuthenticationController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
+                .domain(DomainUtil.extractDomain(BASE_URL))
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build();
@@ -100,6 +109,7 @@ public class AuthenticationController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
+                .domain(DomainUtil.extractDomain(BASE_URL))
                 .path("/")
                 .maxAge(60 * 60)
                 .build();
@@ -133,6 +143,7 @@ public class AuthenticationController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
+                .domain(DomainUtil.extractDomain(BASE_URL))
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build();
