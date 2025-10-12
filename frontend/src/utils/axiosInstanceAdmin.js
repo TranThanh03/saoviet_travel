@@ -3,7 +3,7 @@ import { setLoading } from './loading.js';
 
 const axiosInstanceAdmin = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL,
-    timeout: 15000,
+    timeout: 30000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
 });
