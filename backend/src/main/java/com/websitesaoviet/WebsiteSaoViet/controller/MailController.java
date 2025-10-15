@@ -4,11 +4,8 @@ import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailInvoiceRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.BookingCheckoutDetailResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
-import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
-import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.BookingService;
 import com.websitesaoviet.WebsiteSaoViet.service.MailService;
-import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,18 +24,14 @@ public class MailController {
 
      @PostMapping("/send")
      ResponseEntity<ApiResponse<String>> sendEmail(@RequestBody EmailRequest request) {
-         try {
-             mailService.sendMail(request.getTo(), request.getSubject(), request.getText());
+         mailService.sendMail(request.getTo(), request.getSubject(), request.getText());
 
-             ApiResponse<String> apiResponse = ApiResponse.<String>builder()
-                     .code(1400)
-                     .message("Email đã gửi thành công.")
-                     .build();
+         ApiResponse<String> apiResponse = ApiResponse.<String>builder()
+                 .code(1400)
+                 .message("Email đã gửi thành công.")
+                 .build();
 
-             return ResponseEntity.ok(apiResponse);
-         } catch (MessagingException e) {
-             throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
-         }
+         return ResponseEntity.ok(apiResponse);
      }
 
     @PreAuthorize("hasRole('ADMIN')")

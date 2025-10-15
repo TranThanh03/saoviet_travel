@@ -19,6 +19,7 @@ const SearchDestinationPage = () => {
     });
 
     const onSortChange = (newSort) => {
+        setCurrentPage(0);
         setSearch(prev => ({
             ...prev,
             sort: newSort

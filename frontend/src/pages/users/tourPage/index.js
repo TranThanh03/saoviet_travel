@@ -37,6 +37,7 @@ const TourPage = () => {
     }, [filters, currentPage]);
     
     const updateFilter = (newFilters) => {
+        setCurrentPage(0);
         setFilters(prevFilters => ({
             ...prevFilters,
             ...newFilters
@@ -44,6 +45,7 @@ const TourPage = () => {
     }
 
     const onSortChange = (newSort) => {
+        setCurrentPage(0);
         setFilters(prevFilters => ({
             ...prevFilters,
             sort: newSort

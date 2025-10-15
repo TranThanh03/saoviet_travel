@@ -1,7 +1,7 @@
 import { tourBanner } from 'assets';
 import Banner from 'components/banner';
 import TourList from 'components/users/tour/TourList.js';
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TourApi } from 'services';
 
@@ -15,6 +15,7 @@ const SearchPage = () => {
         keyword: '',
         sort: 'default'
     });
+    const prevSortRef = useRef(search.sort);
 
     const onSortChange = (newSort) => {
         setSearch(prev => ({
@@ -27,6 +28,12 @@ const SearchPage = () => {
         const fetchTourList = async () => {
             const queryParams = new URLSearchParams(location.search);
             const searchQuery = queryParams.get('p') || '';
+
+            if (searchQuery !== search.keyword || search.sort !== prevSortRef.current) {
+                setCurrentPage(0);
+                prevSortRef.current = search.sort;
+                setSearch(prev => ({ ...prev, keyword: searchQuery }));
+            }
 
             try {
                 const response = await TourApi.searchTours(

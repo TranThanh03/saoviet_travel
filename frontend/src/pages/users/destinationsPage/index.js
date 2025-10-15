@@ -45,6 +45,7 @@ const DestinationsPage = () => {
     }, [filters, currentPage]);
     
     const updateFilter = (newFilters) => {
+        setCurrentPage(0);
         setFilters(prevFilters => ({
             ...prevFilters,
             ...newFilters
@@ -52,6 +53,7 @@ const DestinationsPage = () => {
     }
 
     const handleFilterChange = (field, value) => {
+        setCurrentPage(0);
         setFilters({
             ...filters,
             [field]: value,

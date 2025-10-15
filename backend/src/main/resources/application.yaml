@@ -37,18 +37,9 @@ spring:
     password: ${RABBITMQ_PASSWORD}
     virtual-host: ${RABBITMQ_VHOST}
 
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    fromName: ${MAIL_FROM_NAME}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
+sendgrid:
+  api-key: ${SENDGRID_API_KEY}
+  sender: ${SENDGRID_SENDER}
 
 gemini:
   api-key: ${GEMINI_API_KEY}
