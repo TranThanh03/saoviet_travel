@@ -5,10 +5,7 @@ import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.BookingResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingSummaryResponse;
-import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
-import com.websitesaoviet.WebsiteSaoViet.service.BookingService;
-import com.websitesaoviet.WebsiteSaoViet.service.CustomerService;
-import com.websitesaoviet.WebsiteSaoViet.service.TourService;
+import com.websitesaoviet.WebsiteSaoViet.service.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +28,7 @@ public class BookingController {
     AuthenticationService authenticationService;
     TourService tourService;
     CustomerService customerService;
+    MailService mailService;
 
     @GetMapping("/list")
     ResponseEntity<ApiResponse<List<BookingSummaryResponse>>> getBookingsByCustomerId(@CookieValue("token") String token){
@@ -67,13 +65,28 @@ public class BookingController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/confirm/{id}")
-    ResponseEntity<ApiResponse<BookingResponse>> confirmBooking(@PathVariable String id) {
-        bookingService.confirmBooking(id);
+    @PatchMapping("/admin/cancel/{id}")
+    ResponseEntity<ApiResponse<BookingResponse>> cancelBookingByAdmin(@PathVariable String id) {
+        bookingService.cancelBooking(id);
+        boolean mailSent = bookingService.sendInvoice(id, false);
 
         ApiResponse<BookingResponse> apiResponse = ApiResponse.<BookingResponse>builder()
                 .code(1804)
-                .message("Xác nhận lịch đặt thành công.")
+                .message(mailSent ? "Đã hủy và gửi mail thành công." : "Đã hủy thành công, nhưng gửi mail thất bại.")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/confirm/{id}")
+    ResponseEntity<ApiResponse<BookingResponse>> confirmBooking(@PathVariable String id) {
+        bookingService.confirmBooking(id);
+        boolean mailSent = bookingService.sendInvoice(id, true);
+
+        ApiResponse<BookingResponse> apiResponse = ApiResponse.<BookingResponse>builder()
+                .code(1805)
+                .message(mailSent ? "Xác nhận và gửi mail thành công." : "Xác nhận thành công, nhưng gửi mail thất bại.")
                 .build();
 
         return ResponseEntity.ok(apiResponse);
@@ -85,7 +98,7 @@ public class BookingController {
         bookingService.confirmReserve(id);
 
         ApiResponse<BookingResponse> apiResponse = ApiResponse.<BookingResponse>builder()
-                .code(1805)
+                .code(1806)
                 .message("Xác nhận giữ chỗ thành công.")
                 .build();
 
@@ -103,7 +116,7 @@ public class BookingController {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<BookingListResponse>> apiResponse = ApiResponse.<Page<BookingListResponse>>builder()
-                .code(1806)
+                .code(1807)
                 .result(bookingService.getBookings(keyword.trim(), pageable))
                 .build();
 
@@ -114,7 +127,7 @@ public class BookingController {
     @GetMapping("/detail/{id}")
     ResponseEntity<ApiResponse<BookingCheckoutDetailResponse>> getBookingCheckoutDetail(@PathVariable String id) {
         ApiResponse<BookingCheckoutDetailResponse> apiResponse = ApiResponse.<BookingCheckoutDetailResponse>builder()
-                .code(1807)
+                .code(1808)
                 .result(bookingService.getBookingCheckoutDetail(id))
                 .build();
 
@@ -133,7 +146,7 @@ public class BookingController {
                 countTours, countCustomers, countBookings, totalRevenue);
 
         ApiResponse<InfoCountsResponse> apiResponse = ApiResponse.<InfoCountsResponse>builder()
-                .code(1808)
+                .code(1809)
                 .result(adminHomeResponse)
                 .build();
 
@@ -144,7 +157,7 @@ public class BookingController {
     @GetMapping("/latest")
     ResponseEntity<ApiResponse<List<BookingsLatestResponse>>> getLatestBookings() {
         ApiResponse<List<BookingsLatestResponse>> apiResponse = ApiResponse.<List<BookingsLatestResponse>>builder()
-                .code(1809)
+                .code(1810)
                 .result(bookingService.getBookingsLatest())
                 .build();
 
@@ -155,7 +168,7 @@ public class BookingController {
     @GetMapping("/top-popular")
     ResponseEntity<ApiResponse<List<PopularToursResponse>>> getTopPopularTours() {
         ApiResponse<List<PopularToursResponse>> apiResponse = ApiResponse.<List<PopularToursResponse>>builder()
-                .code(1810)
+                .code(1811)
                 .result(bookingService.getTopPopularTours())
                 .build();
 
@@ -166,7 +179,7 @@ public class BookingController {
     @GetMapping("/status-count")
     ResponseEntity<ApiResponse<BookingStatusCountsResponse>> getBookingStatusCounts() {
         ApiResponse<BookingStatusCountsResponse> apiResponse = ApiResponse.<BookingStatusCountsResponse>builder()
-                .code(1811)
+                .code(1812)
                 .result(bookingService.getStatusCounts())
                 .build();
 
@@ -177,7 +190,7 @@ public class BookingController {
     @GetMapping("/statistics/{year}")
     ResponseEntity<ApiResponse<List<BookingStatisticResponse>>> getBookingsStatisticsByMonth(@PathVariable Integer year) {
         ApiResponse<List<BookingStatisticResponse>> apiResponse = ApiResponse.<List<BookingStatisticResponse>>builder()
-                .code(1812)
+                .code(1813)
                 .result(bookingService.getBookingStatisticByYear(year))
                 .build();
 

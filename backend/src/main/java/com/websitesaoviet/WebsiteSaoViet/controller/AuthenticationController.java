@@ -2,7 +2,9 @@ package com.websitesaoviet.WebsiteSaoViet.controller;
 
 import com.nimbusds.jose.JOSEException;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.common.AuthenticationRequest;
+import com.websitesaoviet.WebsiteSaoViet.dto.request.common.IntrospectRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.common.IntrospectResponse;
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
@@ -63,18 +65,21 @@ public class AuthenticationController {
     }
 
     @GetMapping("/introspect")
-    public ApiResponse<Boolean> introspectToken(@CookieValue("token") String token) {
-        var result = authenticationService.introspect(token);
+    public ApiResponse<IntrospectResponse> introspectToken(@CookieValue("token") String token) {
+        var result = authenticationService.introspect(
+                IntrospectRequest.builder()
+                        .token(token)
+                        .build());
 
-        return ApiResponse.<Boolean>builder()
-                .code(result ? 9998 : 4448)
+        return ApiResponse.<IntrospectResponse>builder()
+                .code(result.isValid() ? 9998 : 4448)
                 .result(result)
                 .build();
     }
 
     @PostMapping("/logout")
     ApiResponse<String> logout(@CookieValue("token") String token,
-                                HttpServletResponse response) throws ParseException, JOSEException {
+                               HttpServletResponse response) throws ParseException, JOSEException {
 
         authenticationService.logout(token);
 
@@ -123,11 +128,14 @@ public class AuthenticationController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/introspect")
-    public ApiResponse<Boolean> introspectTokenAdmin(@CookieValue("token-admin") String token) {
-        var result = authenticationService.introspect(token);
+    public ApiResponse<IntrospectResponse> introspectTokenAdmin(@CookieValue("token-admin") String token) {
+        var result = authenticationService.introspect(
+                IntrospectRequest.builder()
+                        .token(token)
+                        .build());
 
-        return ApiResponse.<Boolean>builder()
-                .code(result ? 9995 : 4447)
+        return ApiResponse.<IntrospectResponse>builder()
+                .code(result.isValid() ? 9995 : 4447)
                 .result(result)
                 .build();
     }

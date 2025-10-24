@@ -74,7 +74,7 @@ const RegisterPage = () => {
                     repeatpw: '',
                     recaptcha: ''
                 });
-                SuccessToast(<p>Vui lòng kiểm tra mail <b>{response.result.email}</b></p>);
+                SuccessToast(<p>Vui lòng kiểm tra email <b>{response.result.email}</b> để kích hoạt tài khoản.</p>);
             } else {
                 let newErrors = {};
                 if (response?.code === 1005 || response?.code === 1008) newErrors.phone = response.message;

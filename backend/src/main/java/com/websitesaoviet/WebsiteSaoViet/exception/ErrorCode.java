@@ -32,7 +32,7 @@ public enum ErrorCode {
     USER_NOT_EXITED(1017, "Khách hàng không tồn tại!", HttpStatus.OK),
     INACTIVATE(1018, "Tài khoản chưa kích hoạt!", HttpStatus.OK),
     BLOCKED(1019, "Tài khoản đã bị khóa!", HttpStatus.OK),
-    EMAIL_SEND_FAILED(1020, "Lỗi gửi mail!", HttpStatus.OK),
+    EMAIL_SEND_FAILED(1020, "Lỗi gửi email!", HttpStatus.OK),
 
     DAY_INVALID(1021, "Số ngày phải lớn hơn không!", HttpStatus.OK),
     TOUR_NOT_EXITED(1022, "Tour không tồn tại!", HttpStatus.OK),

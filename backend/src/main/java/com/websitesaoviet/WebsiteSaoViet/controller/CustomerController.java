@@ -8,14 +8,12 @@ import com.websitesaoviet.WebsiteSaoViet.dto.response.common.CustomerResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.CustomerCreateResponse;
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
-import com.websitesaoviet.WebsiteSaoViet.service.AuthenticationService;
-import com.websitesaoviet.WebsiteSaoViet.service.BookingService;
-import com.websitesaoviet.WebsiteSaoViet.service.CustomerService;
-import com.websitesaoviet.WebsiteSaoViet.service.RecaptchaService;
+import com.websitesaoviet.WebsiteSaoViet.service.*;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +25,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/customers")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
+@Slf4j
 public class CustomerController {
     CustomerService customerService;
     AuthenticationService authenticationService;
     BookingService bookingService;
     RecaptchaService recaptchaService;
+    MailService mailService;
 
     @PostMapping()
     ResponseEntity<ApiResponse<CustomerCreateResponse>> createCustomer(@RequestBody @Valid CustomerCreationRequest request) {
@@ -40,10 +39,23 @@ public class CustomerController {
             throw new AppException(ErrorCode.RECAPTCHA_FAILED);
         }
 
+        var customer = customerService.createCustomer(request);
+
+        try {
+            mailService.sendActivationEmail(customer.getId(), customer.getEmail());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+
         ApiResponse<CustomerCreateResponse> apiResponse = ApiResponse.<CustomerCreateResponse>builder()
                 .code(1300)
-                .message("Thêm khách hàng mới thành công.")
-                .result(customerService.createCustomer(request))
+                .message("Tạo khách hàng mới thành công.")
+                .result(CustomerCreateResponse.builder()
+                        .code(customer.getCode())
+                        .fullName(customer.getFullName())
+                        .phone(customer.getPhone())
+                        .email(customer.getEmail())
+                        .build())
                 .build();
 
         return ResponseEntity.ok(apiResponse);

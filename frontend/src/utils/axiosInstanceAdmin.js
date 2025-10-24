@@ -66,12 +66,6 @@ axiosInstanceAdmin.interceptors.response.use(
             }
 
             window.location.href = "/manage/error/404";
-        } else if (error.request?.status === 401) {
-            if (config.url?.includes("/api/v1/auth/admin/login")) {
-                return Promise.reject(error.response || error.message);
-            }
-
-            window.location.href = "/manage/auth/login";
         } else if (error.code === "ERR_NETWORK") {
             window.location.href = "/manage/auth/login";
         }

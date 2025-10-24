@@ -4,7 +4,6 @@ import com.websitesaoviet.WebsiteSaoViet.dto.request.common.PasswordChangeReques
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerCreationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerUpdateRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.CustomerResponse;
-import com.websitesaoviet.WebsiteSaoViet.dto.response.user.CustomerCreateResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Customer;
 import com.websitesaoviet.WebsiteSaoViet.enums.CustomerStatus;
 import com.websitesaoviet.WebsiteSaoViet.enums.Role;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -40,14 +38,12 @@ public class CustomerService {
     CustomerRepository customerRepository;
     CustomerMapper customerMapper;
     SequenceService sequenceService;
-    MailService mailService;
 
     @NonFinal
     @Value("${base.url}")
     protected String BASE_URL;
 
-    @Transactional
-    public CustomerCreateResponse createCustomer(CustomerCreationRequest request) {
+    public Customer createCustomer(CustomerCreationRequest request) {
         if(customerRepository.existsCustomerByPhone(request.getPhone())) {
             throw new AppException(ErrorCode.PHONENUMBER_EXISTED);
         }
@@ -66,27 +62,9 @@ public class CustomerService {
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
         customer.setRoles(roles);
-
         customer.setStatus(CustomerStatus.INACTIVATE.getValue());
 
-        Customer savedCustomer = customerRepository.save(customer);
-
-        String emailContent = String.format(
-                "<html><body>" +
-                        "<p>Xin chào,</p>" +
-                        "<p>Vui lòng nhấn vào link dưới đây để kích hoạt tài khoản của bạn:</p>" +
-                        "<a href='%s/customer/activate/%s'>Kích hoạt tài khoản</a>" +
-                        "<p>Trân trọng, <b>Sao Việt - Vivu ba miền</b></p>" +
-                        "</body></html>", BASE_URL, savedCustomer.getId()
-        );
-
-        mailService.sendToQueue(
-            savedCustomer.getEmail(),
-            "Kích hoạt tài khoản",
-            emailContent
-        );
-
-        return customerMapper.toCustomerCreateResponse(savedCustomer);
+        return customerRepository.save(customer);
     }
 
     public Page<CustomerResponse> getCustomers(String keyword, Pageable pageable) {

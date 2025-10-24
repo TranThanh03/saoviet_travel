@@ -33,7 +33,7 @@ const CalendarPage = () => {
                 size: pageSize,
             });
 
-            if (response?.code === 1806) {
+            if (response?.code === 1807) {
                 setCalendars(response.result.content);
                 setTotalPages(response.result.totalPages);
             }

@@ -39,7 +39,7 @@ const CalendarDetailPage = () => {
         try {
             const response = await BookingApi.getByIdAndAdmin(id);
 
-            if (response?.code === 1807) {
+            if (response?.code === 1808) {
                 setCalendar(response?.result);
             } else {
                 navigate("/manage/error/404");
@@ -54,26 +54,6 @@ const CalendarDetailPage = () => {
         fetchCalendar();
     }, [id]);
 
-    const sendMailInvoice = async (isConfirm) => {
-        try {
-            const response = await BookingApi.sendInvoiceToCustomer({
-                to: calendar.email,
-                subject: `Thông tin lịch đặt #${calendar.code}`,
-                confirm: isConfirm,
-                id: id
-            });
-
-            if (response?.code === 1401) {
-                SuccessToast("Gửi mail thành công.");
-            } else {
-                ErrorToast("Gửi mail thất bại.");
-            }
-        } catch (error) {
-            console.error("Failed to send mail invoice: ", error);
-            ErrorToast("Gửi mail thất bại.");
-        }
-    }
-
     const handleCancel = async () => {
         const result = await Swal.fire({
             title: "Xác nhận",
@@ -86,17 +66,15 @@ const CalendarDetailPage = () => {
 
         if (result.isConfirmed) {
             try {
-                const response = await BookingApi.cancelAdmin(id);
+                const response = await BookingApi.cancelByAdmin(id);
 
-                if (response.code === 1803) {
-                    SuccessToast("Lịch đặt đã được hủy thành công.")
+                if (response?.code === 1804) {
+                    SuccessToast(response?.message);
                     setCalendar((prev) => ({
                         ...prev,
                         reserved: true,
                         status: "Đã hủy",
                     }));
-
-                    sendMailInvoice(false);
                 } else {
                     ErrorToast("Hủy lịch đặt không thành công.");
                 }
@@ -121,14 +99,12 @@ const CalendarDetailPage = () => {
             try {
                 const response = await BookingApi.confirm(id);
 
-                if (response.code === 1804) {
-                    SuccessToast("Lịch đặt đã được xác nhận thành công.");
+                if (response?.code === 1805) {
+                    SuccessToast(response?.message);
                     setCalendar((prev) => ({
                         ...prev,
                         status: "Đã xác nhận",
                     }));
-
-                    sendMailInvoice(true);
                 } else {
                     ErrorToast("Xác nhận lịch đặt không thành công.")
                 }
@@ -180,7 +156,7 @@ const CalendarDetailPage = () => {
             try {
                 const response = await BookingApi.confirmReserve(id);
 
-                if (response.code === 1805) {
+                if (response.code === 1806) {
                     SuccessToast("Lịch đặt đã được giữ chỗ thành công.");
                     setCalendar((prev) => ({
                         ...prev,

@@ -6,6 +6,8 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.common.AuthenticationRequest;
+import com.websitesaoviet.WebsiteSaoViet.dto.request.common.IntrospectRequest;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.common.IntrospectResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Admin;
 import com.websitesaoviet.WebsiteSaoViet.entity.InvalidatedToken;
 import com.websitesaoviet.WebsiteSaoViet.entity.Customer;
@@ -13,6 +15,7 @@ import com.websitesaoviet.WebsiteSaoViet.enums.CustomerStatus;
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.repository.InvalidatedTokenRepository;
+import com.websitesaoviet.WebsiteSaoViet.util.DomainUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -40,6 +44,10 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
+
+    @NonFinal
+    @Value("${base.url}")
+    protected String BASE_URL;
 
     public String authenticate(AuthenticationRequest request) {
         Customer customer;
@@ -102,7 +110,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(username)
-                .issuer("saoviet.com")
+                .issuer(DomainUtil.extractDomain(BASE_URL))
                 .issueTime(new Date())
                 .expirationTime(Date.from(
                         Instant.now().plusSeconds(3600)
@@ -153,13 +161,21 @@ public class AuthenticationService {
         }
     }
 
-    public Boolean introspect(String token) {
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        boolean isValid = true;
         try {
-            verifyToken(token);
-            return true;
+            var signToken = verifyToken(request.getToken());
+
+            if (Objects.isNull(signToken)) {
+                isValid = false;
+            }
         } catch (JOSEException | ParseException e) {
-            return false;
+            isValid = false;
         }
+
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .build();
     }
 
     public void logout(String token)

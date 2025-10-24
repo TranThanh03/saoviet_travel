@@ -17,8 +17,8 @@ const BookingApi = {
     cancel: (id) => {
         return axiosInstance.patch(`/api/v1/bookings/cancel/${id}`, {});
     },
-    cancelAdmin: (id) => {
-        return axiosInstanceAdmin.patch(`/api/v1/bookings/cancel/${id}`, {});
+    cancelByAdmin: (id) => {
+        return axiosInstanceAdmin.patch(`/api/v1/bookings/admin/cancel/${id}`, {});
     },
     confirm: (id) => {
         return axiosInstanceAdmin.patch(`/api/v1/bookings/confirm/${id}`, {});
@@ -40,10 +40,7 @@ const BookingApi = {
     },
     getStatistics: (year) => {
         return axiosInstanceAdmin.get(`/api/v1/bookings/statistics/${year}`);
-    },
-    sendInvoiceToCustomer: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/mail/send-invoice", data);
-    },
+    }
 };
 
 export default BookingApi;

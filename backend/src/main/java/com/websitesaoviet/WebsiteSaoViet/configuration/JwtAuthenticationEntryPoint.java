@@ -1,23 +1,28 @@
 package com.websitesaoviet.WebsiteSaoViet.configuration;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(
-            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException {
-        ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException {
+
+        ErrorCode errorCode = (ErrorCode) request.getAttribute("errorCode");
+        if (errorCode == null) {
+            errorCode = ErrorCode.UNAUTHENTICATED;
+        }
 
         response.setStatus(errorCode.getStatusCode().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -27,9 +32,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 .message(errorCode.getMessage())
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
         response.flushBuffer();
     }
 }

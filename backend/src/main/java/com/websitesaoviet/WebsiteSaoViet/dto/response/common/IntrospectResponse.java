@@ -1,4 +1,4 @@
-package com.websitesaoviet.WebsiteSaoViet.dto.request.admin;
+package com.websitesaoviet.WebsiteSaoViet.dto.response.common;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EmailInvoiceRequest {
-    String to;
-    String subject;
-    boolean confirm;
+public class IntrospectResponse {
+    boolean valid;
 }

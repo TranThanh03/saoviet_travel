@@ -2,13 +2,13 @@
 <head>
     <meta charset="UTF-8">
 </head>
-<body>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
 <p>Chào <b th:text="${invoice.fullName}"></b>,</p>
-<p>Cảm ơn bạn đã đặt tour tại Sao Việt.</p>
+<p>Cảm ơn bạn đã đặt tour tại <b>Sao Việt Travel</b>.</p>
 
 <p th:if="${isConfirm}">
     Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã được <b>xác nhận</b>.<br /><br />
-    Chúc bạn một chuyến đi vui vẻ!
+    Chúc bạn có một chuyến đi vui vẻ!
 </p>
 <p th:unless="${isConfirm}">
     Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã <b>bị hủy</b>.
@@ -23,8 +23,8 @@
     <span th:text="${#dates.format(bookingDate, 'HH:mm:ss dd-MM-yyyy')}"></span>
 </p>
 
-<table border="1" cellpadding="6" cellspacing="0">
-    <tr>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+    <tr style="background-color: #f0f0f0;">
         <th>Đối tượng</th>
         <th>Số lượng</th>
         <th>Đơn giá</th>
@@ -33,29 +33,21 @@
     <tr>
         <td>Người lớn</td>
         <td th:text="${invoice.quantityAdult}"></td>
-        <td>
-            <span th:text="${adultPrice}"></span> đ
-        </td>
-        <td>
-            <span th:text="${totalAdultPrice}"></span> đ
-        </td>
+        <td><span th:text="${adultPrice}"></span> đ</td>
+        <td><span th:text="${totalAdultPrice}"></span> đ</td>
     </tr>
     <tr>
         <td>Trẻ em</td>
         <td th:text="${invoice.quantityChildren}"></td>
-        <td>
-            <span th:text="${childrenPrice}"></span> đ
-        </td>
-        <td>
-            <span th:text="${totalChildrenPrice}"></span> đ
-        </td>
+        <td><span th:text="${childrenPrice}"></span> đ</td>
+        <td><span th:text="${totalChildrenPrice}"></span> đ</td>
     </tr>
 </table>
 
-<div>
+<div style="margin-top: 20px;">
     <p><b>Phương thức thanh toán:</b></p>
     <p th:if="${invoice.method != 'Tiền mặt'}">
-        <b>Mã giao dịch: </b>
+        <b>Mã giao dịch:</b>
         <b th:text="${invoice.checkoutCode}"></b>
     </p>
     <p>
@@ -72,32 +64,35 @@
     </p>
 </div>
 
-<div>
+<div style="margin-top: 20px;">
     <p><b>Tính tiền:</b></p>
-    <div>
-        <table>
-            <tbody>
-            <tr>
-                <td>Tổng tiền:</td>
-                <td>
-                    <span th:text="${totalCost}"></span> đ
-                </td>
-            </tr>
-            <tr>
-                <td>Giảm giá:</td>
-                <td>
-                    <span th:text="${discount}"></span> đ
-                </td>
-            </tr>
-            <tr>
-                <th>Thành tiền:</th>
-                <th>
-                    <span th:text="${totalPrice}"></span> đ
-                </th>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    <table style="width: 300px;">
+        <tbody>
+        <tr>
+            <td>Tổng tiền:</td>
+            <td><span th:text="${totalCost}"></span> đ</td>
+        </tr>
+        <tr>
+            <td>Giảm giá:</td>
+            <td><span th:text="${discount}"></span> đ</td>
+        </tr>
+        <tr>
+            <td><b>Thành tiền:</b></td>
+            <td><b><span th:text="${totalPrice}"></span> đ</b></td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+
+<hr style="margin-top: 40px; border: none; border-top: 1px solid #ccc;" />
+<footer style="text-align: center; font-size: 13px; color: #777; margin-top: 20px;">
+    <p style="margin: 5px 0;"><b>Sao Việt Travel</b> – Vi vu ba miền</p>
+    <p style="margin: 5px 0;">
+        🌐 <a th:href="${baseUrl}" th:text="${website}" style="color: #007bff; text-decoration: none;"></a>
+    </p>
+    <p style="margin-top: 10px; font-size: 12px; color: #aaa;">
+        Email này được gửi tự động. Vui lòng không trả lời lại.
+    </p>
+</footer>
 </body>
 </html>

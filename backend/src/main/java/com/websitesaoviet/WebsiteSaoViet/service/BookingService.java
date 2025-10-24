@@ -1,5 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
+import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailInvoiceRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.*;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.BookingResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse;
@@ -33,6 +34,7 @@ public class BookingService {
     ScheduleService scheduleService;
     TourService tourService;
     PromotionService promotionService;
+    MailService mailService;
 
     public BookingResponse createBooking (String bookingCode, String customerId, String scheduleId,
                                           int quantityAdult, int quantityChildren,
@@ -225,5 +227,18 @@ public class BookingService {
         }
 
         return bookingRepository.findBookingCheckoutDetail(id);
+    }
+
+    public boolean sendInvoice(String bookingId, boolean isConfirm) {
+        try {
+            var invoice = getBookingCheckoutDetail(bookingId);
+            String subject = String.format("Thông tin lịch đặt #%s", invoice.getCode());
+
+            mailService.sendInvoice(invoice, subject, isConfirm);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

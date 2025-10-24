@@ -44,7 +44,7 @@ const DashboardPage = () => {
             try {
                 const response = await BookingApi.infoCount();
 
-                if (response?.code === 1808) {
+                if (response?.code === 1809) {
                     setInfoCounts(response?.result);
                 }
             } 
@@ -61,7 +61,7 @@ const DashboardPage = () => {
             try {
                 const response = await BookingApi.statusCount();
 
-                if (response?.code === 1811 && response?.result) {
+                if (response?.code === 1812 && response?.result) {
                     setPieDataStatus((prevData) =>
                         prevData.map((item) => {
                             if (item.name === "Đang xử lý") return { ...item, value: response.result.processing };
@@ -111,7 +111,7 @@ const DashboardPage = () => {
             try {
                 const response = await BookingApi.latest();
 
-                if (response?.code === 1809) {
+                if (response?.code === 1810) {
                     setBookingsLatest(response?.result);
                 }
             } 
@@ -128,7 +128,7 @@ const DashboardPage = () => {
             try {
                 const response = await BookingApi.getStatistics(selectedYear);
 
-                if (response?.code === 1812 && response?.result) {
+                if (response?.code === 1813 && response?.result) {
                     if (response.result.length === 0) {
                         const emptyData = Array.from({ length: 12 }, (_, i) => ({
                             month: `Tháng ${i + 1}`,
@@ -163,7 +163,7 @@ const DashboardPage = () => {
             try {
                 const response = await BookingApi.popularTours();
 
-                if (response?.code === 1810) {
+                if (response?.code === 1811) {
                     setPopularTours(response?.result);
                 }
             } 
