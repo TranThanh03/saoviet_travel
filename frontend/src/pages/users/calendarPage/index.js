@@ -74,7 +74,7 @@ const CalendarPage = () => {
 
     return (
         <>
-            <section className="calendar-page tour-list-page pt-50 pb-100 rel z-1">
+            <section className="calendar-page tour-list-page pt-50 pb-100 rel z-1 min-vh-100">
                 <div className="container">
                     <h3 className="fw-bold mb-3">Danh sách lịch đặt</h3>
                     <div className="calendar col-lg-10" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">

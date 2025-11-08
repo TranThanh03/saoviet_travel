@@ -68,7 +68,7 @@ public class ChatbotService {
                     "Nếu có từ hai điểm đến hoặc tour trở lên (dấu phẩy, dấu gạch ngang,...), trả về: {\"destination\": [\"Hà Nội\", \"Hạ Long\"]}. " +
 
                     // DURATION
-                    "Nếu có thông tin về thời gian tour, như: 2 ngày, 3 ngày 2 đêm..., thì gán vào 'quantityDay'. " +
+                    "Nếu có thông tin về thời gian tour, như: 2 ngày, 2 ngày 2 đêm, 3 ngày, 3 ngày 2 đêm,..., thì chỉ gán số ngày(bỏ đêm) vào 'quantityDay'. " +
 
                     // AREA
                     "Nếu nhắc đến miền/khu vực (Miền Bắc, Miền Trung, Miền Nam), gán vào 'area' với giá trị tương ứng: 'b', 't', 'n'. " +

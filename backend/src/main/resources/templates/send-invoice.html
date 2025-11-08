@@ -4,7 +4,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
 <p>Chào <b th:text="${invoice.fullName}"></b>,</p>
-<p>Cảm ơn bạn đã đặt tour tại <b>Sao Việt Travel</b>.</p>
+<p>Cảm ơn bạn đã đặt tour tại <b>Sao Việt</b>.</p>
 
 <p th:if="${isConfirm}">
     Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã được <b>xác nhận</b>.<br /><br />
@@ -86,7 +86,7 @@
 
 <hr style="margin-top: 40px; border: none; border-top: 1px solid #ccc;" />
 <footer style="text-align: center; font-size: 13px; color: #777; margin-top: 20px;">
-    <p style="margin: 5px 0;"><b>Sao Việt Travel</b> – Vi vu ba miền</p>
+    <p style="margin: 5px 0;"><b>Sao Việt</b> – Vivu ba miền</p>
     <p style="margin: 5px 0;">
         🌐 <a th:href="${baseUrl}" th:text="${website}" style="color: #007bff; text-decoration: none;"></a>
     </p>

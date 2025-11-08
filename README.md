@@ -17,6 +17,7 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 - Tìm kiếm và lọc tour theo nhiều tiêu chí (giá, điểm đến, ngày khởi hành, ngày kết thúc, đánh giá).
 - Xem tin tức, khuyến mãi.
 - Thanh toán online (VNPay, MoMo).
+- Nhận email hóa đơn tự động.
 - Chatbot tư vấn, hỗ trợ về tour.
 - Cập nhật thông tin cá nhân.
 

@@ -37,15 +37,17 @@ const TourInsertPage = () => {
                     <div className="col-md-12 col-sm-12">
                         <div className="x_panel">
                             <div className="x_title">
-                                <h2 className="fw-bold">Thêm Tour</h2>
-                                <button type="button" className="btn btn-back float-right"
+                                <button type="button" className="btn btn-back position-absolute"
                                     onClick={() => {
                                         navigate("/manage/tours/index");
                                     }}
                                 >
                                     <FaArrowLeft size={18} color="black" />
                                 </button>
-                                <div className="clearfix"></div>
+                                <div className="d-flex justify-content-center">
+                                    <h2 className="fw-bold text-center">Thêm Tour</h2>
+                                </div>
+                                <div className="clearfix mt-2"></div>
                             </div>
                             <div className="x_content add-tours mb-3">
                                 <StepZilla

@@ -1,6 +1,5 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
-import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailInvoiceRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.*;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.BookingResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse;
