@@ -1,15 +1,16 @@
-import React, { memo, useState, useEffect, useRef, useMemo, useContext } from "react";
+import React, { memo, useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaAngleDown, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { logo } from "assets";
 import { AuthApi } from "services";
 import "./style.scss";
-import { AuthContext } from "../masterLayout";
+import { useAuth } from "utils/AuthContext";
+import { ErrorToast } from "components/notifi";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [isShow, setShow] = useState(false);
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated, logout } = useAuth();
     const [showSearch, setShowSearch] = useState(false);
     const [placeholder, setPlaceholder] = useState("Tìm kiếm Tours theo điểm đến");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -50,13 +51,14 @@ const Header = () => {
             const response = await AuthApi.logout();
 
             if (response.code === 9997) {
+                logout();
                 window.location.href = "/";
             } else {
-                window.location.href = "/";
+                ErrorToast("Đã xảy ra lỗi không xác định!");
             }
         } catch (error) {
             console.error("Logout error:", error);
-            window.location.href = "/";
+            ErrorToast("Đã xảy ra lỗi không xác định!");
         }
     };
 

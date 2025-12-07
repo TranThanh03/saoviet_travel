@@ -3,16 +3,17 @@ import { setLoading } from './loading.js';
 
 const axiosInstance = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL,
-    timeout: 30000,
+    timeout: 20000,
     headers: { 'Content-Type': 'application/json' },
-    withCredentials: true
+    withCredentials: true,
 });
 
 const pendingRequests = new Set();
 const skipEndpoints = [
     '/api/v1/chatbot',
     '/api/v1/auth/login',
-    '/api/v1/customers'
+    '/api/v1/customers',
+    '/api/v1/auth/token/refresh'
 ];
 
 const shouldSkipLoading = (url = '') => {
@@ -25,8 +26,18 @@ const shouldSkipLoading = (url = '') => {
     });
 };
 
+let accessToken = null;
+
+export const setAccessToken = (token) => {
+    accessToken = token;
+};
+
 axiosInstance.interceptors.request.use(
     (config) => {
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
         config.metadata = {
             skipLoading: shouldSkipLoading(config.url),
         };
@@ -67,14 +78,8 @@ axiosInstance.interceptors.response.use(
                 setLoading(false);
             }
         }
-
-        if (error.response?.data?.code === 4445) {
-            window.location.href = "/error/404";
-        } else if (error.code === "ERR_NETWORK") {
-            if (error.config?.url?.includes("/api/v1/auth/introspect")) {
-                return Promise.reject(error.response || error.message);
-            }
-
+        
+        if ((navigator.onLine && error.code === "ERR_NETWORK") || error?.status === 500) {
             window.location.href = "/error/500";
         }
 

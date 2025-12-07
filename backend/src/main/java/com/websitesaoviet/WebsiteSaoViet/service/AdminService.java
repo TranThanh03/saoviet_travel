@@ -23,8 +23,13 @@ public class AdminService {
     AdminMapper adminMapper;
 
     public AdminResponse getAdminById(String id) {
-        return  adminMapper.toAdminResponse(adminRepository.findById(id)
+        return adminMapper.toAdminResponse(adminRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ADMIN_NOT_EXITED)));
+    }
+
+    public Admin getAdminDetail(String id) {
+        return adminRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ADMIN_NOT_EXITED));
     }
 
     public AdminResponse updateAdmin(String id, AdminUpdateRequest request) {

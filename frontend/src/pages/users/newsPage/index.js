@@ -52,7 +52,7 @@ const NewsPage = () => {
                             <h4 className="fw-bold">{outstanding.title || ''}</h4>
                             <p className="ellipsis">{outstanding.summary || ''}</p>
                             <span>
-                                <i class="fa-regular fa-eye me-1"></i>
+                                <i className="fa-regular fa-eye me-1"></i>
                                 {outstanding.viewCount || 0}
                             </span>
                         </article>
@@ -70,7 +70,7 @@ const NewsPage = () => {
                                     <h5 className="fw-bold">{item.title || ''}</h5>
                                     <p className="ellipsis">{item.summary || ''}</p>
                                     <span>
-                                        <i class="fa-regular fa-eye me-1"></i>
+                                        <i className="fa-regular fa-eye me-1"></i>
                                         {item.viewCount || 0}
                                     </span>
                                 </article>

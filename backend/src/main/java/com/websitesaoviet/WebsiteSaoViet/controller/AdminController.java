@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class AdminController {
     AdminService adminService;
     AuthenticationService authenticationService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/infor")
-    ResponseEntity<ApiResponse<AdminResponse>> getAdminByToken(@CookieValue("token-admin") String token) {
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<AdminResponse>> getAdminByToken(@RequestHeader("Authorization") String authHeader) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<AdminResponse> apiResponse = ApiResponse.<AdminResponse>builder()
                 .code(1200)
@@ -38,10 +38,12 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("")
-    ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(@CookieValue("token-admin") String token,
-                                                            @RequestBody @Valid AdminUpdateRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<AdminResponse>> updateAdmin(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid AdminUpdateRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<AdminResponse> apiResponse = ApiResponse.<AdminResponse>builder()
                 .code(1201)
@@ -54,10 +56,12 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/password")
-    ResponseEntity<ApiResponse<String>> changePassword(@CookieValue("token-admin") String token,
-                                                            @RequestBody @Valid PasswordChangeRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<String>> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid PasswordChangeRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         adminService.changePassword(id, request);
 

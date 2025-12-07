@@ -28,7 +28,6 @@ import java.util.List;
 @RequestMapping("/schedules")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class ScheduleController {
     ScheduleService scheduleService;
     BookingService bookingService;
@@ -50,8 +49,8 @@ public class ScheduleController {
     ResponseEntity<ApiResponse<Page<ScheduleListResponse>>> getSchedules(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<ScheduleListResponse>> apiResponse = ApiResponse.<Page<ScheduleListResponse>>builder()
@@ -95,8 +94,8 @@ public class ScheduleController {
     @PutMapping("/{id}")
     ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(
             @PathVariable String id,
-            @RequestParam int totalPeople) {
-
+            @RequestParam int totalPeople
+    ) {
         ApiResponse<ScheduleResponse> apiResponse = ApiResponse.<ScheduleResponse>builder()
                 .code(1605)
                 .result(scheduleService.updateSchedule(id, totalPeople))

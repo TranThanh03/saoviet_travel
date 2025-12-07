@@ -59,7 +59,7 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
     List<Object[]> findBookingsByCustomerId(@Param("customerId") String customerId);
 
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse(" +
-            "b.id, b.code, b.tourId, b.tourCode, b.tourName, b.startDate, b.endDate, b.quantityDay, " +
+            "b.id, b.code, b.customerId, b.tourId, b.tourCode, b.tourName, b.startDate, b.endDate, b.quantityDay, " +
             "b.quantityAdult, b.quantityChildren, b.adultPrice, b.childrenPrice, " +
             "b.discount, b.totalPrice, b.bookingTime, b.status, b.isReviewed, " +
             "c.code, c.method, c.checkoutTime, c.status) " +

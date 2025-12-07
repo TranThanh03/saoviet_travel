@@ -2,6 +2,8 @@ package com.websitesaoviet.WebsiteSaoViet.service;
 
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CheckoutProcessionRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.CheckoutResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.user.ProcessCheckoutResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.user.ResultCheckoutResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Checkout;
 import com.websitesaoviet.WebsiteSaoViet.enums.CheckoutStatus;
 import com.websitesaoviet.WebsiteSaoViet.enums.MethodPayment;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,6 +25,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +39,7 @@ public class CheckoutService {
     VnpayService vnpayService;
     PromotionService promotionService;
     BookingService bookingService;
+    AuthenticationService authenticationService;
 
     @NonFinal
     @Value("${base.url}")
@@ -51,6 +57,82 @@ public class CheckoutService {
         checkout.setStatus(status);
 
         return checkoutMapper.toCheckoutResponse(checkoutRepository.save(checkout));
+    }
+
+    @Async("taskExecutor")
+    public CompletableFuture<ProcessCheckoutResponse> processCheckout(String accessToken, CheckoutProcessionRequest request) {
+        try {
+            if (request.getQuantityAdult() + request.getQuantityChildren() <= 0) {
+                throw new AppException(ErrorCode.QUANTITY_PEOPLE_INVALID);
+            }
+
+            var schedule = scheduleService.getScheduleById(request.getScheduleId());
+
+            int quantityPeople = request.getQuantityAdult() + request.getQuantityChildren();
+            if (!scheduleService.existsScheduleByQuantityPeople(request.getScheduleId(), quantityPeople)) {
+                throw new AppException(ErrorCode.SCHEDULE_PEOPLE_INVALID);
+            }
+
+            Double adultPrice = schedule.getAdultPrice();
+            Double childrenPrice = schedule.getChildrenPrice();
+            Double discount = 0.0;
+
+            if ((request.getMethod().equals("momo") || request.getMethod().equals("vnpay")) && (!request.getPromotionId().trim().equals(""))) {
+                try {
+                    var promotion = promotionService.getAvailablePromotionById(request.getPromotionId());
+                    discount = promotion.getDiscount();
+                } catch (Exception e) {
+                    throw new AppException(ErrorCode.PROMOTION_NOT_EXITED);
+                }
+            }
+
+            Double amount = adultPrice * request.getQuantityAdult() + childrenPrice * request.getQuantityChildren() - discount;
+
+            String checkoutUrl = "";
+            Random random = new Random();
+            String orderId = System.currentTimeMillis() + "" + random.nextInt(1000);
+            int responseCode = 0;
+            String customerId = authenticationService.getIdByToken(accessToken);
+
+            switch (request.getMethod()) {
+                case "momo":
+                    responseCode = 1901;
+                    checkoutUrl = this.processMomoCheckout(orderId, customerId, amount, request);
+                    break;
+                case "vnpay":
+                    responseCode = 1902;
+                    checkoutUrl = this.processVnpayCheckout(orderId, customerId, amount, request);
+                    break;
+                case "cash":
+                    responseCode = 1903;
+                    checkoutUrl = this.resultCashCheckout(orderId, customerId, amount, request);
+                    break;
+                default:
+                    responseCode = 1900;
+                    break;
+            }
+
+            return CompletableFuture.completedFuture(
+                    ProcessCheckoutResponse.builder()
+                            .responseCode(responseCode)
+                            .checkoutUrl(checkoutUrl)
+                            .build()
+            );
+        } catch (AppException e) {
+            return CompletableFuture.completedFuture(
+                    ProcessCheckoutResponse.builder()
+                            .responseCode(e.getErrorCode().getCode())
+                            .message(e.getErrorCode().getMessage())
+                            .build()
+            );
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture(
+                    ProcessCheckoutResponse.builder()
+                            .responseCode(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                            .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+                            .build()
+            );
+        }
     }
 
     public String processMomoCheckout(String orderId, String customerId, Double amount, CheckoutProcessionRequest request) {
@@ -74,23 +156,24 @@ public class CheckoutService {
         return vnpayService.createPayment(amountInt, orderId, redirectUrl, extraData);
     }
 
-    public boolean resultMomoCheckout(@RequestParam Map<String, String> params) {
-        if (!momoService.verifySignature(params)) {
-            throw new AppException(ErrorCode.SIGNATURE_INVALID);
-        }
-
-        String bookingCode = params.getOrDefault("orderId", "");
-        String checkoutCode = params.getOrDefault("transId", "");
-
-        if (bookingCode.isEmpty() || checkoutCode.isEmpty()) {
-            throw new AppException(ErrorCode.DATA_INVALID);
-        }
-
-        if (checkoutRepository.existsCheckoutByCode(checkoutCode)) {
-            throw new AppException(ErrorCode.CHECKOUT_EXITED);
-        }
-
+    @Async("taskExecutor")
+    public CompletableFuture<ResultCheckoutResponse> resultMomoCheckout(@RequestParam Map<String, String> params) {
         try {
+            if (!momoService.verifySignature(params)) {
+                throw new AppException(ErrorCode.SIGNATURE_INVALID);
+            }
+
+            String bookingCode = params.getOrDefault("orderId", "");
+            String checkoutCode = params.getOrDefault("transId", "");
+
+            if (bookingCode.isEmpty() || checkoutCode.isEmpty()) {
+                throw new AppException(ErrorCode.DATA_INVALID);
+            }
+
+            if (checkoutRepository.existsCheckoutByCode(checkoutCode)) {
+                throw new AppException(ErrorCode.CHECKOUT_EXITED);
+            }
+
             int resultCode = Integer.parseInt(params.getOrDefault("resultCode", "-1"));
 
             if (resultCode == 0) {
@@ -124,32 +207,53 @@ public class CheckoutService {
 
                 scheduleService.addQuantityPeople(scheduleId, people);
 
-                return true;
+                return CompletableFuture.completedFuture(
+                        ResultCheckoutResponse.builder()
+                                .responseResult(true)
+                                .build()
+                );
             }
 
-            return false;
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseResult(false)
+                            .build()
+            );
+        } catch (AppException e) {
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseCode(e.getErrorCode().getCode())
+                            .message(e.getErrorCode().getMessage())
+                            .build()
+            );
         } catch (Exception e) {
-            throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseCode(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                            .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+                            .build()
+            );
         }
     }
 
-    public boolean resultVnpayCheckout(Map<String, String> params) {
-        if (!vnpayService.verifySignature(params)) {
-            throw new AppException(ErrorCode.SIGNATURE_INVALID);
-        }
-
-        String bookingCode = params.get("vnp_TxnRef");
-        String checkoutCode = params.get("vnp_TransactionNo");
-
-        if (bookingCode.isEmpty() || checkoutCode.isEmpty()) {
-            throw new AppException(ErrorCode.DATA_INVALID);
-        }
-
-        if (checkoutRepository.existsCheckoutByCode(checkoutCode)) {
-            throw new AppException(ErrorCode.CHECKOUT_EXITED);
-        }
-
+    @Async("taskExecutor")
+    public CompletableFuture<ResultCheckoutResponse> resultVnpayCheckout(Map<String, String> params) {
         try {
+            if (!vnpayService.verifySignature(params)) {
+                throw new AppException(ErrorCode.SIGNATURE_INVALID);
+            }
+
+            String bookingCode = params.get("vnp_TxnRef");
+            String checkoutCode = params.get("vnp_TransactionNo");
+
+            if (bookingCode.isEmpty() || checkoutCode.isEmpty()) {
+                throw new AppException(ErrorCode.DATA_INVALID);
+            }
+
+            if (checkoutRepository.existsCheckoutByCode(checkoutCode)) {
+                throw new AppException(ErrorCode.CHECKOUT_EXITED);
+            }
+
             String vnp_ResponseCode = params.get("vnp_ResponseCode");
 
             if ("00".equals(vnp_ResponseCode)) {
@@ -193,12 +297,32 @@ public class CheckoutService {
 
                 scheduleService.addQuantityPeople(scheduleId, people);
 
-                return true;
+                return CompletableFuture.completedFuture(
+                        ResultCheckoutResponse.builder()
+                                .responseResult(true)
+                                .build()
+                );
             }
 
-            return false;
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseResult(false)
+                            .build()
+            );
+        } catch (AppException e) {
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseCode(e.getErrorCode().getCode())
+                            .message(e.getErrorCode().getMessage())
+                            .build()
+            );
         } catch (Exception e) {
-           throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            return CompletableFuture.completedFuture(
+                    ResultCheckoutResponse.builder()
+                            .responseCode(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                            .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+                            .build()
+            );
         }
     }
 

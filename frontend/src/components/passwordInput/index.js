@@ -51,9 +51,7 @@ const PasswordInput = ({ value, onChange, name, id, placeholder, label = '' }) =
                         {showPassword ? <BsEyeSlash size={20} /> : <BsEye size={20} />}
                     </span>
                 </>
-            )}
-            
-                        
+            )}     
         </>
     );
 };

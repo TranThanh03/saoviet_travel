@@ -1,5 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
+import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailInvoiceRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.*;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.BookingResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse;
@@ -41,7 +42,7 @@ public class BookingService {
         Booking booking = new Booking();
         var customer = customerService.getCustomerById(customerId);
         var schedule = scheduleService.getScheduleById(scheduleId);
-        var tour = tourService.getTourById(schedule.getTourId());
+        var tour = tourService.getTourDetail(schedule.getTourId());
         LocalDateTime currentTime = LocalDateTime.now();
 
         booking.setCode(bookingCode);

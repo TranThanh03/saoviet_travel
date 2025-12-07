@@ -5,6 +5,7 @@ import { logo } from 'assets';
 import { AuthApi } from 'services';
 import PasswordInput from 'components/passwordInput';
 import RecaptchaCb from 'components/recaptcha/checkbox';
+import { useAdminAuth } from 'utils/AdminAuthContext';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '', recaptcha: '' });
@@ -13,6 +14,7 @@ const LoginPage = () => {
     const [captchaToken, setCaptchaToken] = useState(null);
     const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
     const [loading, setLoading] = useState(false);
+    const { login } = useAdminAuth();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -43,6 +45,9 @@ const LoginPage = () => {
             });
 
             if (response?.code === 9996) {
+                const accessToken = response?.result?.accessToken;
+                
+                login(accessToken);
                 navigate('/manage/dashboard');
             } 
             else if (response?.code === 1009) {

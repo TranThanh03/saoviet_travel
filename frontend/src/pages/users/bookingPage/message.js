@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import "./message.scss";
 import { CheckoutApi } from "services";
 import { failedSvg, successSvg } from "assets";
+import { ErrorToast } from "components/notifi";
 
 const MessagePage = () => {
     const [status, setStatus] = useState();
@@ -36,35 +37,57 @@ const MessagePage = () => {
     useEffect(() => {
         const fetchCheckoutCallback = async () => {
             try {
-                const isMoMo = queryParams.get("partnerCode");
+                const resultMomoCode = queryParams.get("resultCode");
+                const resultVnpCode = queryParams.get("vnp_ResponseCode");
 
-                if (isMoMo) {
+                if (resultMomoCode) {
                     processScheduleIdByMomo();
-                    const response = await CheckoutApi.momoCallback(queryParams);
 
-                    if (response?.code === 1904) {
-                        setStatus('success');
-                    } else if (response?.code === 1905) {
-                        setStatus('failed');
+                    if (resultMomoCode === "0" ) {
+                        const response = await CheckoutApi.momoCallback(queryParams);
+
+                        if (response?.code === 1904) {
+                            setStatus('success');
+                        } else if (response?.code === 1905) {
+                            setStatus('failed');
+                        } else if (response?.code === 1044) {
+                            setStatus('failed');
+                            ErrorToast("Lỗi không xác định. Vui lòng liên hệ hỗ trợ viên để được hỗ trợ!");
+                        } else {
+                            navigate("/error/404");
+                        }
                     } else {
-                        navigate("/error/404");
+                        setStatus('failed');
                     }
-                } else {
+                }
+                
+                if (resultVnpCode) {
                     processScheduleIdByVnpay();
-                    const response = await CheckoutApi.vnpayCallback(queryParams);
 
-                    if (response?.code === 1906) {
-                        setStatus('success');
-                    } else if (response?.code === 1907) {
-                        setStatus('failed');
+                    if (resultVnpCode === "00") {
+                        const response = await CheckoutApi.vnpayCallback(queryParams);
+
+                        if (response?.code === 1906) {
+                            setStatus('success');
+                        } else if (response?.code === 1907) {
+                            setStatus('failed');
+                        } else if (response?.code === 1044) {
+                            setStatus('failed');
+                            ErrorToast(response?.message);
+                        } else {
+                            navigate("/error/404");
+                        }
                     } else {
-                        navigate("/error/404");
+                        setStatus('failed');
                     }
                 }
             }
             catch (error) {
                 console.error("Failed to fetch checkout callback: ", error);
-                navigate("/error/404");
+
+                if (error.status !== 500) {
+                    navigate("/error/404");
+                }
             }
             finally {
                 setLoading(false);

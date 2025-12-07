@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -105,6 +106,11 @@ public class CustomerService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED)));
     }
 
+    public Customer getCustomerDetail(String id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED));
+    }
+
     public CustomerResponse updateCustomer(String id, CustomerUpdateRequest request) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED));
@@ -121,6 +127,7 @@ public class CustomerService {
         return customerMapper.toCustomerResponse(customerRepository.save(customer));
     }
 
+    @Transactional
     public void deleteCustomer(String id) {
         if (!customerRepository.existsById(id)) {
             throw new AppException(ErrorCode.USER_NOT_EXITED);
@@ -207,7 +214,7 @@ public class CustomerService {
         return customerRepository.existsCustomerByIdAndAndStatus(id, "Bị khóa");
     }
 
-    public boolean existsCustomerById(String id) {
+    public Boolean existsCustomerById(String id) {
         return customerRepository.existsById(id);
     }
 }

@@ -71,7 +71,7 @@ const NewsDetailPage = () => {
                 <div className="article-meta">
                     <span>{`Mã: ${news.code}`}</span>
                     <span>{`Ngày đăng: ${news.timeStamp ? formatDatetime(news.timeStamp) : ''}`}</span>
-                    <span><i class="fa-regular fa-eye me-1"></i>{news.viewCount || 0}</span>
+                    <span><i className="fa-regular fa-eye me-1"></i>{news.viewCount || 0}</span>
                 </div>
                 
                 <img src={news.image || noImage} alt="Ảnh" className="featured-image" /> 

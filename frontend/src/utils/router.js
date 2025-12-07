@@ -42,7 +42,7 @@ export const ROUTERS = {
         NEWSUPDATEPAGE: "/manage/news/edit/:id",
     },
     ERROR: {
-        ERROR500: 'error/500',
-        MANAGEERROR500: 'manage/error/500',
+        ERROR500: '/error/500',
+        MANAGEERROR500: '/manage/error/500',
     },
 }

@@ -1,9 +1,9 @@
-import { memo, useContext, useState } from 'react';
+import { memo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 import { logo } from 'assets';
 import { AuthApi } from 'services';
-import { AuthContext } from '../theme/masterLayout';
+import { useAuth } from 'utils/AuthContext';
 import PasswordInput from 'components/passwordInput';
 import Recaptcha from 'components/recaptcha/checkbox';
 
@@ -11,7 +11,7 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '', recaptcha: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-    const { fetchAuth } = useContext(AuthContext);
+    const { login } = useAuth();
     const [captchaToken, setCaptchaToken] = useState(null);
     const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -45,13 +45,16 @@ const LoginPage = () => {
             });
 
             if (response?.code === 9999) {
-                await fetchAuth();
+                const accessToken = response?.result?.accessToken;
+
+                login(accessToken);
                 navigate('/');
             } else {
                 setErrorMessage(response.message);
                 setCaptchaToken(null);
             }
         } catch (error) {
+            console.error(error);
             setErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
         } finally {
             setLoading(false);

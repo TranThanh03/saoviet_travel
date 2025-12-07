@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -85,6 +86,7 @@ public class NewsService {
         return newsMapper.toNewsResponse(newsRepository.save(news));
     }
 
+    @Transactional
     public void deleteNews(String id) {
         if (!newsRepository.existsById(id)) {
             throw new AppException(ErrorCode.NEWS_NOT_EXITED);

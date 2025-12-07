@@ -1,9 +1,11 @@
-import { ROUTERS } from "@utils/router.js";
+import { ROUTERS } from "utils/router.js";
 import { Routes, Route, createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import * as usersPage from "@pages/users";
-import * as adminPage from "@pages/admin";
-import * as errorPage from "@components/error/index.js";
+import * as usersPage from "pages/users";
+import * as adminPage from "pages/admin";
+import * as errorPage from "components/error/index.js";
+import { AuthProvider } from "utils/AuthContext";
+import { AdminAuthProvider } from "utils/AdminAuthContext";
 
 const NotFoundRedirect = () => {
     const navigate = useNavigate();
@@ -185,27 +187,31 @@ const RenderRouter = () => {
 
     return (
         isAdminRoute ? (
-            <adminPage.MasterLayout>
-                <Routes>
-                    {customRouters
-                        .filter(route => route.path.startsWith("/manage"))
-                        .map((item, key) => (
-                            <Route key={key} path={item.path} element={item.component} />
-                        ))}
-                    <Route path="*" element={<NotFoundManageRedirect />} />
-                </Routes>
-            </adminPage.MasterLayout>
+            <AdminAuthProvider>
+                <adminPage.MasterLayout>
+                    <Routes>
+                        {customRouters
+                            .filter(route => route.path.startsWith("/manage"))
+                            .map((item, key) => (
+                                <Route key={key} path={item.path} element={item.component} />
+                            ))}
+                        <Route path="*" element={<NotFoundManageRedirect />} />
+                    </Routes>
+                </adminPage.MasterLayout>
+            </AdminAuthProvider>
         ) : (
-            <usersPage.MasterLayout>
-                <Routes>
-                    {customRouters
-                        .filter(route => !route.path.startsWith("/manage"))
-                        .map((item, key) => (
-                            <Route key={key} path={item.path} element={item.component} />
-                        ))}
-                    <Route path="*" element={<NotFoundRedirect />} />
-                </Routes>
-            </usersPage.MasterLayout>
+            <AuthProvider>
+                <usersPage.MasterLayout>
+                    <Routes>
+                        {customRouters
+                            .filter(route => !route.path.startsWith("/manage"))
+                            .map((item, key) => (
+                                <Route key={key} path={item.path} element={item.component} />
+                            ))}
+                        <Route path="*" element={<NotFoundRedirect />} />
+                    </Routes>
+                </usersPage.MasterLayout>
+            </AuthProvider>
         )
     );
 };

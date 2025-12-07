@@ -34,7 +34,6 @@ import java.util.List;
 @RequestMapping("/tours")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class TourController {
     TourService tourService;
     ScheduleService scheduleService;
@@ -57,8 +56,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<ToursSummaryResponse>>> getTours(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<ToursSummaryResponse>> apiResponse = ApiResponse.<Page<ToursSummaryResponse>>builder()
@@ -117,8 +116,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<FilterToursResponse>>> getFilterTours(
             @RequestBody FilterToursRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<FilterToursResponse>> apiResponse = ApiResponse.<Page<FilterToursResponse>>builder()
                 .code(1505)
                 .result(tourService.getFilteredTours(request, page, size))
@@ -151,7 +150,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<SearchToursResponse>>> getSearchTours(
             @RequestBody SearchToursRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<SearchToursResponse>> apiResponse = ApiResponse.<Page<SearchToursResponse>>builder()
                 .code(1509)
                 .result(tourService.getSearchTours(request, page, size))
@@ -164,7 +164,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<SearchToursResponse>>> getSearchToursByDestination(
             @RequestBody SearchToursDestinationRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<SearchToursResponse>> apiResponse = ApiResponse.<Page<SearchToursResponse>>builder()
                 .code(1510)
                 .result(tourService.getSearchToursByDestination(request, page, size))
@@ -177,8 +178,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<FilterToursAreaResponse>>> getFilterToursByArea(
             @RequestBody FilterToursAreaRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<FilterToursAreaResponse>> apiResponse = ApiResponse.<Page<FilterToursAreaResponse>>builder()
                 .code(1511)
                 .result(tourService.getFilteredToursByArea(request, page, size))
@@ -191,8 +192,8 @@ public class TourController {
     ResponseEntity<ApiResponse<List<SimilarToursResponse>>> getFilterToursByArea(
             @RequestParam String id,
             @RequestParam String destination,
-            @RequestParam Integer day) {
-
+            @RequestParam Integer day
+    ) {
         ApiResponse<List<SimilarToursResponse>> apiResponse = ApiResponse.<List<SimilarToursResponse>>builder()
                 .code(1512)
                 .result(tourService.getSimilarTours(id, destination, day))
@@ -229,7 +230,6 @@ public class TourController {
 
     @GetMapping("/hot")
     ResponseEntity<ApiResponse<List<FilterToursResponse>>> getHotTours() {
-
         ApiResponse<List<FilterToursResponse>> apiResponse = ApiResponse.<List<FilterToursResponse>>builder()
                 .code(1515)
                 .result(tourService.getHotTours())

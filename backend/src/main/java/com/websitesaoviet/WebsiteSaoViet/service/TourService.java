@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -93,6 +94,11 @@ public class TourService {
                 .orElseThrow(() -> new AppException(ErrorCode.TOUR_NOT_EXITED)));
     }
 
+    public Tour getTourDetail(String id) {
+        return tourRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TOUR_NOT_EXITED));
+    }
+
     public TourResponse updateTour(String id, TourUpdateRequest request) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TOUR_NOT_EXITED));
@@ -105,6 +111,7 @@ public class TourService {
         return tourMapper.toTourResponse(tourRepository.save(tour));
     }
 
+    @Transactional
     public void deleteTour(String id) {
         if (!tourRepository.existsById(id)) {
             throw new AppException(ErrorCode.TOUR_NOT_EXITED);

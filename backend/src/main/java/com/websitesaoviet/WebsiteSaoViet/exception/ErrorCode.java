@@ -11,7 +11,7 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(1001, "Uncategorized error!", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED(1002, "Unauthenticated!", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1003, "Unauthorized!", HttpStatus.FORBIDDEN),
-    TOKEN_INVALID(1004, "Token invalid!", HttpStatus.OK),
+    TOKEN_INVALID(1004, "Token invalid!", HttpStatus.BAD_REQUEST),
     PHONENUMBER_EXISTED(1005, "Số điện thoại đã tồn tại!", HttpStatus.OK),
     EMAIL_EXISTED(1006, "Email đã tồn tại!", HttpStatus.OK),
 
@@ -100,7 +100,9 @@ public enum ErrorCode {
     CHATBOT_DATE_INVALID(1065, "Vui lòng nhập thời gian đúng định dạng. Ví dụ: 25/05/2025 hoặc 05/2025.", HttpStatus.OK),
 
     NOT_NULL(1066, "Vui lòng không bỏ trống!", HttpStatus.OK),
-    RECAPTCHA_FAILED(1067, "Xác thực reCAPTCHA thất bại!", HttpStatus.OK)
+    RECAPTCHA_FAILED(1067, "Xác thực reCAPTCHA thất bại!", HttpStatus.OK),
+    REFRESH_TOKEN_INVALID(1068, "Refresh token invalid!", HttpStatus.OK),
+    REFRESH_TOKEN_NOT_EXITED(1069, "Refresh token not exited!", HttpStatus.OK),
     ;
     
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/promotions")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class PromotionController {
     PromotionService promotionService;
 
@@ -45,8 +44,8 @@ public class PromotionController {
     ResponseEntity<ApiResponse<Page<PromotionListResponse>>> getPromotions(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<PromotionListResponse>> apiResponse = ApiResponse.<Page<PromotionListResponse>>builder()
@@ -80,8 +79,10 @@ public class PromotionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    ResponseEntity<ApiResponse<PromotionResponse>> updateUser(@PathVariable String id,
-                                                              @RequestBody @Valid PromotionUpdateRequest request) {
+    ResponseEntity<ApiResponse<PromotionResponse>> updateUser(
+            @PathVariable String id,
+            @RequestBody @Valid PromotionUpdateRequest request
+    ) {
         ApiResponse<PromotionResponse> apiResponse = ApiResponse.<PromotionResponse>builder()
                 .code(1704)
                 .message("Cập nhật thông tin khuyến mãi thành công.")
@@ -94,7 +95,6 @@ public class PromotionController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<ApiResponse<String>> deletePromotion(@PathVariable String id) {
-
         promotionService.deletePromotion(id);
 
         ApiResponse<String> apiResponse = ApiResponse.<String>builder()

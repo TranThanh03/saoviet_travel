@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,6 +94,7 @@ public class ScheduleService {
         return scheduleRepository.findStartDateByTourId(tourId);
     }
 
+    @Transactional
     public void deleteSchedule(String id) {
         if (scheduleRepository.existsScheduleByScheduleId(id)) {
             throw new AppException(ErrorCode.BOOKING_SUCCESSFULLY);
@@ -103,6 +105,7 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteByTourId(String tourId) {
         if (scheduleRepository.existsScheduleByTourIdAndStatus(tourId, CommonStatus.IN_PROGRESS.getValue())) {
             throw new AppException(ErrorCode.SCHEDULE_IN_PROGRESS);

@@ -6,12 +6,16 @@ const AuthApi = {
         return axiosInstance.post("/api/v1/auth/login", data);
     },
 
-    introspect: () => {
-        return axiosInstance.get("/api/v1/auth/introspect");
+    introspect: (accessToken) => {
+        return axiosInstance.post("/api/v1/auth/introspect", accessToken);
     },
 
     logout: () => {
         return axiosInstance.post("/api/v1/auth/logout", {});
+    },
+
+    refreshAccessToken: () => {
+        return axiosInstance.post("/api/v1/auth/token/refresh", {});
     },
 
     loginAdmin: (data) => {
@@ -24,6 +28,10 @@ const AuthApi = {
     
     logoutAdmin: () => {
         return axiosInstanceAdmin.post("/api/v1/auth/admin/logout", {});
+    },
+
+    refreshAccessTokenAdmin: () => {
+        return axiosInstanceAdmin.post("/api/v1/auth/admin/token/refresh", {});
     },
 };
 

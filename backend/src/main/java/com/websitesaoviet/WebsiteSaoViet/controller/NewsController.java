@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/news")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class NewsController {
     NewsService newsService;
 
@@ -45,8 +44,8 @@ public class NewsController {
     ResponseEntity<ApiResponse<Page<NewsListResponse>>> getNews(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<NewsListResponse>> apiResponse = ApiResponse.<Page<NewsListResponse>>builder()

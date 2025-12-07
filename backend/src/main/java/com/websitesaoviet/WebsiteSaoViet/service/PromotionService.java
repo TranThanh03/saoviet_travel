@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -130,6 +131,7 @@ public class PromotionService {
         }
     }
 
+    @Transactional
     public void deletePromotion(String id) {
         if (!promotionRepository.existsById(id)) {
             throw new AppException(ErrorCode.PROMOTION_NOT_EXITED);

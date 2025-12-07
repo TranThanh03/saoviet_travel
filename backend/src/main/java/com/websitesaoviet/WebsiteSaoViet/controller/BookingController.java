@@ -5,6 +5,8 @@ import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.BookingResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingDetailResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.BookingSummaryResponse;
+import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
+import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +24,16 @@ import java.util.List;
 @RequestMapping("/bookings")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class BookingController {
     BookingService bookingService;
     AuthenticationService authenticationService;
     TourService tourService;
     CustomerService customerService;
-    MailService mailService;
 
     @GetMapping("/list")
-    ResponseEntity<ApiResponse<List<BookingSummaryResponse>>> getBookingsByCustomerId(@CookieValue("token") String token){
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<List<BookingSummaryResponse>>> getBookingsByCustomerId(@RequestHeader("Authorization") String authHeader){
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<List<BookingSummaryResponse>> apiResponse = ApiResponse.<List<BookingSummaryResponse>>builder()
                 .code(1801)
@@ -43,10 +44,21 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<ApiResponse<BookingDetailResponse>> getBookingById(@PathVariable String id) {
+    ResponseEntity<ApiResponse<BookingDetailResponse>> getBookingById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String id
+    ) {
+        var result = bookingService.getBookingDetail(id);
+        String accessToken = authHeader.substring(7);
+        String customerId = authenticationService.getIdByToken(accessToken);
+
+        if (!result.getCustomerId().equals(customerId)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
         ApiResponse<BookingDetailResponse> apiResponse = ApiResponse.<BookingDetailResponse>builder()
                 .code(1802)
-                .result(bookingService.getBookingDetail(id))
+                .result(result)
                 .build();
 
         return ResponseEntity.ok(apiResponse);
@@ -111,8 +123,8 @@ public class BookingController {
     ResponseEntity<ApiResponse<Page<BookingListResponse>>> getAllBookings(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<BookingListResponse>> apiResponse = ApiResponse.<Page<BookingListResponse>>builder()

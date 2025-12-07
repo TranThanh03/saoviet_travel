@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/customers")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class CustomerController {
     CustomerService customerService;
     AuthenticationService authenticationService;
@@ -40,12 +38,7 @@ public class CustomerController {
         }
 
         var customer = customerService.createCustomer(request);
-
-        try {
-            mailService.sendActivationEmail(customer.getId(), customer.getEmail());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        mailService.sendActivationEmail(customer.getId(), customer.getEmail());
 
         ApiResponse<CustomerCreateResponse> apiResponse = ApiResponse.<CustomerCreateResponse>builder()
                 .code(1300)
@@ -66,8 +59,8 @@ public class CustomerController {
     ResponseEntity<ApiResponse<Page<CustomerResponse>>> getCustomers(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<CustomerResponse>> apiResponse = ApiResponse.<Page<CustomerResponse>>builder()
@@ -89,8 +82,9 @@ public class CustomerController {
     }
 
     @GetMapping("/infor")
-    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@CookieValue("token") String token) {
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@RequestHeader("Authorization") String authHeader) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
                 .code(1303)
@@ -101,10 +95,12 @@ public class CustomerController {
     }
 
     @PutMapping("")
-    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(@CookieValue("token") String token,
-                                                                 @RequestBody @Valid CustomerUpdateRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid CustomerUpdateRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
                 .code(1304)
@@ -133,10 +129,12 @@ public class CustomerController {
     }
 
     @PutMapping("/password")
-    ResponseEntity<ApiResponse<String>> changePassword(@CookieValue("token") String token,
-                                                       @RequestBody @Valid PasswordChangeRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<String>> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid PasswordChangeRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         customerService.changePassword(id, request);
 
@@ -164,6 +162,7 @@ public class CustomerController {
     @PatchMapping("/lock/{id}")
     ResponseEntity<ApiResponse<String>> blockCustomer(@PathVariable String id) {
         customerService.blockCustomer(id);
+        authenticationService.deleteRefreshTokenByUserId(id);
 
         ApiResponse<String> apiResponse = ApiResponse.<String>builder()
                 .code(1308)

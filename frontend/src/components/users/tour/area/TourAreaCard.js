@@ -36,13 +36,13 @@ const TourAreaCard = ({ tour }) => {
                     </ul>
                     <ul className="blog-meta">
                         <li>
-                            <i class="fa-solid fa-plane-departure me-2"></i>
+                            <i className="fa-solid fa-plane-departure me-2"></i>
                             {tour.startDate ? formatDatetime(tour.startDate) : ''}
                         </li>
                     </ul>
                     <ul className="blog-meta">
                         <li>
-                            <i class="fas fa-plane-arrival me-2"></i>
+                            <i className="fas fa-plane-arrival me-2"></i>
                             {tour.endDate ? formatDatetime(tour.endDate) : ''}
                         </li>
                     </ul>

@@ -18,17 +18,18 @@ import java.util.List;
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class ReviewController {
     ReviewService reviewService;
     AuthenticationService authenticationService;
 
     @PostMapping("/{bookingId}")
-    ResponseEntity<ApiResponse<ReviewResponse>> createReview(@PathVariable String bookingId,
-                                                             @CookieValue("token") String token,
-                                                             @RequestBody @Valid ReviewCreationRequest request) {
-
-        String customerId = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<ReviewResponse>> createReview(
+            @PathVariable String bookingId,
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid ReviewCreationRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String customerId = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<ReviewResponse> apiResponse = ApiResponse.<ReviewResponse>builder()
                 .code(2000)
@@ -42,12 +43,16 @@ public class ReviewController {
     @GetMapping("/{tourId}")
     ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviews(
             @PathVariable String tourId,
-            @CookieValue(value = "token", required = false) String token) {
-
+            @RequestHeader(value = "Authorization", required = false) String authHeader
+    ) {
         String customerId = null;
 
-        if (token != null) {
-            customerId = authenticationService.getIdByToken(token);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String accessToken = authHeader.substring(7);
+
+            if (!accessToken.isBlank()) {
+                customerId = authenticationService.getIdByToken(accessToken);
+            }
         }
 
         ApiResponse<List<ReviewResponse>> apiResponse = ApiResponse.<List<ReviewResponse>>builder()
@@ -59,10 +64,12 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<String>> deleteReview(@PathVariable String id,
-                                                     @CookieValue("token") String token){
-
-        String customerId = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<String>> deleteReview(
+            @PathVariable String id,
+            @RequestHeader("Authorization") String authHeader
+    ){
+        String accessToken = authHeader.substring(7);
+        String customerId = authenticationService.getIdByToken(accessToken);
 
         reviewService.deleteReview(id, customerId);
 
@@ -75,10 +82,12 @@ public class ReviewController {
     }
 
     @GetMapping("/check/{bookingId}")
-    ResponseEntity<ApiResponse<Boolean>> checkReview(@PathVariable String bookingId,
-                                                     @CookieValue("token") String token) {
-
-        String customerId = authenticationService.getIdByToken(token);
+    ResponseEntity<ApiResponse<Boolean>> checkReview(
+            @PathVariable String bookingId,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String accessToken = authHeader.substring(7);
+        String customerId = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<Boolean> apiResponse = ApiResponse.<Boolean>builder()
                 .code(2003)

@@ -23,9 +23,14 @@ const ReviewList = ({ tourId, bookingId }) => {
 
             if (response?.code === 2001) {
                 setReviews(response?.result);
+
+                if (Array.isArray(response?.result) && response.result.length === 0) {
+                    setAvgRating(0);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch reviews: ", error);
+            setAvgRating(0);
         }
     }
 
@@ -224,6 +229,7 @@ const ReviewList = ({ tourId, bookingId }) => {
                     </div>
                 </>
             )}
+
             <ToastContainer />
         </div>
     );

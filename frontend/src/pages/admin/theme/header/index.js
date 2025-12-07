@@ -1,26 +1,27 @@
-import { memo, useState, useContext } from 'react';
+import { memo, useState } from 'react';
 import './style.scss';
 import { Link } from 'react-router-dom';
 import { AuthApi } from 'services';
-import { AuthAdminContext } from '../masterLayout';
 import { FaUserCircle, FaAngleDown, FaBars } from 'react-icons/fa';
+import { ErrorToast } from 'components/notifi';
+import { useAdminAuth } from 'utils/AdminAuthContext';
 
-const Header = ({ isSidebar, setIsSidebar }) => {
+const Header = () => {
     const [isShow, setIsShow] = useState(false);
-    const { authenticated } = useContext(AuthAdminContext);
+    const { authenticated, isSidebar, setIsSidebar } = useAdminAuth();
 
     const handleLogout = async () => {
         try {
             const response = await AuthApi.logoutAdmin();
 
-            if (response.code === 9994) {
+            if (response.code === 9995) {
                 window.location.href = "/manage/auth/login";
             } else {
-                window.location.href = "/manage/auth/login";
+                ErrorToast("Đã xảy ra lỗi không xác định!");
             }
         } catch (error) {
             console.error("Failed logout:", error);
-            window.location.href = "/manage/auth/login";
+            ErrorToast("Đã xảy ra lỗi không xác định!");
         }
     };
 

@@ -1,7 +1,7 @@
-import { memo, useState, useEffect, useContext } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './detail.scss';
-import { AuthApi, TourApi } from 'services';
+import { TourApi } from 'services';
 import formaterCurrency from 'utils/formatCurrency';
 import { sanitizeHtml } from 'utils/sanitizeHtml';
 import { noImage } from 'assets';
@@ -10,8 +10,7 @@ import CalendarCustom from "components/users/calendar/index";
 import formatDatetime from 'utils/formatDatetime';
 import { ErrorToast } from 'components/notifi';
 import { ToastContainer } from 'react-toastify';
-import { AuthContext } from '../theme/masterLayout';
-
+import { useAuth } from 'utils/AuthContext';
 
 const TourDetailPage = () => {
     const { id } = useParams();
@@ -30,7 +29,7 @@ const TourDetailPage = () => {
         quantityPeople: 0,
         totalPeople: 0
     });
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated } = useAuth();
 
     const handleDateSelect = (data) => {
         setData(data);
@@ -81,13 +80,7 @@ const TourDetailPage = () => {
         try {
             if (authenticated) {
                 if (data.startDate !== '' && data.id !== '') {
-                    const response = await AuthApi.introspect();
-
-                    if (response?.code === 9998 && response?.result) {
-                        navigate(`/booking/${data.id}`);
-                    } else {
-                        ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-                    }
+                    navigate(`/booking/${data.id}`);
                 } else {
                     ErrorToast("Vui lòng chọn ngày khởi hành trước.");
                 }
