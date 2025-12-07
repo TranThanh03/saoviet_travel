@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -85,6 +86,7 @@ public class NewsService {
         return newsMapper.toNewsResponse(newsRepository.save(news));
     }
 
+    @Transactional
     public void deleteNews(String id) {
         if (!newsRepository.existsById(id)) {
             throw new AppException(ErrorCode.NEWS_NOT_EXITED);
@@ -100,18 +102,21 @@ public class NewsService {
     }
 
     public NewsSummaryResponse getOutstandingNews() {
-        return newsRepository.findOutstandingNews();
+        return newsRepository.findTop1OutstandingNews().get(0);
     }
 
     public List<NewsSummaryResponse> getTopNews() {
-        return newsRepository.findTopNews();
+        Pageable pageable = Pageable.ofSize(5);
+        return newsRepository.findTopNews(pageable);
     }
 
     public List<NewsSummaryResponse> getListOutstandingNews(String id) {
-        return newsRepository.findListOutstandingNews(id);
+        Pageable pageable = Pageable.ofSize(10);
+        return newsRepository.findListOutstandingNews(id, pageable);
     }
 
     public List<NewsSummaryResponse> getListTopNews(String id) {
-        return newsRepository.findListTopNews(id);
+        Pageable pageable = Pageable.ofSize(10);
+        return newsRepository.findListTopNews(id, pageable);
     }
 }

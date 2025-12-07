@@ -1,77 +1,61 @@
 import { memo, useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import "./message.scss";
-import { CheckoutApi } from "services";
+import { PaymentApi } from "services";
 import { failedSvg, successSvg } from "assets";
 
 const MessagePage = () => {
     const [status, setStatus] = useState();
     const [countdown, setCountdown] = useState(5);
-    const [scheduleId, setScheduleId] = useState('');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const navigate = useNavigate();
-    const [isLoading, setLoading] = useState(true);
-
-    const processScheduleIdByMomo = () => {
-        const extraData = queryParams.get("extraData");
-
-        if (extraData) {
-            const decodedData = decodeURIComponent(extraData);
-            const scheduleMatch = decodedData.match(/scheduleId=([^;]*)/);
-            setScheduleId(scheduleMatch ? scheduleMatch[1] : "");
-        }
-    }
-
-    const processScheduleIdByVnpay = () => {
-        const orderInfo = queryParams.get("vnp_OrderInfo");
-
-        if (orderInfo) {
-            const decodedData = decodeURIComponent(orderInfo);
-            const scheduleMatch = decodedData.match(/scheduleId=([^;]*)/);
-            setScheduleId(scheduleMatch ? scheduleMatch[1] : "");
-        }
-    }
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCheckoutCallback = async () => {
+        const fetchPaymentCallback = async () => {
             try {
-                const isMoMo = queryParams.get("partnerCode");
+                const momoResultCode = queryParams.get("resultCode");
+                const momoTransId = queryParams.get("transId");
+                const vnpResponseCode = queryParams.get("vnp_ResponseCode");
+                const vnpTransNo = queryParams.get("vnp_TransactionNo");
 
-                if (isMoMo) {
-                    processScheduleIdByMomo();
-                    const response = await CheckoutApi.momoCallback(queryParams);
+                if (momoResultCode && momoTransId) {
+                    if (momoResultCode === "0") {
+                        const response = await PaymentApi.validate(momoTransId);
 
-                    if (response?.code === 1904) {
-                        setStatus('success');
-                    } else if (response?.code === 1905) {
-                        setStatus('failed');
+                        if (response?.code === 2302) {
+                            setStatus('success');
+                        } else {
+                            setStatus('failed');
+                        }
                     } else {
-                        navigate("/error/404");
+                        setStatus('failed');
+                    }   
+                } else if (vnpResponseCode && vnpTransNo) {
+                    if (vnpResponseCode === "00") {
+                        const response = await PaymentApi.validate(vnpTransNo);
+
+                        if (response?.code === 2302) {
+                            setStatus('success');
+                        } else {
+                            setStatus('failed');
+                        }
+                    } else {
+                        setStatus('failed');
                     }
                 } else {
-                    processScheduleIdByVnpay();
-                    const response = await CheckoutApi.vnpayCallback(queryParams);
-
-                    if (response?.code === 1906) {
-                        setStatus('success');
-                    } else if (response?.code === 1907) {
-                        setStatus('failed');
-                    } else {
-                        navigate("/error/404");
-                    }
+                    navigate("/error/404");
                 }
-            }
-            catch (error) {
-                console.error("Failed to fetch checkout callback: ", error);
-                navigate("/error/404");
-            }
-            finally {
-                setLoading(false);
+            } catch (error) {
+                console.error("Failed to fetch validate booking: ", error);
+                setStatus('error');
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        fetchCheckoutCallback();
+        fetchPaymentCallback();
     }, []);
 
     useEffect(() => {
@@ -110,9 +94,16 @@ const MessagePage = () => {
                 ) : status === "failed" ? (
                     <div className="failed">
                         <img src={failedSvg} alt="failed"/>
-                        <h2>Thanh toán thất bại</h2>
-                        <p>Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng thử lại!</p>
-                        <Link to={`/booking/${scheduleId}`}>Đặt tour</Link>
+                        <h2>Thanh toán không thành công</h2>
+                        <p>Giao dịch chưa được hoàn tất. Vui lòng thử lại sau!</p>
+                        <Link to="/">Về trang chủ</Link>
+                    </div>
+                ) : status === "error" ? (
+                    <div className="error">
+                        <img src={failedSvg} alt="error"/>
+                        <h2>Đã xảy ra lỗi</h2>
+                        <p>Hệ thống đang gặp sự cố hoặc kết nối không ổn định. Vui lòng thử lại sau!</p>
+                        <Link to="/">Về trang chủ</Link>
                     </div>
                 ) : null}
             </div>

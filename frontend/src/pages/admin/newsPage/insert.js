@@ -4,14 +4,13 @@ import { NewsApi } from "services";
 import { useNavigate } from "react-router-dom";
 import { noImage } from "assets";
 import { FaArrowLeft } from "react-icons/fa";
-import { ToastContainer } from "react-toastify";
 import { ErrorToast, SuccessToast } from "components/notifi";
 
 const NewsInsertPage = () => {
     const textEditorRef = useRef(null);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
         summary: "",
@@ -19,7 +18,6 @@ const NewsInsertPage = () => {
         content: "",
         type: "Nổi bật"
     });
-
     const [preview, setPreview] = useState(noImage);
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -119,6 +117,8 @@ const NewsInsertPage = () => {
             }
         }
 
+        setIsLoading(true);
+
         try {
             const response = await NewsApi.create(updatedFormData);
 
@@ -144,11 +144,13 @@ const NewsInsertPage = () => {
                     textEditorRef.current.setData("");
                 }
             } else {
-                ErrorToast(response.message || "Thêm tin tức không thành công.");
+                ErrorToast(response?.message || "Thêm tin tức không thành công.");
             }
         } catch (error) {
             console.error("Failed to create news: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -192,22 +194,33 @@ const NewsInsertPage = () => {
                                 </div>
 
                                 <div className="d-flex justify-content-center gap-3">
-                                    <button type="button" className="btn btn-back"
+                                    <button
+                                        type="button"
+                                        className="btn btn-back"
                                         onClick={() => {
                                             destroyEditors();
                                             navigate("/manage/news");
-                                        }}>
+                                        }}
+                                    >
                                         <FaArrowLeft size={18} color="black" />
                                     </button>
-                                    <button type="submit" className="btn btn-submit fw-bold">Thêm</button>
+
+                                    <button
+                                        type="submit"
+                                        isabled={isLoading}
+                                        className="btn btn-submit fw-bold"
+                                    >
+                                        {isLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Thêm'
+                                        }
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>
     );
 };

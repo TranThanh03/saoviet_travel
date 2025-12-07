@@ -27,6 +27,7 @@ public class BookingCheckoutDetailResponse {
     Double discount;
     Double totalPrice;
     LocalDateTime bookingTime;
+    LocalDateTime expiredTime;
     String status;
     boolean isReserved;
     String checkoutId;

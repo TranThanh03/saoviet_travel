@@ -1,10 +1,11 @@
-import { memo, forwardRef, useRef, useEffect } from "react";
+import { memo, forwardRef, useRef, useEffect, useState } from "react";
 import "./step3.scss";
 import { ErrorToast, SuccessToast } from "components/notifi";
 import { TourApi } from "services";
 
 const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => {
     const textEditorRefs = useRef([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const destroyEditors = () => {
         textEditorRefs.current.forEach((editor, i) => {
@@ -108,6 +109,8 @@ const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => 
             return;
         }
 
+        setIsLoading(true);
+
         try {
             const response = await TourApi.update(id, formData);
 
@@ -126,6 +129,8 @@ const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => 
         } catch (error) {
             console.error("Failed to create tour: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -134,8 +139,11 @@ const Step3 = forwardRef(({ id, formData, setFormData, setImgPreview }, ref) => 
             {renderItineraries()}
 
             <div className="btn-control">
-                <button type="button" className="btn btn-submit" onClick={handleSubmit}>
-                    Cập nhật
+                <button type="button" disabled={isLoading} className="btn btn-submit" onClick={handleSubmit}>
+                    {isLoading ? 
+                        <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                        : 'Cập nhật'
+                    }
                 </button>
             </div>
         </div>

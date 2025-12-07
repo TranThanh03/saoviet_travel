@@ -1,18 +1,9 @@
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toastBus } from "./toastBus";
 
 export const SuccessToast = (content) => {
-    toast.success(content, {
-        position: 'top-center',
-        autoClose: 3000,
-        theme: 'colored',
-    });
+    toastBus.emit("show", { type: "success", content });
 };
 
 export const ErrorToast = (content) => {
-    toast.error(content, {
-        position: 'top-center',
-        autoClose: 3000,
-        theme: 'colored',
-    });
+    toastBus.emit("show", { type: "error", content });
 };

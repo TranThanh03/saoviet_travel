@@ -1,7 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.repository;
 
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.PromotionListResponse;
-import com.websitesaoviet.WebsiteSaoViet.dto.response.common.PromotionResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.PromotionSummaryResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Promotion;
 import org.springframework.data.domain.Page;
@@ -21,14 +20,17 @@ public interface PromotionRepository extends JpaRepository<Promotion, String> {
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.PromotionSummaryResponse(" +
             "p.id, p.code, p.title, p.description, p.discount, p.endDate, p.quantity) " +
             "FROM Promotion p " +
-            "WHERE p.status = 'Đang diễn ra' AND p.quantity > 0 " +
-            "ORDER BY p.endDate ASC" )
-    List<PromotionSummaryResponse> findPromotionList();
+            "LEFT JOIN CustomerPromotion cp " +
+            "ON cp.promotionId = p.id " +
+            "AND cp.customerId = :customerId " +
+            "WHERE cp.customerId IS NULL AND p.status = 'Đang diễn ra' AND p.quantity > 0 " +
+            "ORDER BY p.endDate ASC")
+    List<PromotionSummaryResponse> findPromotionList(@Param("customerId") String customerId);
 
     @Query("SELECT p " +
             "FROM Promotion p " +
-            "WHERE p.id = :id AND p.status = 'Đang diễn ra' AND p.quantity > 0")
-    Promotion findAvailablePromotionById(@Param("id") String id);
+            "WHERE p.id = :id AND p.startDate <= :currentDate AND p.endDate >= :currentDate AND p.quantity > 0")
+    Promotion findAvailablePromotionById(@Param("id") String id, @Param("currentDate") LocalDate currentDate);
 
     boolean existsByCode(String code);
 

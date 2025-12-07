@@ -1,9 +1,9 @@
-import { memo, useContext, useState } from 'react';
+import { memo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 import { logo } from 'assets';
 import { AuthApi } from 'services';
-import { AuthContext } from '../theme/masterLayout';
+import { useAuth } from 'utils/AuthContext';
 import PasswordInput from 'components/passwordInput';
 import Recaptcha from 'components/recaptcha/checkbox';
 
@@ -11,7 +11,7 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '', recaptcha: '' });
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-    const { fetchAuth } = useContext(AuthContext);
+    const { login } = useAuth();
     const [captchaToken, setCaptchaToken] = useState(null);
     const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -44,14 +44,17 @@ const LoginPage = () => {
                 recaptcha: captchaToken
             });
 
-            if (response?.code === 9999) {
-                await fetchAuth();
+            if (response?.code === 1900) {
+                const accessToken = response?.result?.accessToken;
+
+                login(accessToken);
                 navigate('/');
             } else {
                 setErrorMessage(response.message);
                 setCaptchaToken(null);
             }
         } catch (error) {
+            console.error("Failed to login: ", error);
             setErrorMessage('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
         } finally {
             setLoading(false);
@@ -97,7 +100,10 @@ const LoginPage = () => {
                                 </div>
 
                                 <div className="input-group mb-1">
-                                    <p><b>Mật khẩu</b></p>
+                                    <p>
+                                        <b>Mật khẩu</b>
+                                        <Link className="forgot-password" to="/auth/forgot-password">Quên mật khẩu?</Link>
+                                    </p>
                                     <PasswordInput
                                         value={formData.password}
                                         onChange={handleInputChange}
@@ -119,25 +125,17 @@ const LoginPage = () => {
                                         className={`btn btn-lg btn-primary w-100 fs-6 ${checkFormData() ? '' : 'inactive'}`}
                                         disabled={!checkFormData() || loading}
                                     >
-                                        {loading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                            </>
-                                        ) : (
-                                            "Đăng nhập"
-                                        )}
+                                        {loading ?
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            : 'Đăng nhập'
+                                        }
                                     </button>
                                 </div>
                             </form>
                     
                             <div className="input-group mt-3 .bg-warning d-flex fs-5 justify-content-between bottom-group">
-                                <div className="register">
-                                    <small>Khách hàng mới? <Link to="/auth/register">Tạo tài khoản</Link></small>
-                                </div>
-
-                                <div className="back">
-                                    <small><Link to="/">Trang chủ</Link></small>
-                                </div>
+                                <small><Link to="/auth/register">Tạo tài khoản</Link></small>
+                                <small><Link to="/">Trang chủ</Link></small>
                             </div>
                         </div>
                     </div>

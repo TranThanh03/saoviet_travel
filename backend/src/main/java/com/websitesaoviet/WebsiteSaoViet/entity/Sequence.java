@@ -5,7 +5,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "sequence")
+@Table(
+        name = "sequence",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"type", "year"})
+        }
+)
 
 @Data
 @NoArgsConstructor
@@ -18,7 +23,7 @@ public class Sequence {
     @Column(name = "id", unique = true)
     Long id;
 
-    @Column(name = "type", unique = true)
+    @Column(name = "type")
     String type;
 
     @Column(name = "year")

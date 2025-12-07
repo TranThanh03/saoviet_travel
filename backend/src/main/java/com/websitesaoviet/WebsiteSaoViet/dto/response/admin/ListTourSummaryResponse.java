@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ToursSummaryResponse {
+public class ListTourSummaryResponse {
     String id;
     String code;
     String name;

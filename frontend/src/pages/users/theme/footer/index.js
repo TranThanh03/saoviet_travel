@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { locationIcon, envelopeIcon, ministryOfIndustryAndTradeIcon, facebookIcon, instagramIcon, zaloIcon, logo, phoneIcon } from 'assets';
+import { locationIcon, envelopeIcon, facebookIcon, instagramIcon, zaloIcon, logo, phoneIcon } from 'assets';
 import './style.scss';
 import { Link } from 'react-router-dom';
 
@@ -21,13 +21,6 @@ const Footer = () => {
                     <div className="d-flex align-items-start gap-2 my-2 icon">
                         <img src={envelopeIcon} alt="Email" />
                         <p className="mb-0">support@saoviet.com</p>
-                    </div>
-                    <div className="mt-2">
-                        <img
-                            src={ministryOfIndustryAndTradeIcon}
-                            alt="Bộ Công Thương"
-                            style={{ height: 40 }}
-                        />
                     </div>
                 </div>
 

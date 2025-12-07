@@ -108,7 +108,7 @@ const Navbar = () => {
 
 const Sidebar = () => {
     return (
-        <div className="col-md-3 left_col sidebar-manage-custom">
+        <div className="col-md-3 left_col sidebar-manage-custom min-vh-100">
             <div className="left_col scroll-view">
                 <div className="clearfix"></div>
 

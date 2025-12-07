@@ -1,6 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.controller;
 
-import com.websitesaoviet.WebsiteSaoViet.dto.request.common.PasswordChangeRequest;
+import com.websitesaoviet.WebsiteSaoViet.dto.request.common.ChangePasswordRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerCreationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerUpdateRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
@@ -9,14 +9,19 @@ import com.websitesaoviet.WebsiteSaoViet.dto.response.user.CustomerCreateRespons
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.service.*;
+import com.websitesaoviet.WebsiteSaoViet.util.DomainUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +30,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/customers")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class CustomerController {
     CustomerService customerService;
     AuthenticationService authenticationService;
     BookingService bookingService;
     RecaptchaService recaptchaService;
     MailService mailService;
+
+    @NonFinal
+    @Value("${app.fe-base-url}")
+    protected String FE_BASE_URL;
 
     @PostMapping()
     ResponseEntity<ApiResponse<CustomerCreateResponse>> createCustomer(@RequestBody @Valid CustomerCreationRequest request) {
@@ -40,12 +48,7 @@ public class CustomerController {
         }
 
         var customer = customerService.createCustomer(request);
-
-        try {
-            mailService.sendActivationEmail(customer.getId(), customer.getEmail());
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        mailService.sendActivationEmail(customer.getId(), customer.getEmail());
 
         ApiResponse<CustomerCreateResponse> apiResponse = ApiResponse.<CustomerCreateResponse>builder()
                 .code(1300)
@@ -66,8 +69,8 @@ public class CustomerController {
     ResponseEntity<ApiResponse<Page<CustomerResponse>>> getCustomers(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<CustomerResponse>> apiResponse = ApiResponse.<Page<CustomerResponse>>builder()
@@ -88,9 +91,10 @@ public class CustomerController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/infor")
-    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@CookieValue("token") String token) {
-        String id = authenticationService.getIdByToken(token);
+    @GetMapping("/info")
+    ResponseEntity<ApiResponse<CustomerResponse>> getCustomerByToken(@RequestHeader("Authorization") String authHeader) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
                 .code(1303)
@@ -100,11 +104,13 @@ public class CustomerController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PutMapping("")
-    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(@CookieValue("token") String token,
-                                                                 @RequestBody @Valid CustomerUpdateRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    @PatchMapping("")
+    ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid CustomerUpdateRequest request
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         ApiResponse<CustomerResponse> apiResponse = ApiResponse.<CustomerResponse>builder()
                 .code(1304)
@@ -132,13 +138,30 @@ public class CustomerController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PutMapping("/password")
-    ResponseEntity<ApiResponse<String>> changePassword(@CookieValue("token") String token,
-                                                       @RequestBody @Valid PasswordChangeRequest request) {
-
-        String id = authenticationService.getIdByToken(token);
+    @PatchMapping("/change-password")
+    ResponseEntity<ApiResponse<String>> changePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid ChangePasswordRequest request,
+            HttpServletResponse response
+    ) {
+        String accessToken = authHeader.substring(7);
+        String id = authenticationService.getIdByToken(accessToken);
 
         customerService.changePassword(id, request);
+        authenticationService.deleteRefreshTokenByUserId(id);
+
+        String refreshToken = authenticationService.generateRefreshToken(id);
+
+        ResponseCookie cookie = ResponseCookie.from("refresh-token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain(DomainUtil.extractDomain(FE_BASE_URL))
+                .path("/")
+                .maxAge(10 * 24 * 3600)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         ApiResponse<String> apiResponse = ApiResponse.<String>builder()
                 .code(1306)
@@ -148,7 +171,7 @@ public class CustomerController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PatchMapping("/activate/{id}")
+    @PatchMapping("/{id}/activate")
     ResponseEntity<ApiResponse<String>> activateCustomer(@PathVariable String id) {
         customerService.activateCustomer(id);
 
@@ -161,9 +184,10 @@ public class CustomerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/lock/{id}")
+    @PatchMapping("/{id}/lock")
     ResponseEntity<ApiResponse<String>> blockCustomer(@PathVariable String id) {
         customerService.blockCustomer(id);
+        authenticationService.deleteRefreshTokenByUserId(id);
 
         ApiResponse<String> apiResponse = ApiResponse.<String>builder()
                 .code(1308)
@@ -174,7 +198,7 @@ public class CustomerController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/unlock/{id}")
+    @PatchMapping("/{id}/unlock")
     ResponseEntity<ApiResponse<String>> unblockCustomer(@PathVariable String id) {
         customerService.unblockCustomer(id);
 

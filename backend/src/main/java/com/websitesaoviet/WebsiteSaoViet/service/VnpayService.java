@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class VnpayService {
 
     @NonFinal
@@ -30,24 +32,26 @@ public class VnpayService {
     @Value("${vnpay.hashSecret}")
     public String hashSecret;
 
-    public String createPayment(int amount, String orderId, String redirectUrl, String extraData) {
+    public String createVnpayPayment(String orderId, int amount, String redirectUrl) {
         try {
             String vnp_Version = "2.1.0";
             String vnp_Command = "pay";
             String orderType = "bill";
             String vnp_IpAddr = "127.0.0.1";
             String bankCode = "NCB";
+            String extraData = String.format("Thanh toan don dat tour #%s.", orderId);
 
             String sandboxUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
             Map<String, String> vnp_Params = new HashMap<>();
+
             vnp_Params.put("vnp_Version", vnp_Version);
             vnp_Params.put("vnp_Command", vnp_Command);
             vnp_Params.put("vnp_TmnCode", tmnCode);
             vnp_Params.put("vnp_Amount", String.valueOf(amount * 100));
             vnp_Params.put("vnp_CurrCode", "VND");
             vnp_Params.put("vnp_TxnRef", orderId);
-            vnp_Params.put("vnp_OrderInfo", "Thanh toan don dat tour;" + extraData);
+            vnp_Params.put("vnp_OrderInfo", extraData);
             vnp_Params.put("vnp_OrderType", orderType);
             vnp_Params.put("vnp_Locale", "vn");
             vnp_Params.put("vnp_ReturnUrl", redirectUrl);
@@ -60,6 +64,7 @@ public class VnpayService {
 
             return sandboxUrl + "?" + query;
         } catch (Exception e) {
+            log.error("Payment VNPAY failed: ", e);
             throw new AppException(ErrorCode.PAYMENT_VNPAY_FAILED);
         }
     }
@@ -80,6 +85,7 @@ public class VnpayService {
 
             return calculatedHash.equalsIgnoreCase(vnpSecureHash);
         } catch (Exception e) {
+            log.error("Payment VNPAY failed: ", e);
             throw new AppException(ErrorCode.SIGNATURE_INVALID);
         }
     }
@@ -104,6 +110,7 @@ public class VnpayService {
             }
             return sb.toString();
         } catch (Exception e) {
+            log.error("Payment VNPAY failed: ", e);
             throw new AppException(ErrorCode.PAYMENT_VNPAY_FAILED);
         }
     }

@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class BookingDetailResponse {
     String id;
     String code;
+    String customerId;
     String tourId;
     String tourCode;
     String tourName;
@@ -27,6 +28,7 @@ public class BookingDetailResponse {
     Double discount;
     Double totalPrice;
     LocalDateTime bookingTime;
+    LocalDateTime expiredTime;
     String status;
     boolean isReviewed;
     String checkoutCode;

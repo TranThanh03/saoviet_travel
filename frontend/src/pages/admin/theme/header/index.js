@@ -1,26 +1,27 @@
-import { memo, useState, useContext } from 'react';
+import { memo, useState } from 'react';
 import './style.scss';
 import { Link } from 'react-router-dom';
-import { AuthApi } from 'services';
-import { AuthAdminContext } from '../masterLayout';
+import { AdminApi } from 'services';
 import { FaUserCircle, FaAngleDown, FaBars } from 'react-icons/fa';
+import { ErrorToast } from 'components/notifi';
+import { useAdminAuth } from 'utils/AdminAuthContext';
 
-const Header = ({ isSidebar, setIsSidebar }) => {
+const Header = () => {
     const [isShow, setIsShow] = useState(false);
-    const { authenticated } = useContext(AuthAdminContext);
+    const { authenticated, isSidebar, setIsSidebar } = useAdminAuth();
 
     const handleLogout = async () => {
         try {
-            const response = await AuthApi.logoutAdmin();
+            const response = await AdminApi.logout();
 
-            if (response.code === 9994) {
+            if (response.code === 1201) {
                 window.location.href = "/manage/auth/login";
             } else {
-                window.location.href = "/manage/auth/login";
+                ErrorToast("Đã xảy ra lỗi không xác định!");
             }
         } catch (error) {
             console.error("Failed logout:", error);
-            window.location.href = "/manage/auth/login";
+            ErrorToast("Đã xảy ra lỗi không xác định!");
         }
     };
 
@@ -41,7 +42,7 @@ const Header = ({ isSidebar, setIsSidebar }) => {
                         <ul className="dropdown-menu dropdown-menu-end show mt-2">
                             {authenticated && (
                                 <>
-                                    <li><Link className="dropdown-item" to="/manage/infor" onClick={() => setIsShow(false)}>Thông tin</Link></li>
+                                    <li className="mt-1"><Link className="dropdown-item" to="/manage/info" onClick={() => setIsShow(false)}>Thông tin</Link></li>
                                     <li><Link className="dropdown-item" to="/manage/password" onClick={() => setIsShow(false)}>Mật khẩu</Link></li>
                                     <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
                                 </>

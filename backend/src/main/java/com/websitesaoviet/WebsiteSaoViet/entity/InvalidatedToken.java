@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.Date;
 
 @Entity
-@Table(name = "token")
+@Table(name = "invalidated_tokens")
 
 @Data
 @NoArgsConstructor

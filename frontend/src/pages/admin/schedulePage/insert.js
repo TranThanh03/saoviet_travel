@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./insert.scss";
 import DatePicker from "react-datepicker";
-import { ToastContainer } from "react-toastify";
 import { ErrorToast, SuccessToast } from "components/notifi";
 import TourSelector from "components/admin/select";
+import getTodayUTC7 from "utils/getTodayUTC7";
 
 const ScheduleInsertPage = () => {
     const [formData, setFormData] = useState({
         tourId: null,
-        startDate: new Date().toISOString().split('T')[0],
+        startDate: getTodayUTC7().toISOString().split('T')[0],
         totalPeople: null,
         adultPrice: null,
         childrenPrice: null
@@ -22,6 +22,7 @@ const ScheduleInsertPage = () => {
         endDate: null
     })
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,6 +78,8 @@ const ScheduleInsertPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setIsLoading(true);
+
         try {
             const response = await ScheduleApi.create(formData);
 
@@ -85,7 +88,7 @@ const ScheduleInsertPage = () => {
 
                 setFormData({
                     tourId: null,
-                    startDate: new Date().toISOString().split('T')[0],
+                    startDate: getTodayUTC7().toISOString().split('T')[0],
                     totalPeople: null,
                     adultPrice: null,
                     childrenPrice: null
@@ -95,12 +98,19 @@ const ScheduleInsertPage = () => {
                     quantityDay: null,
                     endDate: null
                 })
+            } else if (response?.code === 1027) {
+                const date = getTodayUTC7();
+                date.setDate(date.getDate() + 2);
+
+                ErrorToast(`Ngày khởi hành không được trước ngày ${date.toLocaleDateString("vi-VN")}!`);
             } else {
                 ErrorToast(response?.message || "Thêm lịch trình thất bại.");
             }
         } catch (error) {
             console.error("Failed to create schedule: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -165,15 +175,22 @@ const ScheduleInsertPage = () => {
                                         <FaArrowLeft size={18} color="black" />
                                     </button>
 
-                                    <button type="submit" className="btn btn-submit fw-bold">Thêm</button>
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="btn btn-submit fw-bold"
+                                    >
+                                        {isLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Thêm'
+                                        }
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>    
     );
 };

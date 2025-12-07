@@ -18,11 +18,13 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,6 +35,7 @@ public class ScheduleService {
     ScheduleMapper scheduleMapper;
     SequenceService sequenceService;
     TourService tourService;
+    RedisService redisService;
 
     public ScheduleResponse createSchedule(ScheduleCreationRequest request) {
         LocalDate today = LocalDate.now();
@@ -82,17 +85,39 @@ public class ScheduleService {
     }
 
     public List<ScheduleSummaryResponse> getSchedulesByTourId(String tourId) {
-        return scheduleRepository.findSchedulesByTourId(tourId);
+        List<ScheduleSummaryResponse> list = scheduleRepository.findSchedulesByTourId(tourId);
+        List<ScheduleSummaryResponse> result = new ArrayList<>(list.size());
+
+        for (ScheduleSummaryResponse s : list) {
+            int available = redisService.getAvailablePeople(s.getId(), s.getQuantityPeople());
+
+            if (available > 0) {
+                s.setQuantityPeople(available);
+                result.add(s);
+            }
+        }
+
+        return result;
     }
 
     public ScheduleTourResponse getScheduleTourById(String id) {
-        return scheduleRepository.findScheduleTourById(id);
+        ScheduleTourResponse schedule = scheduleRepository.findScheduleTourById(id);
+        int availablePeople = redisService.getAvailablePeople(id, schedule.getQuantityPeople());
+
+        if (availablePeople <= 0) {
+            throw new AppException(ErrorCode.SCHEDULE_NOT_EXITED);
+        }
+
+        schedule.setQuantityPeople(availablePeople);
+
+        return schedule;
     }
 
     public List<ScheduleStartDateResponse> getStartDateByTourId(String tourId) {
         return scheduleRepository.findStartDateByTourId(tourId);
     }
 
+    @Transactional
     public void deleteSchedule(String id) {
         if (scheduleRepository.existsScheduleByScheduleId(id)) {
             throw new AppException(ErrorCode.BOOKING_SUCCESSFULLY);
@@ -103,6 +128,7 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
+    @Transactional
     public void deleteByTourId(String tourId) {
         if (scheduleRepository.existsScheduleByTourIdAndStatus(tourId, CommonStatus.IN_PROGRESS.getValue())) {
             throw new AppException(ErrorCode.SCHEDULE_IN_PROGRESS);
@@ -131,8 +157,18 @@ public class ScheduleService {
         return scheduleRepository.existsScheduleByTourIdAndStatus(id, status);
     }
 
-    public boolean existsScheduleByQuantityPeople(String id, int people) {
-        return scheduleRepository.existsScheduleByQuantityPeople(id, people);
+    public int getAvailablePeople(String id) {
+        Integer availablePeople = scheduleRepository.getAvailablePeople(id);
+
+        if (availablePeople == null) {
+            throw new AppException(ErrorCode.SCHEDULE_NOT_EXITED);
+        }
+
+        if (availablePeople <= 0) {
+            throw new AppException(ErrorCode.SCHEDULE_PEOPLE_INVALID);
+        }
+
+        return availablePeople;
     }
 
     public void addQuantityPeople(String id, int people) {

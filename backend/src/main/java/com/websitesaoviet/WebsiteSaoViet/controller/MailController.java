@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/mail")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class MailController {
      MailService mailService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+     @PreAuthorize("hasRole('ADMIN')")
      @PostMapping("/send")
      ResponseEntity<ApiResponse<String>> sendEmail(@RequestBody EmailRequest request) {
          mailService.sendMail(request.getTo(), request.getSubject(), request.getText());

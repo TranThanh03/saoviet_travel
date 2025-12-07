@@ -1,10 +1,11 @@
 import { memo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './login.scss';
 import { logo } from 'assets';
-import { AuthApi } from 'services';
+import { AdminApi } from 'services';
 import PasswordInput from 'components/passwordInput';
 import RecaptchaCb from 'components/recaptcha/checkbox';
+import { useAdminAuth } from 'utils/AdminAuthContext';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '', recaptcha: '' });
@@ -13,6 +14,7 @@ const LoginPage = () => {
     const [captchaToken, setCaptchaToken] = useState(null);
     const [isRefreshCaptcha, setRefreshCaptCha] = useState(true);
     const [loading, setLoading] = useState(false);
+    const { login } = useAdminAuth();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -37,12 +39,15 @@ const LoginPage = () => {
         setLoading(true);
 
         try {
-            const response = await AuthApi.loginAdmin({
+            const response = await AdminApi.login({
                 ...formData,
                 recaptcha: captchaToken
             });
 
-            if (response?.code === 9996) {
+            if (response?.code === 1200) {
+                const accessToken = response?.result?.accessToken;
+                
+                login(accessToken);
                 navigate('/manage/dashboard');
             } 
             else if (response?.code === 1009) {
@@ -98,7 +103,10 @@ const LoginPage = () => {
                                 </div>
 
                                 <div className="input-group mb-1">
-                                    <p><b>Mật khẩu</b></p>
+                                    <p>
+                                        <b>Mật khẩu</b>
+                                        <Link className="forgot-password" to="/manage/auth/forgot-password">Quên mật khẩu?</Link>
+                                    </p>
                                     <PasswordInput
                                         value={formData.password}
                                         onChange={handleInputChange}
@@ -120,13 +128,10 @@ const LoginPage = () => {
                                         className={`btn btn-lg btn-primary w-100 fs-6 rounded-2 ${checkFormData() ? '' : 'inactive'}`}
                                         disabled={!checkFormData() || loading}
                                     >
-                                        {loading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                            </>
-                                        ) : (
-                                            "Đăng nhập"
-                                        )}
+                                        {loading ?
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            : 'Đăng nhập'
+                                        }
                                     </button>
                                 </div>
                             </form>

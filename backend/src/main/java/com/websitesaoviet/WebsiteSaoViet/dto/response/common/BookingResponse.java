@@ -31,5 +31,6 @@ public class BookingResponse {
     Double discount;
     Double totalPrice;
     LocalDateTime bookingTime;
+    LocalDateTime expiredTime;
     String status;
 }

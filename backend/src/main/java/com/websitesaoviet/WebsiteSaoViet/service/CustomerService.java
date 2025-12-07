@@ -1,6 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
-import com.websitesaoviet.WebsiteSaoViet.dto.request.common.PasswordChangeRequest;
+import com.websitesaoviet.WebsiteSaoViet.dto.request.common.ChangePasswordRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerCreationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerUpdateRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.CustomerResponse;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -40,8 +41,8 @@ public class CustomerService {
     SequenceService sequenceService;
 
     @NonFinal
-    @Value("${base.url}")
-    protected String BASE_URL;
+    @Value("${app.fe-base-url}")
+    protected String FE_BASE_URL;
 
     public Customer createCustomer(CustomerCreationRequest request) {
         if(customerRepository.existsCustomerByPhone(request.getPhone())) {
@@ -105,6 +106,11 @@ public class CustomerService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED)));
     }
 
+    public Customer getCustomerDetail(String id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED));
+    }
+
     public CustomerResponse updateCustomer(String id, CustomerUpdateRequest request) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED));
@@ -121,6 +127,16 @@ public class CustomerService {
         return customerMapper.toCustomerResponse(customerRepository.save(customer));
     }
 
+    public void updatePassword(String id, String newPassword) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        int rowsUpdated = customerRepository.updatePassword(id, passwordEncoder.encode(newPassword), CustomerStatus.ACTIVATE.getValue());
+
+        if (rowsUpdated == 0) {
+            throw new AppException(ErrorCode.UPDATE_PASSWORD_FAILED);
+        }
+    }
+
+    @Transactional
     public void deleteCustomer(String id) {
         if (!customerRepository.existsById(id)) {
             throw new AppException(ErrorCode.USER_NOT_EXITED);
@@ -129,7 +145,7 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 
-    public void changePassword(String id, PasswordChangeRequest request) {
+    public void changePassword(String id, ChangePasswordRequest request) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITED));
 
@@ -204,10 +220,15 @@ public class CustomerService {
     }
 
     public boolean existsCustomerInvalid(String id) {
-        return customerRepository.existsCustomerByIdAndAndStatus(id, "Bị khóa");
+        return customerRepository.existsCustomerByIdAndStatus(id, "Bị khóa");
     }
 
-    public boolean existsCustomerById(String id) {
+    public Boolean existsCustomerById(String id) {
         return customerRepository.existsById(id);
+    }
+
+    public String getActivationByEmail(String email) {
+        return customerRepository.findActivationByEmail(email, CustomerStatus.ACTIVATE.getValue()).
+                orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_EXITED));
     }
 }

@@ -4,7 +4,6 @@ import { NewsApi } from "services";
 import { useNavigate, useParams } from "react-router-dom";
 import { noImage } from "assets";
 import { FaArrowLeft } from "react-icons/fa";
-import { ToastContainer } from "react-toastify";
 import { ErrorToast, SuccessToast } from "components/notifi";
 import { pick } from "lodash";
 
@@ -13,7 +12,7 @@ const NewsUpdatePage = () => {
     const textEditorRef = useRef(null);
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
-
+    const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
         summary: "",
@@ -21,7 +20,6 @@ const NewsUpdatePage = () => {
         content: "",
         type: "Nổi bật"
     });
-
     const [preview, setPreview] = useState(noImage);
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -107,7 +105,7 @@ const NewsUpdatePage = () => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const response = await NewsApi.getByIdAndAdmin(id);
+                const response = await NewsApi.getDetailByAdmin(id);
 
                 if (response?.code === 2105) {
                     setFormData(
@@ -154,17 +152,21 @@ const NewsUpdatePage = () => {
             }
         }
 
+        setIsLoading(true);
+
         try {
             const response = await NewsApi.update(id, updatedFormData);
 
             if (response?.code === 2103) {
                 SuccessToast("Cập nhật tin tức thành công.");
             } else {
-                ErrorToast(response.message || "Cập nhật tin tức không thành công.");
+                ErrorToast(response?.message || "Cập nhật tin tức không thành công.");
             }
         } catch (error) {
             console.error("Failed to update news: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -208,22 +210,33 @@ const NewsUpdatePage = () => {
                                 </div>
 
                                 <div className="d-flex justify-content-center gap-3">
-                                    <button type="button" className="btn btn-back"
+                                    <button
+                                        type="button"
+                                        className="btn btn-back"
                                         onClick={() => {
                                             destroyEditors();
                                             navigate("/manage/news");
-                                        }}>
+                                        }}
+                                    >
                                         <FaArrowLeft size={18} color="black" />
                                     </button>
-                                    <button type="submit" className="btn btn-submit fw-bold">Cập nhật</button>
+                                    
+                                    <button
+                                        type="submit"
+                                        isabled={isLoading}
+                                        className="btn btn-submit fw-bold"
+                                    >
+                                        {isLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Cập nhật'
+                                        }
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>
     );
 };

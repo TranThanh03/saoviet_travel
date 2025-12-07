@@ -1,9 +1,9 @@
-import { memo, useContext, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import "./index.scss";
 import { ScheduleApi } from "services";
 import { useNavigate } from "react-router-dom";
 import { ErrorToast } from "components/notifi";
-import { AuthContext } from "pages/users/theme/masterLayout";
+import { useAuth } from "utils/AuthContext";
 
 const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
     const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
@@ -20,7 +20,7 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
         }
     ]);
     const navigate = useNavigate();
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated } = useAuth();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,11 +40,8 @@ const CalendarCustom = ({ tourId, onDateSelect, isShow, onClose }) => {
 
     useEffect(() => {
         if (isShow && !authenticated) {
+            navigate("/auth/login");
             ErrorToast("Vui lòng đăng nhập để đặt tour.");
-
-            setTimeout(() => {
-                navigate("/auth/login");
-            }, 1500);
         }
     }, [isShow]);
 

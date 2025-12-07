@@ -2,7 +2,6 @@ export { default as logo } from './img/logo.jpg';
 export { default as locationIcon } from './icons/location-dot-solid.svg';
 export { default as phoneIcon } from './icons/phone-solid.svg';
 export { default as envelopeIcon } from './icons/envelope-solid.svg';
-export { default as ministryOfIndustryAndTradeIcon } from './icons/bo-cong-thuong.svg';
 export { default as facebookIcon } from './icons/facebook.svg';
 export { default as instagramIcon } from './icons/instagram.svg';
 export { default as zaloIcon } from './icons/zalo.svg';

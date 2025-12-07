@@ -7,7 +7,8 @@ import formatDatetime from 'utils/formatDatetime.js';
 import { noImage } from 'assets';
 import { BookingApi } from 'services';
 import { ErrorToast, SuccessToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
+import Countdown from 'components/users/countdown';
+import { useAuth } from 'utils/AuthContext';
 
 const CalendarPage = () => {
     const statusClassMap = {
@@ -18,14 +19,21 @@ const CalendarPage = () => {
 
     const [bookings, setBookings] = useState([]);
     const navigate = useNavigate();
+    const [loadingId, setLoadingId] = useState(false);
+    const { setBookingCount } = useAuth();
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
                 const response = await BookingApi.getByCustomerId();
 
-                if (response?.code === 1801) {
-                    setBookings(response?.result);
+                if (response?.code === 1804) {
+                    const data = response?.result.map(b => ({
+                        ...b,
+                        isValidTime: new Date(b.expiredTime).getTime() - Date.now() > 0
+                    }));
+
+                    setBookings(data);
                 }
             }
             catch (error) {
@@ -39,8 +47,20 @@ const CalendarPage = () => {
 
         fetchBookings();
     }, []);
+    
+    const handleCountdownExpire = (index) => {
+        setBookingCount((prev) => prev - 1);
+        setBookings(prev =>
+            prev.map((item, i) =>
+                i === index ? { ...item, isValidTime: false } : item
+            )
+        );
+    };
 
-    const handleCancel = async (id, code) => {
+    const handleCancel = async (item) => {
+        const id = item.id;
+        const code = item.code;
+
         const result = await Swal.fire({
             title: "Xác nhận",
             html: `Bạn có chắc chắn muốn hủy lịch đặt <b>${code}</b> không?`,
@@ -51,36 +71,80 @@ const CalendarPage = () => {
         });
 
         if (result.isConfirmed) {
+            setLoadingId(id);
+            
             try {
                 const response = await BookingApi.cancel(id);
 
-                if (response.code === 1803) {
-                    SuccessToast("Lịch đặt đã được hủy thành công.");
+                if (response.code === 1806) {
+                    SuccessToast(`Lịch đặt ${code} đã được hủy thành công.`);
+                    
+                    if (item.expiredTime) {
+                        if (item.isValidTime) {
+                            setBookingCount((prev) => prev - 1);
+                        }
 
-                    setBookings((prev) =>
-                        prev.map((item) =>
-                            item.id === id ? { ...item, status: "Đã hủy" } : item
-                        )
-                    );
+                        setBookings((prev) => prev.filter((b) => b.id !== id));
+                    } else {
+                        setBookings((prev) =>
+                            prev.map((b) =>
+                                b.id === id
+                                    ? { ...b, status: "Đã hủy", expiredTime: null }
+                                    : b
+                            )
+                        );
+                    }
                 } else {
-                    ErrorToast(response.message || "Hủy lịch đặt không thành công.")
+                    ErrorToast(response.message || `Hủy lịch đặt ${code} không thành công.`)
                 }
             } catch (error) {
-                console.log("Failed to fetch cancel: ", error);
-                ErrorToast("Đã xảy ra lỗi khi hủy lịch đặt! Vui lòng thử lại sau.")
+                console.error("Failed to fetch cancel: ", error);
+                ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.")
+            } finally {
+                setLoadingId(null);
             }
         }
     };
 
     return (
-        <>
-            <section className="calendar-page tour-list-page pt-50 pb-100 rel z-1 min-vh-100">
-                <div className="container">
-                    <h3 className="fw-bold mb-3">Danh sách lịch đặt</h3>
-                    <div className="calendar col-lg-10" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                        {bookings.length > 0 && (
-                            bookings.map((item, index) => (
-                                <div key={index} className="destination-item style-three bgc-lighter">
+        <section className="calendar-page tour-list-page pt-50 pb-100 rel z-1 min-vh-100">
+            <div className="container">
+                <h3 className="fw-bold mb-3">Danh sách lịch đặt</h3>
+                <div className="calendar col-lg-10" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
+                    {bookings.length > 0 && (
+                        bookings.map((item, index) => (
+                            <div key={index} className={`calendar-sub style-three bgc-lighter ${item.expiredTime ? (item.isValidTime ? 'success-border' : 'error-border') : ''}`}>
+                                {item.expiredTime && (
+                                    <div className={`notifi ${item.isValidTime ? 'success-notifi' : 'error-notifi'}`}>
+                                        {item.method === 'Tiền mặt' ? (
+                                            <>
+                                                {item.isValidTime ? (
+                                                    <>
+                                                        Vui lòng thanh toán trước {formatDatetime(item.expiredTime)}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Đã hết thời gian thanh toán
+                                                    </>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <>
+                                                {item.isValidTime ? (
+                                                    <>
+                                                        Thanh toán trong <Countdown expiredTime={item.expiredTime} onExpire={() => handleCountdownExpire(index)}/>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Đã hết thời gian thanh toán
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="destination-item style-three bgc-lighter">
                                     <div className="image">
                                         <Link to={`/tour/detail/${item.tourId}`}>
                                             <span className={`badge ${statusClassMap[item.status] || ''}`}>
@@ -91,14 +155,19 @@ const CalendarPage = () => {
                                     </div>
                                     <div className="content">
                                         <div className="destination-header">
-                                            <div className="booking-code">
+                                            <div className="booking-code my-2">
                                                 Mã lịch đặt:
                                                 <span className="ms-2">{item.code}</span>
                                             </div>
+
+                                            <p className="fw-bold m-0 mb-2" style={{ fontSize: '22px' }}>
+                                                <Link to={`/tour/detail/${item.tourId}`}>{item.tourName}</Link>
+                                            </p>
+                                            
                                             <div className="booking-info">
                                                 <span className="location">
                                                     <i className="fal fa-map-marker-alt"></i>
-                                                    {item.destination}
+                                                    <span style={{ fontSize: '13px' }}>{item.destination}</span>
                                                 </span>
                                                 <div className="ratting">
                                                     {[...Array(5)].map((_, i) =>
@@ -111,10 +180,6 @@ const CalendarPage = () => {
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <h5>
-                                            <Link to={`/tour/detail/${item.tourId}`}>{item.tourName}</Link>
-                                        </h5>
 
                                         <ul className="blog-meta">
                                             <li className="w-100">
@@ -153,8 +218,17 @@ const CalendarPage = () => {
                                             {item.status === 'Đang xử lý' || item.reviewed ? (
                                                 <div className="control">
                                                     {item.status === 'Đang xử lý' && (
-                                                        <button className="theme-btn bg-red style-two style-three" onClick={() => handleCancel(item.id, item.code)}>
-                                                            <span data-hover="Hủy">Hủy</span>
+                                                        <button
+                                                            className={`theme-btn bg-red style-two style-three ${loadingId === item.id ? 'inactive-cancel' : ''}`}
+                                                            disabled={loadingId === item.id}
+                                                            onClick={() => handleCancel(item)}
+                                                        >
+                                                            <span data-hover="Hủy">
+                                                                {loadingId === item.id ?
+                                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                    : 'Hủy'
+                                                                }
+                                                            </span>
                                                         </button>
                                                     )}
 
@@ -180,14 +254,12 @@ const CalendarPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
+                            </div>
+                        ))
+                    )}
                 </div>
-            </section>
-
-            <ToastContainer />
-        </>
+            </div>
+        </section>
     );
 };
 

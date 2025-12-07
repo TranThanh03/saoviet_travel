@@ -1,6 +1,7 @@
 export { default as MasterLayout } from './theme/masterLayout/index.js';
 export { default as HomePage } from './homePage/index.js';
 export { default as ProfilePage } from './profilePage/index.js';
+export { default as ForgotPasswordPage } from './authPage/forgotPassword.js';
 export { default as PasswordPage } from './profilePage/password.js';
 export { default as NewsPage } from './newsPage/index.js';
 export { default as NewsDetailPage } from './newsPage/detail.js';

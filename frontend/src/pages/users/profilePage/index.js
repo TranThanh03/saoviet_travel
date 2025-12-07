@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { userAvatar } from 'assets';
 import { CustomerApi } from 'services';
 import { SuccessToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
-    const [error, setError] = useState(null);
+    const [msgError, setMsgError] = useState(null);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ fullName: '', phone: '', email: '' });
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -25,7 +25,7 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await CustomerApi.infor();
+                const response = await CustomerApi.info();
                 if (response?.code === 1303) {
                     setUser(response.result);
                 }
@@ -42,7 +42,7 @@ const ProfilePage = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value.trim() }));
-        setError(null);
+        setMsgError(null);
     };
 
     const isDataChanged = () => {
@@ -58,14 +58,16 @@ const ProfilePage = () => {
         e.preventDefault();
 
         if (!formData.fullName || !formData.phone || !formData.email) {
-            setError('Vui lòng không bỏ trống!');
+            setMsgError('Vui lòng không bỏ trống!');
             return;
         }
 
         if (!isDataChanged()) {
-            setError('Dữ liệu không thay đổi, không thể cập nhật!');
+            setMsgError('Dữ liệu không thay đổi, không thể cập nhật!');
             return;
         }
+
+        setIsLoading(true);
 
         try {
             const response = await CustomerApi.update(formData);
@@ -74,91 +76,81 @@ const ProfilePage = () => {
                 setUser((prev) => ({ ...prev, ...formData }));
                 SuccessToast("Cập nhật thông tin thành công.");
             } else {
-                setError(response.message);
+                setMsgError(response.message);
             }
         } catch (error) {
-            setError('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
+            setMsgError('Đã xảy ra lỗi không xác định. Vui lòng thử lại!');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <>
-            <div className="user-profile container">
-                <div className="card mx-auto shadow" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                    <div className="card-body text-center">
-                        <div className="mb-4">
-                            <img src={userAvatar} alt="avatar" className="avatar rounded-circle" />
+        <div className="user-profile container">
+            <div className="card mx-auto shadow p-4" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
+                <div className="card-body text-center">
+                    <div className="mb-4">
+                        <img src={userAvatar} alt="avatar" className="avatar rounded-circle" />
+                    </div>
+                    <div className="user-details">
+                        <h2 className="card-title">Thông tin khách hàng</h2>
+                        <div className="text-start">
+                            <label className="fw-bold text-muted mt-3">Mã khách hàng:</label>
+                            <input
+                                type="text"
+                                name="code"
+                                className="form-control form-custom"
+                                style={{ borderColor: '#dee2e6' }}
+                                disabled
+                                value={user?.code || 'N/A'}
+                            />
                         </div>
-                        <div className="user-details">
-                            <h2 className="card-title mb-4">Thông tin khách hàng</h2>
-                            <table className="table table-borderless">
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Mã khách hàng:</strong></td>
-                                        <td className="text-end me-1">{user?.code || 'N/A'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Họ tên:</strong></td>
-                                        <td className="text-end">
-                                            <input
-                                                type="text"
-                                                name="fullName"
-                                                className="form-custom"
-                                                value={formData.fullName}
-                                                onChange={handleInputChange}
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Số điện thoại:</strong></td>
-                                        <td className="text-end">
-                                            <input
-                                                type="text"
-                                                name="phone"
-                                                className="form-custom"
-                                                value={formData.phone}
-                                                onChange={handleInputChange}
-                                            />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Email:</strong></td>
-                                        <td className="text-end">
-                                            <input
-                                                type="text"
-                                                name="email"
-                                                className="form-custom"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                            />
-                                        </td>
-                                    </tr>
-                                    {error && (
-                                        <tr>
-                                            <td colSpan="2">
-                                                <div className="text-danger text-center">{error}</div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                    <tr>
-                                        <td colSpan="2" className="text-center float-none">
-                                            <button
-                                                type="button"
-                                                className="btn text-white"
-                                                onClick={handleUpdate}
-                                            >
-                                                Cập nhật
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div className="text-start">
+                            <label className="fw-bold text-muted mt-3">Họ tên:</label>
+                            <input
+                                type="text"
+                                name="fullName"
+                                className="form-custom"
+                                value={formData.fullName}
+                                onChange={handleInputChange}
+                            />
                         </div>
+                        <div className="text-start">
+                            <label className="fw-bold text-muted mt-3">Số điện thoại:</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                className="form-custom"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="text-start">
+                            <label className="fw-bold text-muted mt-3">Email:</label>
+                            <input
+                                type="text"
+                                name="email"
+                                className="form-custom"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        {msgError && <span className="color-red text-start mt-1" style={{ display: 'block' }}>{msgError}</span>}
+                        <button
+                            type="button"
+                            className="btn text-white w-100 mt-4"
+                            disabled={isLoading}
+                            onClick={handleUpdate}
+                        >
+                            {isLoading ? 
+                                <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                : 'Cập nhật'
+                            }
+                        </button>
                     </div>
                 </div>
             </div>
-            <ToastContainer />
-        </>
+        </div>
     );
 };
 

@@ -7,7 +7,7 @@ import com.websitesaoviet.WebsiteSaoViet.dto.request.user.FilterToursRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.SearchToursDestinationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.SearchToursRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ListToursResponse;
-import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ToursSummaryResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ListTourSummaryResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.ApiResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.TourResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.*;
@@ -34,7 +34,6 @@ import java.util.List;
 @RequestMapping("/tours")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class TourController {
     TourService tourService;
     ScheduleService scheduleService;
@@ -54,14 +53,14 @@ public class TourController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
-    ResponseEntity<ApiResponse<Page<ToursSummaryResponse>>> getTours(
+    ResponseEntity<ApiResponse<Page<ListTourSummaryResponse>>> getTours(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        ApiResponse<Page<ToursSummaryResponse>> apiResponse = ApiResponse.<Page<ToursSummaryResponse>>builder()
+        ApiResponse<Page<ListTourSummaryResponse>> apiResponse = ApiResponse.<Page<ListTourSummaryResponse>>builder()
                 .code(1501)
                 .result(tourService.getTours(keyword, pageable))
                 .build();
@@ -80,7 +79,7 @@ public class TourController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     ResponseEntity<ApiResponse<TourResponse>> updateUser(@PathVariable String id, @RequestBody @Valid TourUpdateRequest request) {
         if (scheduleService.existsScheduleByTourIdAndStatus(id, CommonStatus.NOT_STARTED.getValue())) {
             throw new AppException(ErrorCode.TOUR_NOT_STARTED);
@@ -117,8 +116,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<FilterToursResponse>>> getFilterTours(
             @RequestBody FilterToursRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<FilterToursResponse>> apiResponse = ApiResponse.<Page<FilterToursResponse>>builder()
                 .code(1505)
                 .result(tourService.getFilteredTours(request, page, size))
@@ -127,6 +126,7 @@ public class TourController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/area-count")
     ResponseEntity<ApiResponse<AreaTourCountResponse>> getFilterTours() {
         ApiResponse<AreaTourCountResponse> apiResponse = ApiResponse.<AreaTourCountResponse>builder()
@@ -151,7 +151,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<SearchToursResponse>>> getSearchTours(
             @RequestBody SearchToursRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<SearchToursResponse>> apiResponse = ApiResponse.<Page<SearchToursResponse>>builder()
                 .code(1509)
                 .result(tourService.getSearchTours(request, page, size))
@@ -164,7 +165,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<SearchToursResponse>>> getSearchToursByDestination(
             @RequestBody SearchToursDestinationRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<SearchToursResponse>> apiResponse = ApiResponse.<Page<SearchToursResponse>>builder()
                 .code(1510)
                 .result(tourService.getSearchToursByDestination(request, page, size))
@@ -177,8 +179,8 @@ public class TourController {
     ResponseEntity<ApiResponse<Page<FilterToursAreaResponse>>> getFilterToursByArea(
             @RequestBody FilterToursAreaRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         ApiResponse<Page<FilterToursAreaResponse>> apiResponse = ApiResponse.<Page<FilterToursAreaResponse>>builder()
                 .code(1511)
                 .result(tourService.getFilteredToursByArea(request, page, size))
@@ -191,8 +193,8 @@ public class TourController {
     ResponseEntity<ApiResponse<List<SimilarToursResponse>>> getFilterToursByArea(
             @RequestParam String id,
             @RequestParam String destination,
-            @RequestParam Integer day) {
-
+            @RequestParam Integer day
+    ) {
         ApiResponse<List<SimilarToursResponse>> apiResponse = ApiResponse.<List<SimilarToursResponse>>builder()
                 .code(1512)
                 .result(tourService.getSimilarTours(id, destination, day))
@@ -213,7 +215,7 @@ public class TourController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/not-started/{id}")
+    @GetMapping("/{id}/not-started")
     ResponseEntity<ApiResponse<TourResponse>> checkNotStartedById(@PathVariable String id) {
         if (scheduleService.existsScheduleByTourIdAndStatus(id, CommonStatus.NOT_STARTED.getValue())) {
             throw new AppException(ErrorCode.TOUR_NOT_STARTED);
@@ -229,7 +231,6 @@ public class TourController {
 
     @GetMapping("/hot")
     ResponseEntity<ApiResponse<List<FilterToursResponse>>> getHotTours() {
-
         ApiResponse<List<FilterToursResponse>> apiResponse = ApiResponse.<List<FilterToursResponse>>builder()
                 .code(1515)
                 .result(tourService.getHotTours())

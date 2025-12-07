@@ -14,6 +14,7 @@ import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.repository.ChatSessionsRepository;
 import com.websitesaoviet.WebsiteSaoViet.repository.MessagesRepository;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,11 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ChatbotService {
     @NonFinal
     @Value("${gemini.api-key}")
-    private String apiKey;
+    private String GEMINI_API_KEY;
 
     @NonFinal
     @Value("${gemini.url}")
@@ -45,8 +47,8 @@ public class ChatbotService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @NonFinal
-    @Value("${base.url}")
-    protected String BASE_URL;
+    @Value("${app.fe-base-url}")
+    protected String FE_BASE_URL;
 
     ChatSessionsRepository chatSessionsRepository;
     MessagesRepository messagesRepository;
@@ -54,7 +56,7 @@ public class ChatbotService {
 
     public String sendPrompt(String message) {
         try {
-            String url = String.format(GEMINI_URL, apiKey);
+            String url = String.format("%s?key=%s", GEMINI_URL, GEMINI_API_KEY);
             LocalDate currentDate = LocalDate.now();
 
             String systemInstruction =
@@ -111,7 +113,7 @@ public class ChatbotService {
                     "Địa chỉ: 1 Hoàng Công Chất, Phú Diễn, Bắc Từ Liêm, Hà Nội. " +
                     "Số điện thoại: 0399.999.999. " +
                     "Email: support@saoviet.com. " +
-                    "Website: " + BASE_URL +
+                    "Website: " + FE_BASE_URL +
                     "Ngược lại nếu câu hỏi KHÔNG LIÊN QUAN đến LIÊN HỆ thì tìm kiếm thông tin trên Internet và đưa ra câu trả lời. " +
 
                     // FALLBACK
@@ -143,6 +145,7 @@ public class ChatbotService {
 
             return text;
         } catch (Exception e) {
+            log.error("Chatbot error: ", e);
             throw new AppException(ErrorCode.CHATBOT_ERROR);
         }
     }
@@ -216,6 +219,7 @@ public class ChatbotService {
 
             messagesRepository.save(messages);
         } catch (Exception e) {
+            log.error("Chatbot error: ", e);
             throw new AppException(ErrorCode.CHATBOT_ERROR);
         }
     }

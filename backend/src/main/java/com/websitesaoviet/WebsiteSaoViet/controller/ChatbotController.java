@@ -11,6 +11,7 @@ import com.websitesaoviet.WebsiteSaoViet.service.TourService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +22,17 @@ import java.util.Map;
 @RequestMapping("/chatbot")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ChatbotController {
 
     ChatbotService chatbotService;
     TourService tourService;
 
     @PostMapping("/{id}")
-    public ResponseEntity<ApiResponse<List<ChatToursResponse>>> ask(@PathVariable String id,
-                                                                    @RequestBody String inputMessage) {
+    public ResponseEntity<ApiResponse<List<ChatToursResponse>>> ask(
+            @PathVariable String id,
+            @RequestBody String inputMessage
+    ) {
         String text = chatbotService.sendPrompt(inputMessage.trim());
         chatbotService.updateChat(id, inputMessage.trim());
 
@@ -50,6 +54,7 @@ public class ChatbotController {
                 message = text;
             }
         } catch (Exception e) {
+            log.error("Chatbot error: ", e);
             throw new AppException(ErrorCode.CHATBOT_ERROR);
         }
 

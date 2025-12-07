@@ -17,5 +17,4 @@ public class ScheduleSummaryResponse {
     Double adultPrice;
     Double childrenPrice;
     int quantityPeople;
-    int totalPeople;
 }

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import './register.scss';
 import { CustomerApi } from 'services';
 import { SuccessToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
 import PasswordInput from 'components/passwordInput';
 import RecaptchaInv from 'components/recaptcha/invisible';
 import debounce from 'lodash.debounce';
@@ -37,6 +36,7 @@ const RegisterPage = () => {
         if (!data.phone.trim()) newErrors.phone = 'Số điện thoại không được để trống!';
         if (!data.email.trim()) newErrors.email = 'Email không được để trống!';
         if (!data.password.trim()) newErrors.password = 'Mật khẩu không được để trống!';
+        if (data.password.trim().length < 8) newErrors.password = 'Mật khẩu phải có độ dài tối thiểu 8 ký tự!';
         if (!data.repeatpw.trim()) newErrors.repeatpw = 'Vui lòng nhập lại mật khẩu!';
         else if (data.password !== data.repeatpw) newErrors.repeatpw = 'Mật khẩu không khớp!';
 
@@ -85,6 +85,7 @@ const RegisterPage = () => {
                 setErrors(newErrors);
             }
         } catch (error) {
+            console.error("Failed to register: ", error)
             setErrors({ general: 'Đã xảy ra lỗi không xác định. Vui lòng thử lại!' });
         } finally {
             setLoading(false);
@@ -103,7 +104,7 @@ const RegisterPage = () => {
     return (
         <div className="register-page">
             <div className="container d-flex justify-content-center align-items-center min-vh-100">
-                <div className="row border rounded-4 p-3 shadow my-2 bg-custom">
+                <div className="row border rounded-4 p-3 shadow my-2 bg-custom form-register">
                     <h2 className="text-center fw-bold">Đăng ký</h2>
 
                     <form onSubmit={(e) => e.preventDefault()}>
@@ -176,17 +177,10 @@ const RegisterPage = () => {
                             onClick={debouncedRegister}
                             disabled={!checkFormData() || loading}
                         >
-                            {loading ? (
-                                <>
-                                    <span
-                                        className="spinner-border spinner-border-sm me-2"
-                                        role="status"
-                                        aria-hidden="true"
-                                    ></span>
-                                </>
-                            ) : (
-                                'Đăng ký'
-                            )}
+                            {loading ?
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                : 'Đăng ký'
+                            }
                         </button>
 
                         <RecaptchaInv ref={recaptchaRef} />
@@ -196,14 +190,13 @@ const RegisterPage = () => {
                         Bằng việc đăng ký tài khoản bạn đã đồng ý với
                         <Link to="#"> Điều khoản sử dụng </Link>của chúng tôi!
                     </p>
-                    <p>
-                        Bạn đã có tài khoản? <Link to="/auth/login">Đăng nhập</Link>
-                        <Link to="/" id="back">Trang chủ</Link>
-                    </p>
+
+                    <div className="d-flex justify-content-between">
+                        <Link to="/auth/login">Đăng nhập</Link>
+                        <Link to="/">Trang chủ</Link>
+                    </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>
     );
 };

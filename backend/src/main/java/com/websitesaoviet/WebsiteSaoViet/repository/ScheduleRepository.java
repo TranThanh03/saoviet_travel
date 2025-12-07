@@ -20,7 +20,7 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, String> {
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.ScheduleSummaryResponse(" +
-            "s.id, s.startDate, s.endDate, s.adultPrice, s.childrenPrice, s.quantityPeople, s.totalPeople) " +
+            "s.id, s.startDate, s.endDate, s.adultPrice, s.childrenPrice, s.totalPeople - s.quantityPeople) " +
             "FROM Schedule s " +
             "WHERE s.tourId = :tourId AND s.status = 'Chưa diễn ra' AND s.quantityPeople < s.totalPeople " +
             "ORDER BY s.startDate ASC")
@@ -41,8 +41,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, String> {
     @Modifying
     void deleteAllByTourId(String tourId);
 
-    @Query("SELECT COUNT(s) > 0 FROM Schedule s WHERE s.id = :id AND s.status = 'Chưa diễn ra' AND s.quantityPeople + :people <= s.totalPeople")
-    boolean existsScheduleByQuantityPeople(@Param("id") String id, @Param("people") int people);
+    @Query("SELECT s.totalPeople - s.quantityPeople FROM Schedule s WHERE s.id = :id AND s.status = 'Chưa diễn ra' AND s.quantityPeople <= s.totalPeople")
+    Integer getAvailablePeople(@Param("id") String id);
 
     @Transactional
     @Modifying

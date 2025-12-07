@@ -1,6 +1,6 @@
 package com.websitesaoviet.WebsiteSaoViet.dto.request.common;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IntrospectRequest {
-    @NotNull(message = "NOT_NULL")
-    String token;
+    @NotBlank(message = "NOT_NULL")
+    String accessToken;
 }

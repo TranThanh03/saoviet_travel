@@ -183,7 +183,12 @@ const Step2 = forwardRef(({ formData, setFormData, imgPreview, setImgPreview }, 
             </div>
 
             <div className="mt-3 btn-control">
-                <button className="btn btn-primary" onClick={handleSaveImages}>Upload Cloudinary</button>
+                <button className="btn btn-primary" disabled={uploading} onClick={handleSaveImages}>
+                    {uploading ? 
+                        <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                        : 'Upload Cloudinary'
+                    }
+                </button>
             </div>
         </div>
     );

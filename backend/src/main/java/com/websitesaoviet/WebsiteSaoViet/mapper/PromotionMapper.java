@@ -4,7 +4,6 @@ import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.PromotionCreationRequ
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.PromotionResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Promotion;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PromotionMapper {

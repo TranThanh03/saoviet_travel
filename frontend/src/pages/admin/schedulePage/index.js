@@ -6,7 +6,6 @@ import "./index.scss";
 import formatCurrency from "utils/formatCurrency.js";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "components/notifi";
-import { ToastContainer } from "react-toastify";
 import Pagination from "components/pagination";
 import { Link } from "react-router-dom";
 
@@ -24,8 +23,13 @@ const SchedulePage = () => {
         "Đang diễn ra": "ongoing",
         "Đã kết thúc": "ended"
     };
+    const [loadingId, setLoadingId] = useState(null);
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     
     const fetchSchedules = useCallback(async () => {
+        setIsLoading(true);
+
         try {
             const response = await ScheduleApi.getAll({ 
                 keyword: search.trim(),
@@ -39,9 +43,10 @@ const SchedulePage = () => {
             } else if (response?.code === 1057) {
                 ErrorToast('Thời gian phải có định dạng kiểu "dd-mm-yyyy".');
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.error("Failed to fetch schedules: ", error);
+        } finally {
+            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -51,6 +56,7 @@ const SchedulePage = () => {
 
     const handleSearch = () => {
         setCurrentPage(0);
+        setTotalPages(1);
         fetchSchedules();
     };
 
@@ -65,6 +71,8 @@ const SchedulePage = () => {
         });
 
         if (confirm.isConfirmed) {
+            setLoadingId(id);
+
             try {
                 const response = await ScheduleApi.delete(id);
 
@@ -84,6 +92,8 @@ const SchedulePage = () => {
             } catch (error) {
                 console.log("Failed to delete schedule: ", error);
                 ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.")
+            } finally {
+                setLoadingId(null);
             }
         }
     };
@@ -96,6 +106,8 @@ const SchedulePage = () => {
             return;
         }
         
+        setUpdateLoading(true);
+
         try {
             const response = await ScheduleApi.update(editSchedule.id, { totalPeople: totalPeopleEdit});
            
@@ -107,13 +119,15 @@ const SchedulePage = () => {
                 );
                 setTotalPeopleEdit(0);
 
-                SuccessToast(`Cập nhật lịch trình thành công.`);
+                SuccessToast(`Cập nhật lịch trình ${editSchedule.code} thành công.`);
             } else {
-                ErrorToast(response?.message || "Cập nhật lịch trình không thành công.");
+                ErrorToast(response?.message || `Cập nhật lịch trình ${editSchedule.code} không thành công.`);
             }
         } catch (error) {
             console.error("Failed to update schedule: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setUpdateLoading(false);
         }
     };
 
@@ -123,57 +137,74 @@ const SchedulePage = () => {
     };
 
     return (
-        <>
-            <div className="schedule-manage-page">
-                <div className="row">
-                    <div className="col-md-12 col-sm-12 ">
-                        <div className="x_panel">
-                            <div className="x_title">
-                                <h2>Danh sách lịch trình</h2>
-                                <Link to={"/manage/schedules/insert"}>
-                                    <span>
-                                        <FaPlus className="me-1 mb-1" style={{ color: '#2A3F54', fontSize: '18px' }} />
-                                        Thêm
-                                    </span>
-                                </Link>
+        <div className="schedule-manage-page">
+            <div className="row">
+                <div className="col-md-12 col-sm-12 ">
+                    <div className="x_panel">
+                        <div className="x_title">
+                            <h2>Danh sách lịch trình</h2>
+                            <Link to={"/manage/schedules/insert"}>
+                                <span>
+                                    <FaPlus className="me-1 mb-1" style={{ color: '#2A3F54', fontSize: '18px' }} />
+                                    Thêm
+                                </span>
+                            </Link>
 
-                                <div className="clearfix"></div>
+                            <div className="clearfix"></div>
+                        </div>
+                        <div className="x_content">
+                            <div className="form-search">
+                                <input
+                                    type="search"
+                                    placeholder="Nhập mã lịch, mã tour, ngày khởi hành"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }
+                                    }}
+                                />
+                                <button type="button" onClick={handleSearch}>
+                                    <FaSearch style={{ color: '#333', fontSize: '16px' }} />
+                                </button>
                             </div>
-                            <div className="x_content">
-                                <div className="form-search">
-                                    <input
-                                        type="search"
-                                        placeholder="Nhập mã lịch, mã tour, ngày khởi hành"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                    />
-                                    <button type="button" onClick={handleSearch}>
-                                        <FaSearch style={{ color: '#333', fontSize: '16px' }} />
-                                    </button>
-                                </div>
-                                <div className="clearfix"></div>
+                            <div className="clearfix"></div>
 
-                                <div className="row">
-                                    <div className="col-sm-12">
-                                        <div className="card-box table-responsive">
-                                            <table className="table table-striped table-bordered" >
-                                                <thead>
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <div className="card-box table-responsive">
+                                        <table className="table table-striped table-bordered" >
+                                            <thead>
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Mã lịch</th>
+                                                    <th>Mã tour</th>
+                                                    <th>Ngày khởi hành</th>
+                                                    <th>Ngày kết thúc</th>
+                                                    <th>Số người</th>
+                                                    <th>Tổng người</th>
+                                                    <th>Giá người lớn</th>
+                                                    <th>Giá trẻ em</th>
+                                                    <th>Trạng thái</th>
+                                                    <th colSpan={2}>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {isLoading ? (
                                                     <tr>
-                                                        <th>STT</th>
-                                                        <th>Mã lịch</th>
-                                                        <th>Mã tour</th>
-                                                        <th>Ngày khởi hành</th>
-                                                        <th>Ngày kết thúc</th>
-                                                        <th>Số người</th>
-                                                        <th>Tổng người</th>
-                                                        <th>Giá người lớn</th>
-                                                        <th>Giá trẻ em</th>
-                                                        <th>Trạng thái</th>
-                                                        <th colSpan={2}>Thao tác</th>
+                                                        <td colSpan="11" style={{height: '350px', verticalAlign: 'middle'}}>
+                                                            <span 
+                                                                className="spinner-border spinner-border-sm mx-3 my-3 text-info" 
+                                                                style={{ width: '30px', height: '30px'}} 
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {schedules.length > 0 && schedules.map((item, index) => (
+                                                ) : (
+                                                    schedules.length > 0 && schedules.map((item, index) => (
                                                         <tr key={index}>
                                                             <td> {index + 1} </td>
                                                             <td> {item.code} </td>
@@ -196,76 +227,84 @@ const SchedulePage = () => {
                                                             </td>
                                                             <td>
                                                                 {item.status !== "Đang diễn ra" && (
-                                                                    <button type="button" onClick={() => handleDelete(item.id, item.code)}>
-                                                                        <FaTrash style={{ color: 'red', fontSize: '18px' }} />
+                                                                    <button
+                                                                        type="button"
+                                                                        disabled={loadingId === item.id}
+                                                                        onClick={() => handleDelete(item.id, item.code)}
+                                                                    >
+                                                                        {loadingId === item.id ? 
+                                                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                                                            : <FaTrash style={{ color: 'red', fontSize: '18px' }} />
+                                                                        }
                                                                     </button>
                                                                 )}
                                                             </td>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+                            </div>
 
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={setCurrentPage}
-                                />
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {showEdit && (
+                <div className="form-input-custom">
+                    <div className="container">
+                        <div className="row col-7 col-lg-5">
+                            <div className="content bg-white p-4 rounded shadow">
+                                <h2 className="text-center mb-4">Cập nhật lịch trình</h2>
+                                <button type="button" className="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"
+                                    onClick={() => {
+                                        setShowEdit(false);
+                                    }}
+                                ></button>
+                        
+                                <form onSubmit={handleEdit}>
+                                    <div className="mb-3">
+                                        <label className="form-label">Mã lịch trình:</label>
+                                        <input type="text" name="code" className="form-control" disabled
+                                            defaultValue={editSchedule.code || ''}
+                                        />
+                                    </div>
+                        
+                                    <div className="mb-3">
+                                        <label className="form-label">Số người đã đặt:</label>
+                                        <input type="text" name="quantityPeople" className="form-control" disabled
+                                            defaultValue={editSchedule.quantityPeople || 0}
+                                        />
+                                    </div>
+                        
+                                    <div className="mb-3">
+                                        <label className="form-label">Số người tối đa:</label>
+                                        <input type="number" name="totalPeople" min={1} className="form-control" required
+                                            defaultValue={editSchedule.totalPeople || ''}  onChange={(e) => setTotalPeopleEdit(Number(e.target.value))}
+                                        />
+                                    </div>
+                        
+                                    <button type="submit" disabled={updateLoading} className="btn btn-submit w-100 mt-4 text-white">
+                                        {updateLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Cập nhật'
+                                        }
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {showEdit && (
-                    <div className="form-input-custom">
-                        <div className="container">
-                            <div className="row col-7 col-lg-5">
-                                <div className="content bg-white p-4 rounded shadow">
-                                    <h2 className="text-center mb-4">Cập nhật lịch trình</h2>
-                                    <button type="button" className="btn-close position-absolute top-0 end-0 m-3" aria-label="Close"
-                                        onClick={() => {
-                                            setShowEdit(false);
-                                        }}
-                                    ></button>
-                            
-                                    <form onSubmit={handleEdit}>
-                                        <div className="mb-3">
-                                            <label className="form-label">Mã lịch trình:</label>
-                                            <input type="text" name="code" className="form-control" disabled
-                                                defaultValue={editSchedule.code || ''}
-                                            />
-                                        </div>
-                            
-                                        <div className="mb-3">
-                                            <label className="form-label">Số người đã đặt:</label>
-                                            <input type="text" name="quantityPeople" className="form-control" disabled
-                                                defaultValue={editSchedule.quantityPeople || 0}
-                                            />
-                                        </div>
-                            
-                                        <div className="mb-3">
-                                            <label className="form-label">Số người tối đa:</label>
-                                            <input type="number" name="totalPeople" min={1} className="form-control" required
-                                                defaultValue={editSchedule.totalPeople || ''}  onChange={(e) => setTotalPeopleEdit(Number(e.target.value))}
-                                            />
-                                        </div>
-                            
-                                        <button type="submit" className="btn btn-submit w-100 mt-4 text-white">
-                                            Cập nhật
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <ToastContainer />
-        </>
+            )}
+        </div>
     );
 };
 

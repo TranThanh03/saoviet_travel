@@ -2,13 +2,14 @@ import { memo, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './index.scss';
 import formatCurrency from 'utils/formatCurrency.js';
-import { ScheduleApi, CustomerApi, CheckoutApi, PromotionApi } from 'services';
+import { ScheduleApi, CustomerApi, PromotionApi, BookingApi } from 'services';
 import formatDatetime from 'utils/formatDatetime.js';
 import Swal from 'sweetalert2';
-import { cash, momo, vnpay, voucherImg } from 'assets';
+import { cash, momo, vnpay } from 'assets';
 import { ErrorToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
 import dayjs from 'dayjs';
+import { FaTrash } from 'react-icons/fa';
+import { useAuth } from 'utils/AuthContext';
 
 const BookingPage = () => {
     const [user, setUser] = useState({
@@ -55,11 +56,13 @@ const BookingPage = () => {
     const [isActive, setIsActive] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const { setBookingCount } = useAuth();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const resUser = await CustomerApi.infor();
+                const resUser = await CustomerApi.info();
                 const resSchedule = await ScheduleApi.getScheduleTourById(id);
 
                 if (resUser?.code === 1303) {
@@ -143,7 +146,7 @@ const BookingPage = () => {
     }, [id, promotion.id, quantityAdult, quantityChildren, method]);
 
     const handleIncreaseAdult = () => {
-        if (quantityAdult + quantityChildren <= schedule.people - 1) {
+        if (quantityAdult + quantityChildren <= schedule.quantityPeople - 1) {
             setQuantityAdult(prev => Math.min(prev + 1, 99));
         } else {
             ErrorToast("Số lượng hành khách vượt quá số lượng tối đa.");
@@ -155,7 +158,7 @@ const BookingPage = () => {
     };
 
     const handleIncreaseChildren = () => {
-        if (quantityAdult + quantityChildren <= schedule.people - 1) {
+        if (quantityAdult + quantityChildren <= schedule.quantityPeople - 1) {
             setQuantityChildren(prev => Math.min(prev + 1, 99));
         } else {
             ErrorToast("Số lượng hành khách vượt quá số lượng tối đa.");
@@ -175,16 +178,29 @@ const BookingPage = () => {
         setIsActive(false);
     }
 
+    const handleVoucherRemove = () => {
+        setPromotion({
+            id: '',
+            discount: 0
+        })
+        setInputValue('');
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (agree && formData.method) {
-            try {
-                const response = await CheckoutApi.process(formData);
+            setIsLoading(true);
 
-                if (response?.code === 1901 || response?.code === 1902) {
+            try {
+                const response = await BookingApi.process(formData);
+
+                if (response?.code === 1800 || response?.code === 1801) {
+                    setBookingCount((prev) => prev + 1);
                     window.location.href = response?.result?.checkoutUrl;
-                } else if (response?.code === 1903) {
+                } else if (response?.code === 1802) {
+                    setBookingCount((prev) => prev + 1);
+
                     Swal.fire({
                         title: 'Thành công',
                         html: `<p style="color: green; margin-bottom: 5px;">Đặt tour thành công</p>
@@ -195,10 +211,13 @@ const BookingPage = () => {
                         navigate("/calendar/index");
                     });
                 } else {
-                    ErrorToast(response?.message);
+                    ErrorToast(response?.message || "Đã xảy ra lỗi không xác định. Vui lòng thử lại!");
+                    setIsLoading(false);
                 }
             } catch (error) {
+                console.error(error);
                 ErrorToast("Đã xảy ra lỗi không xác định. Vui lòng thử lại!")
+                setIsLoading(false);
             }
         }
     }
@@ -208,7 +227,7 @@ const BookingPage = () => {
             <div className="booking-container row">
                 <div className="booking-info col-lg-6">
                     <h2 className="booking-header">Thông tin khách hàng</h2>
-                    <div className="booking__infor">
+                    <div className="booking__infor user_info">
                         <div className="form-group">
                             <label htmlFor="username">Họ và tên</label>
                             <input type="text" id="username" value={user.fullName} disabled />
@@ -275,13 +294,13 @@ const BookingPage = () => {
 
                 <div className="booking-summary col-lg-5">
                     <div className="summary-section">
-                        <div className="tour-infor">
-                            <p>Mã Tour: <span>{schedule.tourCode}</span></p>
+                        <div className="tour-info">
+                            <p>Mã tour: <span>{schedule.tourCode}</span></p>
                             <h5 className="widget-title fw-bold">{schedule.tourName}</h5>
                             <p>Ngày khởi hành: <span>{schedule.startDate ? formatDatetime(schedule.startDate) : ''}</span></p>
                             <p>Ngày kết thúc: <span>{schedule.endDate ? formatDatetime(schedule.endDate) : ''}</span></p>
                             <p>Thời gian: <span>{schedule.quantityDay ? `${schedule.quantityDay} ngày ${schedule.quantityDay-1} đêm` : ''}</span></p>
-                            <p>Còn nhận: <span>{schedule.people} <i className="far fa-user"></i></span></p>
+                            <p>Còn nhận: <span><i className="far fa-user me-1"></i>{schedule.quantityPeople}</span></p>
                         </div>
 
                         <div className="order-summary">
@@ -317,14 +336,14 @@ const BookingPage = () => {
                             <div className="order-coupon">
                                 <span className={`${formData.quantityAdult + formData.quantityChildren > 0 ? '' : 'inactive'}`} id="title" onClick={() => setIsActive(!isActive)}>Khuyến mãi</span>          
                                 <input type="text" placeholder="Mã giảm giá" className="input-coupon" value={inputValue} disabled/>
-
+                                <FaTrash className={`btn-trash ${promotion.id ? '' : 'inactive-trash'}`} onClick={() => handleVoucherRemove()}/>
+                                
                                 {isActive && (
                                     <div className="voucher-dropdown">
                                         {vouchers.length > 0 ? (vouchers.map((voucher) => (
                                             <div key={voucher.id} className="voucher-item" onClick={() => handleVoucherClick(voucher)}>
-                                                <img src={voucherImg} alt="Voucher" className="voucher-image" />
+                                                <p className="voucher-code mb-0">{voucher.code}</p>
                                                 <div className="voucher-info">
-                                                    <p className="voucher-code">Mã: {voucher.code}</p>
                                                     <p className="voucher-title">{voucher.title}</p>
                                                     <p className="voucher-desc">{voucher.description}</p>
                                                     <p className="voucher-expiry">
@@ -335,7 +354,7 @@ const BookingPage = () => {
                                             </div>
                                         ))) : (
                                             <div className="voucher-item">
-                                                Không có.
+                                                Không có
                                             </div>
                                         )}
                                     </div>
@@ -343,12 +362,20 @@ const BookingPage = () => {
                             </div>
                         )}
 
-                        <button type="button" className={`booking-btn btn-submit-booking ${agree && formData.method && formData.quantityAdult + formData.quantityChildren > 0 ? '' : 'inactive'}`} onClick={handleSubmit}>Xác nhận</button>
+                        <button
+                            type="button"
+                            disabled={isLoading || !(agree && formData.method && formData.quantityAdult + formData.quantityChildren > 0)}
+                            className={`booking-btn btn-submit-booking ${isLoading || !(agree && formData.method && formData.quantityAdult + formData.quantityChildren > 0) ? 'inactive' : ''}`}
+                            onClick={handleSubmit}
+                        >
+                            {isLoading ? 
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                : 'Xác nhận'
+                            }
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </section>
     );
 };

@@ -1,98 +1,133 @@
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                padding: 16px !important;
+            }
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-<p>Chào <b th:text="${invoice.fullName}"></b>,</p>
-<p>Cảm ơn bạn đã đặt tour tại <b>Sao Việt</b>.</p>
-
-<p th:if="${isConfirm}">
-    Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã được <b>xác nhận</b>.<br /><br />
-    Chúc bạn có một chuyến đi vui vẻ!
-</p>
-<p th:unless="${isConfirm}">
-    Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã <b>bị hủy</b>.
-</p>
-
-<h3>Hóa đơn chi tiết:</h3>
-<h4 th:text="${invoice.tourName + ' (' + #dates.format(startDate, 'dd-MM-yyyy') + ' - ' + #dates.format(endDate, 'dd-MM-yyyy') + ')'}"></h4>
-
-<p>Mã hóa đơn: <span th:text="${invoice.code}"></span></p>
-<p>Trạng thái: <span th:text="${invoice.status}"></span></p>
-<p>Thời gian đặt:
-    <span th:text="${#dates.format(bookingDate, 'HH:mm:ss dd-MM-yyyy')}"></span>
-</p>
-
-<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-top: 10px;">
-    <tr style="background-color: #f0f0f0;">
-        <th>Đối tượng</th>
-        <th>Số lượng</th>
-        <th>Đơn giá</th>
-        <th>Tổng</th>
-    </tr>
+<body style="margin:0; padding:0; background:#f4f6f8; font-family:Arial, sans-serif; font-size: 16px; line-height: 25px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8; padding:20px 0;">
     <tr>
-        <td>Người lớn</td>
-        <td th:text="${invoice.quantityAdult}"></td>
-        <td><span th:text="${adultPrice}"></span> đ</td>
-        <td><span th:text="${totalAdultPrice}"></span> đ</td>
-    </tr>
-    <tr>
-        <td>Trẻ em</td>
-        <td th:text="${invoice.quantityChildren}"></td>
-        <td><span th:text="${childrenPrice}"></span> đ</td>
-        <td><span th:text="${totalChildrenPrice}"></span> đ</td>
+        <td align="center">
+            <table class="container" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:12px; padding:30px;">
+                <tr>
+                    <td style="font-size:22px; font-weight:bold; color:#007bff; padding-bottom:10px;">
+                        Xin chào <span th:text="${invoice.fullName}"></span>,
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Cảm ơn bạn đã đặt tour tại <b>Sao Việt</b>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span th:if="${isConfirm}">
+                            Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã được
+                            <b style="color:#28a745;">xác nhận</b>.<br/>
+                            Chúc bạn có một chuyến đi vui vẻ!
+                        </span>
+                        <span th:unless="${isConfirm}">
+                            Lịch đặt #<b th:text="${invoice.code}"></b> của bạn đã
+                            <b style="color:#dc3545;">bị hủy</b>.
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:10px; padding-bottom: 5px; font-size: 17px;">
+                        <b>Hóa đơn chi tiết:</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h3 style="margin:0;">
+                            <span th:text="${invoice.tourName + ' (' + #dates.format(startDate, 'dd-MM-yyyy') + ' - ' + #dates.format(endDate, 'dd-MM-yyyy') + ')'}"></span>
+                        </h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:5px;">
+                        Mã hóa đơn: <b th:text="${invoice.code}"></b><br/>
+                        Trạng thái: <span th:text="${invoice.status}"></span><br/>
+                        Thời gian đặt: <span th:text="${#dates.format(bookingDate, 'HH:mm:ss dd-MM-yyyy')}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:5px;">
+                        <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; border:1px solid #ddd;">
+                            <tr style="background:#f0f0f0; text-align:center; font-weight:bold;">
+                                <td>Đối tượng</td>
+                                <td>Số lượng</td>
+                                <td>Đơn giá</td>
+                                <td>Tổng</td>
+                            </tr>
+                            <tr style="text-align:center;">
+                                <td>Người lớn</td>
+                                <td th:text="${invoice.quantityAdult}"></td>
+                                <td><span th:text="${adultPrice}"></span> đ</td>
+                                <td><span th:text="${totalAdultPrice}"></span> đ</td>
+                            </tr>
+                            <tr style="text-align:center; background:#fafafa;">
+                                <td>Trẻ em</td>
+                                <td th:text="${invoice.quantityChildren}"></td>
+                                <td><span th:text="${childrenPrice}"></span> đ</td>
+                                <td><span th:text="${totalChildrenPrice}"></span> đ</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding-top:10px;">
+                        <b>Thông tin thanh toán:</b><br/>
+                        <span th:if="${invoice.method != 'Tiền mặt'}">
+                            Mã giao dịch: <span th:text="${invoice.checkoutCode}"></span><br/>
+                        </span>
+                        Phương thức: <span th:text="${invoice.method}"></span><br/>
+                        Thời gian: <span th:text="${checkoutDate != null ? #dates.format(checkoutDate, 'HH:mm:ss dd-MM-yyyy') : ''}"></span><br/>
+                        Trạng thái: <span th:text="${invoice.checkoutStatus}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:10px;">
+                        <b>Tổng kết chi phí:</b><br/>
+                        <table cellpadding="4" cellspacing="0">
+                            <tr>
+                                <td>Tổng tiền:</td>
+                                <td style="text-align:right;"><span th:text="${totalCost}"></span> đ</td>
+                            </tr>
+                            <tr>
+                                <td>Giảm giá:</td>
+                                <td style="text-align:right;"><span th:text="${discount}"></span> đ</td>
+                            </tr>
+                            <tr style="font-weight:bold;">
+                                <td>Thành tiền:</td>
+                                <td style="text-align:right; padding-left: 10px;"><span th:text="${totalPrice}"></span> đ</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top:10px; border-top:1px solid #ddd; text-align:center; font-size:13px; color:#777;">
+                        <p><b>Sao Việt</b> – Vivu ba miền</p>
+                        <p>
+                            🌐<a th:href="${feBaseUrl}" th:text="${website}" style="color:#007bff; text-decoration:none;"></a>
+                        </p>
+                        <p style="font-size:12px; color:#aaa;">
+                            Email được gửi tự động. Vui lòng không trả lời.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
     </tr>
 </table>
-
-<div style="margin-top: 20px;">
-    <p><b>Phương thức thanh toán:</b></p>
-    <p th:if="${invoice.method != 'Tiền mặt'}">
-        <b>Mã giao dịch:</b>
-        <b th:text="${invoice.checkoutCode}"></b>
-    </p>
-    <p>
-        <span>Phương thức: </span>
-        <span th:text="${invoice.method}"></span>
-    </p>
-    <p>
-        <span>Thời gian: </span>
-        <span th:text="${checkoutDate != null ? #dates.format(checkoutDate, 'HH:mm:ss dd-MM-yyyy') : ''}"></span>
-    </p>
-    <p>
-        <span>Trạng thái: </span>
-        <span th:text="${invoice.checkoutStatus}"></span>
-    </p>
-</div>
-
-<div style="margin-top: 20px;">
-    <p><b>Tính tiền:</b></p>
-    <table style="width: 300px;">
-        <tbody>
-        <tr>
-            <td>Tổng tiền:</td>
-            <td><span th:text="${totalCost}"></span> đ</td>
-        </tr>
-        <tr>
-            <td>Giảm giá:</td>
-            <td><span th:text="${discount}"></span> đ</td>
-        </tr>
-        <tr>
-            <td><b>Thành tiền:</b></td>
-            <td><b><span th:text="${totalPrice}"></span> đ</b></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<hr style="margin-top: 40px; border: none; border-top: 1px solid #ccc;" />
-<footer style="text-align: center; font-size: 13px; color: #777; margin-top: 20px;">
-    <p style="margin: 5px 0;"><b>Sao Việt</b> – Vivu ba miền</p>
-    <p style="margin: 5px 0;">
-        🌐 <a th:href="${baseUrl}" th:text="${website}" style="color: #007bff; text-decoration: none;"></a>
-    </p>
-    <p style="margin-top: 10px; font-size: 12px; color: #aaa;">
-        Email này được gửi tự động. Vui lòng không trả lời lại.
-    </p>
-</footer>
 </body>
 </html>

@@ -1,25 +1,26 @@
 package com.websitesaoviet.WebsiteSaoViet.service;
 
-import com.sendgrid.*;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.*;
-import com.websitesaoviet.WebsiteSaoViet.dto.request.admin.EmailInvoiceRequest;
+import com.websitesaoviet.WebsiteSaoViet.configuration.RabbitMQConfig;
+import com.websitesaoviet.WebsiteSaoViet.dto.request.common.SendMailMessage;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.BookingCheckoutDetailResponse;
 import com.websitesaoviet.WebsiteSaoViet.exception.AppException;
 import com.websitesaoviet.WebsiteSaoViet.exception.ErrorCode;
 import com.websitesaoviet.WebsiteSaoViet.util.DomainUtil;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.ZoneId;
 import java.util.Date;
@@ -28,108 +29,92 @@ import java.util.Locale;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class MailService {
-
     RabbitTemplate rabbitTemplate;
     TemplateEngine templateEngine;
+    JavaMailSender mailSender;
 
-    static final String QUEUE_NAME = "mailQueue";
-
-    @NonFinal
-    @Value("${sendgrid.api-key}")
-    String sendGridApiKey;
+    static final int MAX_RETRY = 2;
 
     @NonFinal
-    @Value("${sendgrid.sender}")
-    String senderEmail;
+    @Value("${mail.sender}")
+    String MAIL_SENDER;
 
     @NonFinal
-    @Value("${base.url}")
-    String BASE_URL;
-
-    public void sendMail(String to, String subject, String htmlContent) {
-        Email from = new Email(senderEmail, "SaoViet Travel");
-        Email recipient = new Email(to);
-        Email replyTo = new Email("contact@saoviettravel.site");
-
-        Content content = new Content("text/html", htmlContent);
-
-        Mail mail = new Mail();
-        mail.setFrom(from);
-        mail.setSubject(subject);
-        mail.addContent(content);
-        mail.setReplyTo(replyTo);
-
-        Personalization personalization = new Personalization();
-        personalization.addTo(recipient);
-        mail.addPersonalization(personalization);
-
-        SendGrid sg = new SendGrid(sendGridApiKey);
-        Request request = new Request();
-
-        int maxRetries = 3;
-        for (int i = 0; i < maxRetries; i++) {
-            try {
-                request.setMethod(Method.POST);
-                request.setEndpoint("mail/send");
-                request.setBody(mail.build());
-
-                Response response = sg.api(request);
-
-                if (response.getStatusCode() < 400) {
-                    return;
-                }
-
-                if (response.getStatusCode() == 429 || response.getStatusCode() >= 500) {
-                    Thread.sleep(2000L * (i + 1));
-                    continue;
-                }
-
-                throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
-
-            } catch (IOException | InterruptedException e) {
-                if (i == maxRetries - 1) {
-                    throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
-                }
-            }
-        }
-    }
+    @Value("${app.fe-base-url}")
+    String FE_BASE_URL;
 
     public void sendToQueue(String to, String subject, String htmlContent) {
         try {
-            String emailData = to + ";" + subject + ";" + htmlContent;
-            rabbitTemplate.convertAndSend(QUEUE_NAME, emailData);
+            SendMailMessage message = new SendMailMessage(to, subject, htmlContent, 0);
+
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.MAIL_EXCHANGE,
+                    RabbitMQConfig.MAIL_ROUTING_KEY,
+                    message
+            );
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 
-    @RabbitListener(queues = QUEUE_NAME)
-    public void consumeEmailQueue(String message) {
+    @RabbitListener(queues = RabbitMQConfig.MAIL_QUEUE)
+    public void consume(SendMailMessage message) {
         try {
-            String[] parts = message.split(";", 3);
-            if (parts.length != 3) {
-                return;
-            }
-
-            String to = parts[0];
-            String subject = parts[1];
-            String htmlContent = parts[2];
-
-            sendMail(to, subject, htmlContent);
+            sendMail(message.getTo(), message.getSubject(), message.getContent());
         } catch (Exception e) {
+            log.error(e.getMessage());
+
+            if (message.getRetryCount() < MAX_RETRY) {
+                message.setRetryCount(message.getRetryCount() + 1);
+
+                rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.MAIL_EXCHANGE,
+                        RabbitMQConfig.MAIL_RETRY_ROUTING_KEY,
+                        message
+                );
+            } else {
+                rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.MAIL_EXCHANGE,
+                        RabbitMQConfig.MAIL_DEAD_ROUTING_KEY,
+                        message
+                );
+            }
+        }
+    }
+
+    public void sendMail(String to, String subject, String htmlContent) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    "UTF-8"
+            );
+
+            helper.setFrom(MAIL_SENDER);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error(e.getMessage());
             throw new AppException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 
     public void sendActivationEmail(String customerId, String email) {
         String subject = "Kích hoạt tài khoản";
-        String activationLink = String.format("%s/customer/activate/%s", BASE_URL, customerId);
+        String activationLink = String.format("%s/customer/activate/%s", FE_BASE_URL, customerId);
 
         Context context = new Context();
+
         context.setVariable("activationLink", activationLink);
-        context.setVariable("baseUrl", BASE_URL);
-        context.setVariable("website", DomainUtil.extractDomain(BASE_URL));
+        context.setVariable("feBaseUrl", FE_BASE_URL);
+        context.setVariable("website", DomainUtil.extractDomain(FE_BASE_URL));
 
         String emailContent = templateEngine.process("activate-account", context);
 
@@ -147,6 +132,7 @@ public class MailService {
         Double totalChildrenPrice = invoice.getChildrenPrice() * invoice.getQuantityChildren();
 
         Context context = new Context();
+
         context.setVariable("invoice", invoice);
         context.setVariable("isConfirm", isConfirm);
         context.setVariable("bookingDate", bookingDate);
@@ -160,18 +146,37 @@ public class MailService {
         context.setVariable("totalCost", formatNumberWithCommas(totalAdultPrice + totalChildrenPrice));
         context.setVariable("discount", formatNumberWithCommas(invoice.getDiscount()));
         context.setVariable("totalPrice", formatNumberWithCommas(invoice.getTotalPrice()));
-        context.setVariable("baseUrl", BASE_URL);
-        context.setVariable("website", DomainUtil.extractDomain(BASE_URL));
+        context.setVariable("feBaseUrl", FE_BASE_URL);
+        context.setVariable("website", DomainUtil.extractDomain(FE_BASE_URL));
 
         String htmlContent = templateEngine.process("send-invoice", context);
 
         sendToQueue(invoice.getEmail(), subject, htmlContent);
     }
 
+    public void sendForgotPasswordEmail(String email, int otp, Long ttl) {
+        String subject = "Mã OTP đặt lại mật khẩu";
+        Long minutes = ttl / 60;
+        Long seconds = ttl % 60;
+        Context context = new Context();
+
+        context.setVariable("otp", otp);
+        context.setVariable("minutes", minutes);
+        context.setVariable("seconds", seconds);
+        context.setVariable("feBaseUrl", FE_BASE_URL);
+        context.setVariable("website", DomainUtil.extractDomain(FE_BASE_URL));
+
+        String emailContent = templateEngine.process("forgot-password", context);
+
+        sendToQueue(email, subject, emailContent);
+    }
+
     public static String formatNumberWithCommas(Double number) {
         Locale vietnamLocale = new Locale("vi", "VN");
+
         if (number == null) return "";
         NumberFormat format = NumberFormat.getNumberInstance(vietnamLocale);
+
         return format.format(number);
     }
 }

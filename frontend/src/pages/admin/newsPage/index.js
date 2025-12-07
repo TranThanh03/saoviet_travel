@@ -5,7 +5,6 @@ import { NewsApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "components/notifi";
-import { ToastContainer } from "react-toastify";
 import Pagination from "components/pagination";
 import formatDatetime from "utils/formatDatetime.js";
 import { noImage } from "assets";
@@ -16,8 +15,12 @@ const NewsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 9;
+    const [loadingId, setLoadingId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchNews = useCallback(async () => {
+        setIsLoading(true);
+
         try {
             const response = await NewsApi.getAll({
                 keyword: search.trim(),
@@ -31,6 +34,8 @@ const NewsPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch news: ", error);
+        } finally {
+            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -40,6 +45,7 @@ const NewsPage = () => {
 
     const handleSearch = () => {
         setCurrentPage(0);
+        setTotalPages(1);
         fetchNews();
     };
 
@@ -54,6 +60,8 @@ const NewsPage = () => {
         });
 
         if (confirm.isConfirmed) {
+            setLoadingId(id);
+
             try {
                 const response = await NewsApi.delete(id);
 
@@ -67,6 +75,8 @@ const NewsPage = () => {
             } catch (error) {
                 console.error("Failed to delete news: ", error);
                 ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.")
+            } finally {
+                setLoadingId(null);
             }
         }
     };
@@ -94,6 +104,12 @@ const NewsPage = () => {
                                     placeholder="Nhập mã, tiêu đề"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }
+                                    }}
                                 />
                                 <button type="button" onClick={handleSearch}>
                                     <FaSearch style={{ color: '#333', fontSize: '16px' }} />
@@ -118,29 +134,49 @@ const NewsPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {news.length > 0 && news.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td> {index + 1} </td>
-                                                        <td> {item.code} </td>
-                                                        <td> {item.title} </td>
-                                                        <td>
-                                                            <img className="image" src={item.image || noImage} alt="news" />
-                                                        </td>
-                                                        <td> {item.type} </td>
-                                                        <td> {item.viewCount} </td>
-                                                        <td> {item.timeStamp ? formatDatetime(item.timeStamp) : ''} </td>
-                                                        <td>
-                                                            <Link to={`/manage/news/edit/${item.id}`}>
-                                                                <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
-                                                            </Link>
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" onClick={() => handleDelete(item.id, item.code)}>
-                                                                <FaTrash style={{ color: 'red', fontSize: '18px' }} />
-                                                            </button>
+                                                {isLoading ? (
+                                                    <tr>
+                                                        <td colSpan="8" style={{height: '350px', verticalAlign: 'middle'}}>
+                                                            <span 
+                                                                className="spinner-border spinner-border-sm mx-3 my-3 text-info" 
+                                                                style={{ width: '30px', height: '30px'}} 
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                ) : (
+                                                    news.length > 0 && news.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td> {index + 1} </td>
+                                                            <td> {item.code} </td>
+                                                            <td> {item.title} </td>
+                                                            <td>
+                                                                <img className="image" src={item.image || noImage} alt="news" />
+                                                            </td>
+                                                            <td> {item.type} </td>
+                                                            <td> {item.viewCount} </td>
+                                                            <td> {item.timeStamp ? formatDatetime(item.timeStamp) : ''} </td>
+                                                            <td>
+                                                                <Link to={`/manage/news/edit/${item.id}`}>
+                                                                    <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
+                                                                </Link>
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={loadingId === item.id}
+                                                                    onClick={() => handleDelete(item.id, item.code)}
+                                                                >
+                                                                    {loadingId === item.id ? 
+                                                                        <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                                                        : <FaTrash style={{ color: 'red', fontSize: '18px' }} />
+                                                                    }
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -156,8 +192,6 @@ const NewsPage = () => {
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>   
     );
 };

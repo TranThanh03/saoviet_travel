@@ -1,15 +1,16 @@
-import React, { memo, useState, useEffect, useRef, useMemo, useContext } from "react";
+import React, { memo, useState, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaAngleDown, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { logo } from "assets";
 import { AuthApi } from "services";
 import "./style.scss";
-import { AuthContext } from "../masterLayout";
+import { useAuth } from "utils/AuthContext";
+import { ErrorToast } from "components/notifi";
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [isShow, setShow] = useState(false);
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated, bookingCount , logout } = useAuth();
     const [showSearch, setShowSearch] = useState(false);
     const [placeholder, setPlaceholder] = useState("Tìm kiếm Tours theo điểm đến");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -49,14 +50,15 @@ const Header = () => {
         try {
             const response = await AuthApi.logout();
 
-            if (response.code === 9997) {
+            if (response.code === 1902) {
+                logout();
                 window.location.href = "/";
             } else {
-                window.location.href = "/";
+                ErrorToast("Đã xảy ra lỗi không xác định!");
             }
         } catch (error) {
             console.error("Logout error:", error);
-            window.location.href = "/";
+            ErrorToast("Đã xảy ra lỗi không xác định!");
         }
     };
 
@@ -150,8 +152,9 @@ const Header = () => {
                                 )}
                             </div>
 
-                            <Link to="/calendar/index" className="text-dark fs-5">
+                            <Link to="/calendar/index" className="calendar text-dark fs-5 mx-1">
                                 <FaRegCalendarAlt size={30} />
+                                {bookingCount > 0 && <span className="booking-count">{bookingCount}</span>}
                             </Link>
 
                             <div className="dropdown">
@@ -166,7 +169,7 @@ const Header = () => {
                                     <ul className="dropdown-menu dropdown-menu-end show mt-2">
                                         {authenticated ? (
                                             <>
-                                                <li><Link className="dropdown-item" to="/customer/infor" onClick={() => setShow(false)}>Thông tin</Link></li>
+                                                <li><Link className="dropdown-item" to="/customer/info" onClick={() => setShow(false)}>Thông tin</Link></li>
                                                 <li><Link className="dropdown-item" to="/customer/password" onClick={() => setShow(false)}>Mật khẩu</Link></li>
                                                 <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
                                             </>

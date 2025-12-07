@@ -4,7 +4,7 @@ export { default as AuthApi } from './authApi.js';
 export { default as CustomerApi } from './customerApi.js';
 export { default as ScheduleApi } from './scheduleApi.js';
 export { default as BookingApi } from './bookingApi.js';
-export { default as CheckoutApi } from './checkoutApi.js';
+export { default as PaymentApi } from './paymentApi.js';
 export { default as AdminApi } from './adminApi.js';
 export { default as NewsApi } from './newsApi.js';
 export { default as ChatbotApi } from './chatbotApi.js';

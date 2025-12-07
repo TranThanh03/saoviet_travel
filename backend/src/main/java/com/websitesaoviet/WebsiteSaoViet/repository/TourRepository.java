@@ -2,6 +2,7 @@ package com.websitesaoviet.WebsiteSaoViet.repository;
 
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.AreaTourCountResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.TourBookingStatsResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.user.TourSummaryResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Tour;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -103,17 +104,15 @@ public interface TourRepository extends JpaRepository<Tour, String> {
             "AND MONTH(b.bookingTime) = MONTH(CURRENT_DATE) " +
             "AND YEAR(b.bookingTime) = YEAR(CURRENT_DATE) " +
             "GROUP BY t " +
-            "ORDER BY COUNT(b.id) DESC " +
-            "LIMIT 5")
-    List<TourBookingStatsResponse> findPopularTours();
+            "ORDER BY COUNT(b.id) DESC")
+    List<TourBookingStatsResponse> findPopularTours(Pageable pageable);
 
     @Query("SELECT t " +
             "FROM Tour t " +
             "INNER JOIN Schedule s ON t.id = s.tourId " +
             "WHERE s.status = 'Chưa diễn ra' AND s.quantityPeople < s.totalPeople " +
-            "ORDER BY t.quantityOrder DESC " +
-            "LIMIT 5")
-    List<Tour> find5PopularTours();
+            "ORDER BY t.quantityOrder DESC")
+    List<Tour> find5PopularTours(Pageable pageable);
 
     @Query(value = """
     SELECT t.id, t.name, t.destination,
@@ -235,7 +234,7 @@ public interface TourRepository extends JpaRepository<Tour, String> {
     @Query("SELECT t " +
             "FROM Tour t " +
             "INNER JOIN Schedule s ON t.id = s.tourId " +
-            "WHERE t.id != :id AND s.status = 'Chưa diễn ra' AND s.quantityPeople < s.totalPeople " +
+            "WHERE t.id <> :id AND s.status = 'Chưa diễn ra' AND s.quantityPeople < s.totalPeople " +
             "ORDER BY t.quantityOrder DESC")
     List<Tour> findAllBySimilar(@Param("id") String id);
 
@@ -304,4 +303,10 @@ public interface TourRepository extends JpaRepository<Tour, String> {
             @Param("endDate") LocalDate endDate,
             @Param("quantityDay") Integer quantityDay
     );
+
+    @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.TourSummaryResponse(" +
+            "t.code, t.name, t.quantityDay) " +
+            "FROM Tour t " +
+            "WHERE t.id = :id")
+    TourSummaryResponse findTourSummaryById(@Param("id") String id);
 }

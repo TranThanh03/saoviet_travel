@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RouterCustom from './router.js';
 import './styles/style.scss';
-import Loading from '@components/loading/index.js';
+import Loading from 'components/loading/index.js';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import ToastProvider from 'components/notifi/ToastProvider.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -27,6 +25,7 @@ const App = () => {
         <>
             <RouterCustom />
             <Loading />
+            <ToastProvider />
         </>
     )
 };

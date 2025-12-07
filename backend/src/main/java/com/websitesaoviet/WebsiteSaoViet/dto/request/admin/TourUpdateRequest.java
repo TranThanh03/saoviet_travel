@@ -1,18 +1,10 @@
 package com.websitesaoviet.WebsiteSaoViet.dto.request.admin;
 
 import com.websitesaoviet.WebsiteSaoViet.entity.Itinerary;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.JoinColumn;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,11 +13,22 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TourUpdateRequest {
+    @NotBlank(message = "NOT_NULL")
     String name;
+
+    @NotBlank(message = "NOT_NULL")
     String destination;
+
+    @NotBlank(message = "NOT_NULL")
     String area;
+
+    @NotEmpty(message = "NOT_NULL")
     List<String> image;
+
+    @NotEmpty(message = "NOT_NULL")
     List<Itinerary> itinerary;
+
+    @NotBlank(message = "NOT_NULL")
     String description;
 
     @Min(value = 1, message = "DAY_INVALID")

@@ -1,5 +1,6 @@
 .error-500-container {
     display: flex;
+    min-width: 410px;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -25,18 +26,23 @@
         margin-bottom: 20px;
     }
 
-    .back-link {
-        font-size: 16px;
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .back-link:hover {
-        text-decoration: underline;
-    }
-
     .error-content {
         max-width: 500px;
         margin: 0 auto;
+    }
+
+    .back-home {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #499ef8;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .back-home:hover {
+        background-color: #007bff;
     }
 }

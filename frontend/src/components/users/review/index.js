@@ -3,7 +3,6 @@ import { memo, useState, useEffect } from 'react';
 import "./index.scss";
 import formatDatetime from 'utils/formatDatetime.js';
 import { SuccessToast, ErrorToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { ReviewApi } from 'services';
 
@@ -23,9 +22,14 @@ const ReviewList = ({ tourId, bookingId }) => {
 
             if (response?.code === 2001) {
                 setReviews(response?.result);
+
+                if (Array.isArray(response?.result) && response.result.length === 0) {
+                    setAvgRating(0);
+                }
             }
         } catch (error) {
             console.error("Failed to fetch reviews: ", error);
+            setAvgRating(0);
         }
     }
 
@@ -115,8 +119,8 @@ const ReviewList = ({ tourId, bookingId }) => {
             <h3>Đánh giá của khách hàng</h3>
             <div className="clients-reviews bgc-black mt-30 mb-60">
                 <div className="left" data-aos="fade-left" data-aos-duration="1500" data-aos-offset="50">
-                    <b>{parseFloat(avgRating.toFixed(1))}</b>
-                    <span>({reviews.length} đánh giá)</span>
+                    <b style={{ color: '#ffb545' }}>{parseFloat(avgRating.toFixed(1))}</b>
+                    <span style={{ color: '#ffd28e' }}>({reviews.length} đánh giá)</span>
                     <div className="ratting">
                         {[...Array(5)].map((_, i) => (
                             <i
@@ -224,7 +228,6 @@ const ReviewList = ({ tourId, bookingId }) => {
                     </div>
                 </>
             )}
-            <ToastContainer />
         </div>
     );
 };

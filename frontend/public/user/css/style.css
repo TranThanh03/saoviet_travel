@@ -382,7 +382,6 @@
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
-    text-transform: capitalize;
     background: var(--primary-color); }
     @media only screen and (max-width: 375px) {
         .theme-btn,
@@ -3647,7 +3646,7 @@
         box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.05); }
         @media only screen and (max-width: 479px) {
         .nav-search form {
-            width: 300px; } }
+            right: -91px; } }
         @media only screen and (max-width: 375px) {
         .nav-search form {
             width: 250px; } }

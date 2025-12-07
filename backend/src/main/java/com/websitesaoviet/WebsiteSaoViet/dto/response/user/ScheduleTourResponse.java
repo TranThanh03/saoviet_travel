@@ -16,7 +16,7 @@ public class ScheduleTourResponse {
     LocalDate startDate;
     LocalDate endDate;
     int quantityDay;
-    int people;
+    int quantityPeople;
     Double adultPrice;
     Double childrenPrice;
 }

@@ -17,10 +17,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,27 +31,29 @@ import java.util.List;
 public class PromotionService {
     PromotionRepository promotionRepository;
     PromotionMapper promotionMapper;
+    RedisService redisService;
 
     public PromotionResponse createPromotion(PromotionCreationRequest request) {
-        LocalDateTime currentTime = LocalDateTime.now();
         LocalDate today = LocalDate.now();
-        LocalDate minStartDate = today.plusDays(1);
+        LocalDateTime currentTime = LocalDateTime.now();
 
         if (promotionRepository.existsByCode(request.getCode().trim().toUpperCase())) {
             throw new AppException(ErrorCode.PROMOTION_CODE_AVAILABLE);
         }
 
-        if (request.getStartDate().isBefore(minStartDate)) {
+        if (request.getStartDate().isBefore(today)) {
             throw new AppException(ErrorCode.PROMOTION_STARTDATE_INVALID);
         }
-        else if (request.getEndDate().isBefore(request.getStartDate())) {
+
+        if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new AppException(ErrorCode.PROMOTION_ENDDATE_INVALID);
         }
 
         Promotion promotion = promotionMapper.createPromotion(request);
+        String status = request.getStartDate().isEqual(today) ? CommonStatus.IN_PROGRESS.getValue() : CommonStatus.NOT_STARTED.getValue();
 
         promotion.setCode(request.getCode().trim().toUpperCase());
-        promotion.setStatus(CommonStatus.NOT_STARTED.getValue());
+        promotion.setStatus(status);
         promotion.setCreatedTime(currentTime);
 
         return promotionMapper.toPromotionResponse(promotionRepository.save(promotion));
@@ -72,13 +76,20 @@ public class PromotionService {
         return promotionRepository.findAllPromotions(keywordText, keywordDate, pageable);
     }
 
-    public List<PromotionSummaryResponse> getPromotionList() {
-        return promotionRepository.findPromotionList();
-    }
+    public List<PromotionSummaryResponse> getPromotionList(String customerId) {
+        List<PromotionSummaryResponse> list = promotionRepository.findPromotionList(customerId);
+        List<PromotionSummaryResponse> result = new ArrayList<>();
 
-    public PromotionResponse getPromotionById(String id) {
-        return promotionMapper.toPromotionResponse(promotionRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PROMOTION_NOT_EXITED)));
+        for(PromotionSummaryResponse p : list) {
+            int availablePromotion = redisService.getAvailablePromotion(p.getId(), p.getQuantity());
+
+            if (availablePromotion > 0 && !redisService.isPromotionLocked(p.getId(), customerId)) {
+                p.setQuantity(availablePromotion);
+                result.add(p);
+            }
+        }
+
+        return result;
     }
 
     public PromotionResponse getPromotionByIdAndAdmin(String id) {
@@ -93,7 +104,14 @@ public class PromotionService {
     }
     
     public Promotion getAvailablePromotionById(String id) {
-        return promotionRepository.findAvailablePromotionById(id);
+        LocalDate currentDate = LocalDate.now();
+        var promotion = promotionRepository.findAvailablePromotionById(id, currentDate);
+
+        if (promotion == null) {
+            throw new AppException(ErrorCode.PROMOTION_NOT_EXITED);
+        }
+
+        return promotion;
     }
 
     public PromotionResponse updatePromotion(String id, PromotionUpdateRequest request) {
@@ -104,23 +122,25 @@ public class PromotionService {
                     .orElseThrow(() -> new AppException(ErrorCode.PROMOTION_NOT_EXITED));
 
             LocalDate today = LocalDate.now();
-            LocalDate minStartDate = today.plusDays(1);
 
-            if (request.getStartDate().isBefore(minStartDate)) {
-                throw new AppException(ErrorCode.PROMOTION_STARTDATE_INVALID);
+            if (promotion.getStatus().equals(CommonStatus.NOT_STARTED.getValue())) {
+                if (request.getStartDate().isBefore(today)) {
+                    throw new AppException(ErrorCode.PROMOTION_STARTDATE_INVALID);
+                }
+                promotion.setStartDate(request.getStartDate());
+                promotion.setDiscount(request.getDiscount());
+
+                if (request.getStartDate().isEqual(today)) {
+                    promotion.setStatus(CommonStatus.IN_PROGRESS.getValue());
+                }
             }
-            else if (request.getEndDate().isBefore(request.getStartDate())) {
+
+            if (request.getEndDate().isBefore(request.getStartDate())) {
                 throw new AppException(ErrorCode.PROMOTION_ENDDATE_INVALID);
             }
 
             promotion.setTitle(request.getTitle());
             promotion.setDescription(request.getDescription());
-            promotion.setDiscount(request.getDiscount());
-
-            if (promotion.getStatus().equals(CommonStatus.NOT_STARTED.getValue())) {
-                promotion.setStartDate(request.getStartDate());
-            }
-
             promotion.setEndDate(request.getEndDate());
             promotion.setQuantity(request.getQuantity());
 
@@ -130,6 +150,7 @@ public class PromotionService {
         }
     }
 
+    @Transactional
     public void deletePromotion(String id) {
         if (!promotionRepository.existsById(id)) {
             throw new AppException(ErrorCode.PROMOTION_NOT_EXITED);

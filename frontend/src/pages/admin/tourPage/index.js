@@ -5,7 +5,6 @@ import { TourApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "components/notifi";
-import { ToastContainer } from "react-toastify";
 import Pagination from "components/pagination";
 
 const TourPage = () => {
@@ -19,8 +18,12 @@ const TourPage = () => {
         "t": "Miền Trung",
         "n": "Miền Nam"
     };
+    const [loadingId, setLoadingId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchTours = useCallback(async () => {
+        setIsLoading(true);
+
         try {
             const response = await TourApi.getAll({
                 keyword: search.trim(),
@@ -34,6 +37,8 @@ const TourPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch tours: ", error);
+        } finally {
+            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -43,6 +48,7 @@ const TourPage = () => {
 
     const handleSearch = () => {
         setCurrentPage(0);
+        setTotalPages(1);
         fetchTours();
     };
 
@@ -57,6 +63,8 @@ const TourPage = () => {
         });
 
         if (confirm.isConfirmed) {
+            setLoadingId(id);
+
             try {
                 const response = await TourApi.delete(id);
 
@@ -75,6 +83,8 @@ const TourPage = () => {
             } catch (error) {
                 console.error("Failed to delete tour: ", error);
                 ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.")
+            } finally {
+                setLoadingId(null);
             }
         }
     };
@@ -102,6 +112,12 @@ const TourPage = () => {
                                     placeholder="Nhập mã, tên, điểm đến"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }
+                                    }}
                                 />
                                 <button type="button" onClick={handleSearch}>
                                     <FaSearch style={{ color: '#333', fontSize: '16px' }} />
@@ -126,29 +142,45 @@ const TourPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {tours.length > 0 && tours.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td> {index + 1} </td>
-                                                        <td> {item.code} </td>
-                                                        <td> {item.name} </td>
-                                                        <td> {item.quantityDay ? `${item.quantityDay} ngày ${item.quantityDay-1} đêm`: ''} </td>
-                                                        <td> {item.destination} </td>
-                                                        <td> 
-                                                            {areasClassMap[item.area] || ''}
-                                                        </td>
-                                                        <td> {item.quantityOrder} </td>
-                                                        <td>
-                                                            <Link to={`/manage/tours/edit/${item.id}`}>
-                                                                <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
-                                                            </Link>
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" onClick={() => handleDelete(item.id, item.code)}>
-                                                                <FaTrash style={{ color: 'red', fontSize: '18px' }} />
-                                                            </button>
+                                                {isLoading ? (
+                                                    <tr>
+                                                        <td colSpan="8" style={{height: '350px', verticalAlign: 'middle'}}>
+                                                            <span 
+                                                                className="spinner-border spinner-border-sm mx-3 my-3 text-info" 
+                                                                style={{ width: '30px', height: '30px'}} 
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                ) : (
+                                                    tours.length > 0 && tours.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td> {index + 1} </td>
+                                                            <td> {item.code} </td>
+                                                            <td> {item.name} </td>
+                                                            <td> {item.quantityDay ? `${item.quantityDay} ngày ${item.quantityDay-1} đêm`: ''} </td>
+                                                            <td> {item.destination} </td>
+                                                            <td> 
+                                                                {areasClassMap[item.area] || ''}
+                                                            </td>
+                                                            <td> {item.quantityOrder} </td>
+                                                            <td>
+                                                                <Link to={`/manage/tours/edit/${item.id}`}>
+                                                                    <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
+                                                                </Link>
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" disabled={loadingId === item.id} onClick={() => handleDelete(item.id, item.code)}>
+                                                                    {loadingId === item.id ? 
+                                                                        <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                                                        : <FaTrash style={{ color: 'red', fontSize: '18px' }} />
+                                                                    }
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -164,8 +196,6 @@ const TourPage = () => {
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>   
     );
 };

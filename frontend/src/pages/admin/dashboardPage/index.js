@@ -5,16 +5,25 @@ import formatCurrency from "utils/formatCurrency.js";
 import { BookingApi, TourApi } from "services";
 import formatDatetime from "utils/formatDatetime.js";
 import { Link } from "react-router-dom";
+import getTodayUTC7 from "utils/getTodayUTC7";
 
 const DashboardPage = () => {
     const [infoCounts, setInfoCounts] = useState({});
     const [bookingsLatest, setBookingsLatest] = useState([]);
     const [popularTours, setPopularTours] = useState([]);
-    const currentYear = new Date().getFullYear();
+    const currentYear = getTodayUTC7().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear);
     const years = [];
+    const [isLoading, setIsLoading] = useState({
+        infoCount: false,
+        statusCount: false,
+        areaCount: false,
+        bookingLatest: false,
+        popularTour: false,
+        statistic: false
+    });
 
-    for (let y = 2023; y <= currentYear; y++) {
+    for (let y = 2025; y <= currentYear; y++) {
         years.push(y);
     }
     
@@ -33,23 +42,26 @@ const DashboardPage = () => {
     const [lineData, setLineData] = useState(
         Array.from({ length: 12 }, (_, i) => ({
             month: `Tháng ${i + 1}`,
-            revenue: null,
-            canceled: null,
-            confirmed: null
+            revenue: 0,
+            canceled: 0,
+            confirmed: 0
         }))
     );
 
     useEffect(() => {
         const fetchInfoCount = async () => {
+            setIsLoading((pre) => ({ ...pre, infoCount: true }));
+
             try {
                 const response = await BookingApi.infoCount();
 
-                if (response?.code === 1809) {
+                if (response?.code === 1812) {
                     setInfoCounts(response?.result);
                 }
-            } 
-            catch (error) {
-                console.error("Failed to fetch count: ", error);
+            } catch (error) {
+                console.error("Failed to fetch info count: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, infoCount: false }));
             }
         };
 
@@ -58,10 +70,12 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchBookingStatusCount = async () => {
+            setIsLoading((pre) => ({ ...pre, statusCount: true }));
+
             try {
                 const response = await BookingApi.statusCount();
 
-                if (response?.code === 1812 && response?.result) {
+                if (response?.code === 1815 && response?.result) {
                     setPieDataStatus((prevData) =>
                         prevData.map((item) => {
                             if (item.name === "Đang xử lý") return { ...item, value: response.result.processing };
@@ -72,9 +86,10 @@ const DashboardPage = () => {
                         })
                     );
                 }
-            }
-            catch(error) {
-                console.error("Failed to fetch booking status: ", error);
+            } catch(error) {
+                console.error("Failed to fetch booking status count: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, statusCount: false }));
             }
         }
 
@@ -83,6 +98,8 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchTourAreaCount = async () => {
+            setIsLoading((pre) => ({ ...pre, areaCount: true }));
+
             try {
                 const response = await TourApi.areaCount();
 
@@ -97,9 +114,10 @@ const DashboardPage = () => {
                         })
                     );
                 }
-            }
-            catch(error) {
-                console.error("Failed to fetch tour area: ", error);
+            } catch(error) {
+                console.error("Failed to fetch tours area count: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, areaCount: false }));
             }
         }
 
@@ -108,15 +126,18 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchBookingsLatest = async () => {
+            setIsLoading((pre) => ({ ...pre, bookingLatest: true }));
+
             try {
                 const response = await BookingApi.latest();
 
-                if (response?.code === 1810) {
+                if (response?.code === 1813) {
                     setBookingsLatest(response?.result);
                 }
-            } 
-            catch (error) {
+            } catch (error) {
                 console.error("Failed to fetch bookings latest: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, bookingLatest: false }));
             }
         };
 
@@ -124,17 +145,39 @@ const DashboardPage = () => {
     }, [])
 
     useEffect(() => {
+        const fetchPopularTours = async () => {
+            setIsLoading((pre) => ({ ...pre, popularTour: true }));
+            
+            try {
+                const response = await BookingApi.popularTours();
+
+                if (response?.code === 1814) {
+                    setPopularTours(response?.result);
+                }
+            } catch (error) {
+                console.error("Failed to fetch popular tours: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, popularTour: false }));
+            }
+        };
+
+        fetchPopularTours();
+    }, [])
+
+    useEffect(() => {
         const fetchBookingStatistic = async () => {
+            setIsLoading((pre) => ({ ...pre, statistic: true }));
+
             try {
                 const response = await BookingApi.getStatistics(selectedYear);
 
-                if (response?.code === 1813 && response?.result) {
+                if (response?.code === 1816 && response?.result) {
                     if (response.result.length === 0) {
                         const emptyData = Array.from({ length: 12 }, (_, i) => ({
                             month: `Tháng ${i + 1}`,
-                            revenue: null,
-                            canceled: null,
-                            confirmed: null,
+                            revenue: 0,
+                            canceled: 0,
+                            confirmed: 0,
                         }));
                         
                         setLineData(emptyData);
@@ -142,38 +185,33 @@ const DashboardPage = () => {
                         setLineData((prevData) =>
                             prevData.map((item) => {
                                 const found = response.result.find((data) => data.month === Number(item.month.replace("Tháng ", "")));
+                                
                                 return found
-                                    ? { ...item, revenue: found.revenue, canceled: found.canceled, confirmed: found.confirmed }
-                                    : { ...item, revenue: 0, canceled: 0, confirmed: 0 };
+                                    ? {
+                                        ...item,
+                                        revenue: Number(found.revenue) || 0,
+                                        canceled: Number(found.canceled) || 0,
+                                        confirmed: Number(found.confirmed) || 0
+                                    }
+                                    : {
+                                        ...item,
+                                        revenue: 0,
+                                        canceled: 0,
+                                        confirmed: 0
+                                    };
                             })
-                        );
+                        )
                     }
                 }
-            } 
-            catch (error) {
+            } catch (error) {
                 console.error("Failed to fetch statistics: ", error);
+            } finally {
+                setIsLoading((pre) => ({ ...pre, statistic: false }));
             }
         };
 
         fetchBookingStatistic();
     }, [selectedYear])
-
-    useEffect(() => {
-        const fetchPopularTours = async () => {
-            try {
-                const response = await BookingApi.popularTours();
-
-                if (response?.code === 1811) {
-                    setPopularTours(response?.result);
-                }
-            } 
-            catch (error) {
-                console.error("Failed to fetch popular tours: ", error);
-            }
-        };
-
-        fetchPopularTours();
-    }, [])
 
     return (
         <div className="dashboard-container-page">
@@ -185,7 +223,10 @@ const DashboardPage = () => {
                         </span>
                         <div className="count green">
                             <i className="fa fa-sort-asc me-2"></i>
-                            {infoCounts.countTours}
+                            {isLoading.infoCount ? 
+                                <span className="spinner-border spinner-border-sm mx-2 text-info" role="status" aria-hidden="true"></span>
+                                : infoCounts.countTours
+                            }
                         </div>
                     </div>
                     <div className="col-md-3 col-sm-4 tile_stats_count">
@@ -194,7 +235,10 @@ const DashboardPage = () => {
                         </span>
                         <div className="count green">
                             <i className="fa fa-sort-asc me-2"></i>
-                            {infoCounts.countCustomers}
+                            {isLoading.infoCount ? 
+                                <span className="spinner-border spinner-border-sm mx-2 text-info" role="status" aria-hidden="true"></span>
+                                : infoCounts.countCustomers
+                            }
                         </div>
                     </div>
                     <div className="col-md-3 col-sm-4 tile_stats_count">
@@ -203,7 +247,10 @@ const DashboardPage = () => {
                         </span>
                         <div className="count green">
                             <i className="fa fa-sort-asc me-2"></i>
-                            {infoCounts.countBookings}
+                            {isLoading.infoCount ? 
+                                <span className="spinner-border spinner-border-sm mx-2 text-info" role="status" aria-hidden="true"></span>
+                                : infoCounts.countBookings
+                            }
                         </div>
                     </div>
                     <div className="col-md-3 col-sm-4 tile_stats_count">
@@ -211,7 +258,10 @@ const DashboardPage = () => {
                             <i className="fas fa-money-bill-wave me-2"></i>Tổng doanh thu
                         </span>
                         <div className="count red">
-                            {infoCounts.totalRevenue ? formatCurrency(infoCounts.totalRevenue) : 0}
+                            {isLoading.infoCount ? 
+                                <span className="spinner-border spinner-border-sm ms-5 text-info" role="status" aria-hidden="true"></span>
+                                : (infoCounts.totalRevenue ? formatCurrency(infoCounts.totalRevenue) : 0)
+                            }
                         </div>
                     </div>
                 </div>
@@ -226,24 +276,33 @@ const DashboardPage = () => {
                         </div>
                         <div className="x_content">
                             <div className="pie-chart">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={pieDataStatus}
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius="80%"
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label
-                                        >
-                                            {pieDataStatus.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                {isLoading.statusCount ? 
+                                    <span
+                                        className="spinner-border spinner-border-sm mx-2 text-info"
+                                        style={{ width: '30px', height: '30px'}}
+                                        role="status"
+                                        aria-hidden="true"
+                                    ></span>
+                                    :
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={pieDataStatus}
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius="80%"
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                label
+                                            >
+                                                {pieDataStatus.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                }
                             </div>
                         </div>
                     </div>
@@ -257,24 +316,33 @@ const DashboardPage = () => {
                         </div>
                         <div className="x_content">
                             <div className="pie-chart">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={pieDataArea}
-                                            cx="50%"
-                                            cy="50%"
-                                            outerRadius="80%"
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            label
-                                        >
-                                            {pieDataArea.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                {isLoading.areaCount ? 
+                                    <span
+                                        className="spinner-border spinner-border-sm mx-2 text-info"
+                                        style={{ width: '30px', height: '30px'}}
+                                        role="status"
+                                        aria-hidden="true"
+                                    ></span>
+                                    :
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={pieDataArea}
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius="80%"
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                label
+                                            >
+                                                {pieDataArea.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                }
                             </div>
                         </div>
                     </div>
@@ -282,7 +350,7 @@ const DashboardPage = () => {
             </div>
 
             <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 d-flex">
                     <div className="x_panel">
                         <div className="x_title">
                             <h2>Lịch đặt mới</h2>
@@ -300,27 +368,40 @@ const DashboardPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {bookingsLatest.length > 0 && bookingsLatest.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>
-                                                <Link className="ellipsis" to={`/manage/calendars/detail/${item.id}`}>{item.code}</Link>
+                                    {isLoading.bookingLatest ?
+                                        <tr>
+                                            <td colSpan={5} style={{height: '350px', verticalAlign: 'middle'}}>
+                                                <span
+                                                    className="spinner-border spinner-border-sm mx-2 text-info"
+                                                    style={{ width: '30px', height: '30px'}}
+                                                    role="status"
+                                                    aria-hidden="true"
+                                                ></span>
                                             </td>
-                                            <td>{item.username ?? ''}</td>
-                                            <td className="color-red">{item.totalPrice ? formatCurrency(item.totalPrice) : 0}</td>
-                                            <td style={{maxWidth: '108px'}}>{item.bookingTime ? formatDatetime(item.bookingTime) : ''}</td>
                                         </tr>
-                                    ))}
+                                        :
+                                        bookingsLatest.length > 0 && bookingsLatest.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>
+                                                    <Link className="ellipsis" to={`/manage/calendars/detail/${item.id}`}>{item.code}</Link>
+                                                </td>
+                                                <td>{item.username ?? ''}</td>
+                                                <td className="color-red">{item.totalPrice ? formatCurrency(item.totalPrice) : 0}</td>
+                                                <td style={{maxWidth: '108px'}}>{item.bookingTime ? formatDatetime(item.bookingTime) : ''}</td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-md-6 d-flex">
                     <div className="x_panel">
                         <div className="x_title">
-                            <h2>Tours phổ biến trong tháng</h2>
+                            <h2 className="w-100">Tours phổ biến trong tháng</h2>
                             <div className="clearfix"></div>
                         </div>
                         <div className="x_content">
@@ -334,14 +415,27 @@ const DashboardPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {popularTours.length > 0 && popularTours.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>{item.code}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.quantityOrder}</td>
+                                    {isLoading.popularTour ?
+                                        <tr>
+                                            <td colSpan={4} style={{height: '350px', verticalAlign: 'middle'}}>
+                                                <span
+                                                    className="spinner-border spinner-border-sm mx-2 text-info"
+                                                    style={{ width: '30px', height: '30px'}}
+                                                    role="status"
+                                                    aria-hidden="true"
+                                                ></span>
+                                            </td>
                                         </tr>
-                                    ))}
+                                        :
+                                        popularTours.length > 0 && popularTours.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{item.code}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.quantityOrder}</td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -371,12 +465,16 @@ const DashboardPage = () => {
                             <div className="clearfix"></div>
                         </div>
                         <div className="x_content">
-                            <ResponsiveContainer width="100%" height={500}>
+                            {isLoading.statistic && <span className="spinner-border spinner-border-sm mx-2 text-info position-absolute" style={{ width: '30px', height: '30px', top: '50%', left: '50%'}} role="status" aria-hidden="true"></span>}
+                            <ResponsiveContainer width="100%" height={500} style={{ opacity: isLoading.statistic && '0.5'}}>
                                 <LineChart data={lineData} margin={{ top: 30, right: 20, left: 5}}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="month" />
                                     <YAxis
-                                        tickFormatter={(v) => `${v / 1_000_000}`}
+                                        domain={
+                                            lineData.every(item => Number(item.revenue) === 0) ? [0, 1] : [0, 'dataMax']
+                                        }
+                                        tickFormatter={(v) => v === 0 ? "0" : (v / 1_000_000).toLocaleString()}
                                         label={{ value: "Triệu VND", angle: -90, position: "insideLeft" }}
                                     />
                                     <Tooltip formatter={(value, name) => {

@@ -7,7 +7,6 @@ import { noImage } from 'assets';
 import formatCurrency from 'utils/formatCurrency.js';
 import formatDatetime from 'utils/formatDatetime.js';
 import { ErrorToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([
@@ -239,8 +238,6 @@ const Chatbot = () => {
                     </form>
                 </div>
             )}
-
-            <ToastContainer />
         </>
     );
 };

@@ -22,6 +22,7 @@ public class BookingSummaryResponse {
     Double totalPrice;
     int rating;
     LocalDateTime bookingTime;
+    LocalDateTime expiredTime;
     String status;
     boolean isReviewed;
     String method;

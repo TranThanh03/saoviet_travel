@@ -2,28 +2,40 @@ import axios from 'axios';
 import { setLoading } from './loading.js';
 
 const axiosInstanceAdmin = axios.create({
-    baseURL: process.env.REACT_APP_BASE_URL,
-    timeout: 30000,
+    baseURL: process.env.REACT_APP_BE_BASE_URL,
+    timeout: 20000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true
 });
 
 const pendingRequests = new Set();
-const skipEndpoints = [
-    '/api/v1/auth/admin/login'
+const loadingEndpoints = [
+    { method: 'POST', endpoint: 'api/v1/admin/auth/logout' }
 ];
 
-const shouldSkipLoading = (url = '') => {
-    return skipEndpoints.some(endpoint => url.includes(endpoint));
+const shouldLoading = (url = '', method = '') => {
+    return loadingEndpoints.some(item => {
+        return item.method === method && url.includes(item.endpoint);
+    });
+};
+
+let accessToken = null;
+
+export const setAccessTokenAdmin = (token) => {
+    accessToken = token;
 };
 
 axiosInstanceAdmin.interceptors.request.use(
     (config) => {
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
         config.metadata = {
-            skipLoading: shouldSkipLoading(config.url),
+            loading: shouldLoading(config.url, config.method.toUpperCase()),
         };
 
-        if (!config.metadata.skipLoading) {
+        if (config.metadata.loading) {
             setLoading(true);
             pendingRequests.add(config);
         }
@@ -60,14 +72,12 @@ axiosInstanceAdmin.interceptors.response.use(
             }
         }
 
-        if (error.response?.data?.code === 4445) {
-            if (config.url?.includes("/api/v1/auth/admin/introspect")) {
-                return Promise.reject(error.response || error.message);
-            }
-
-            window.location.href = "/manage/error/404";
-        } else if (error.code === "ERR_NETWORK") {
+        if (error.response?.data?.code === 1002) {
             window.location.href = "/manage/auth/login";
+        }
+        
+        if ((navigator.onLine && error.code === "ERR_NETWORK") || error?.status === 500) {
+            window.location.href = "/manage/error/500";
         }
 
         return Promise.reject(error.response || error.message);

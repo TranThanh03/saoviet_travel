@@ -2,6 +2,7 @@ package com.websitesaoviet.WebsiteSaoViet.dto.request.user;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,8 +11,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CheckoutProcessionRequest {
+public class BookingProcessionRequest {
+    @NotBlank(message = "NOT_NULL")
     String scheduleId;
+
     String promotionId;
 
     @Min(value = 0, message = "QUANTITY_ADULT")
@@ -22,5 +25,6 @@ public class CheckoutProcessionRequest {
     @Max(value = 99, message = "QUANTITY_CHILDREN")
     int quantityChildren;
 
+    @NotBlank(message = "NOT_NULL")
     String method;
 }

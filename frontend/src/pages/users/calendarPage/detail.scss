@@ -1,4 +1,10 @@
 .calendar-detail-customer-page {
+    .btn-back button {
+        font-size: 20px;
+        margin-top: 20px;
+        color: darkblue;
+    }
+
     .booking-container {
         max-width: 1200px;
         margin: auto;
@@ -29,100 +35,41 @@
         }
 
         .booking-header {
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+
+            .notifi {
+                padding: 10px;
+                border-radius: 15px;
+            }
+        
+            .success-notifi {
+                color: green;
+                border: 1px solid #43A047;
+                background-color: #E8F5E9;
+            }
+        
+            .error-notifi {
+                color: red;
+                border: 1px solid #E53935;
+                background-color: #FFEBEE;
+            }
+        }
+
+        .title {
             font-size: 24px;
             font-weight: 700;
+            padding-top: 10px;
         }
 
-        .mt-40 {
-            margin-top: 40px;
+        .mt-30 {
+            margin-top: 30px;
         }
 
-        .quantity-selector {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            border: 1px solid #e2e4e5;
-            padding: 20px;
-            justify-content: space-between;
-            gap: 48px;
-        }
-
-        .input__quanlity {
-            display: flex;
-            gap: 16px;
-        }
-
-        .quantity-btn {
-            width: 30px;
-            height: 30px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
+        .form-control-method {
+            padding: 10px;
+            border: 1px solid black;
             border-radius: 5px;
-            border: 2px solid #63ab45;
-            color: #63ab45;
-        }
-
-        .quantity-input {
-            padding: 0;
-            width: 50px;
-            text-align: center;
-            border: none;
-            font-size: 24px;
-            line-height: 1;
-            letter-spacing: 0em;
-            font-weight: 500;
-            color: #63ab45;
-        }
-
-        .payment-option {
-            margin-bottom: 15px;
-            padding: 15px;
-            border: 1px solid #e2e4e5;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .payment-option img {
-            width: 45px;
-        }
-
-        .privacy-section {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            font-size: 1rem;
-            color: #333;
-            text-align: center;
-
-            .privacy-checkbox {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-top: 10px;
-                justify-content: center;
-            }
-
-            input {
-                cursor: pointer;
-            }
-
-            label {
-                margin-bottom: 0 !important;
-                cursor: default !important;
-            }
-
-            a {
-                color: blue;
-            }
         }
 
         .order-summary {
@@ -166,7 +113,11 @@
             top: 80px;
             z-index: 99;
 
-            .tour-infor {
+            .tour-info {
+                .title {
+                    font-size: 20px;
+                }
+
                 span {
                     float: right;
                 }
@@ -191,20 +142,48 @@
         .pending {
             color: #e5af10;
         }
+
+        .inactive {
+            background-color: #f3d5b1 !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .inactive-cancel {
+            background-color: rgb(241, 175, 175) !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     }
 
-    @media (max-width: 768px) {
+    @media (min-width: 992px) and (max-width: 1200px) {
+        .booking-container .booking-header {
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 767px) {
         .container {
             max-width: 1000px !important;
         }
 
         .booking-container {
             flex-direction: column;
+
+            .booking-header {
+                display: block !important;
+            }
         }
 
         .booking-summary {
             width: 100% !important;
             margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .booking-container .user_info {
+            display: block !important;
         }
     }
 }

@@ -1,5 +1,6 @@
 export { default as MasterLayout } from './theme/masterLayout/index.js';
 export { default as LoginPage } from './authPage/login.js';
+export { default as ForgotPasswordPage } from './authPage/forgotPassword.js';
 export { default as TourPage } from './tourPage/index.js';
 export { default as TourInsertPage } from './tourPage/insert.js';
 export { default as TourUpdatePage } from './tourPage/update.js';

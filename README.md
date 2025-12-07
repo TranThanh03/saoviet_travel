@@ -17,9 +17,10 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 - Tìm kiếm và lọc tour theo nhiều tiêu chí (giá, điểm đến, ngày khởi hành, ngày kết thúc, đánh giá).
 - Xem tin tức, khuyến mãi.
 - Thanh toán online (VNPay, MoMo).
-- Nhận email hóa đơn tự động.
+- Thanh toán lại lịch đặt nếu phát sinh lỗi trong quá trình thanh toán.
 - Chatbot tư vấn, hỗ trợ về tour.
 - Cập nhật thông tin cá nhân.
+- Quên mật khẩu.
 
 ### 🛠️ Dành cho quản trị viên
 - Quản lý khách hàng.
@@ -27,6 +28,12 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 - Quản lý lịch đặt.
 - Quản lý tin tức, khuyến mãi.
 - Cập nhật thông tin cá nhân.
+- Quên mật khẩu.
+
+### 🛠️ Hệ thống
+- Tự động gửi email xác thực, mã OTP.
+- Tự động gửi hóa đơn thanh toán sau khi quản trị viên duyệt lịch đặt.
+- Tự động khóa số lượng chỗ trong lịch đặt và voucher(nếu dùng) trong 15 phút khi đặt tour.
 
 ---
 
@@ -44,8 +51,23 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 - **Database:**  
   - [MySQL](https://www.mysql.com/)  
 
+- **Caching:**  
+  - [Redis](https://redis.io/)  
+
 - **Thanh toán demo:**  
   - VNPay, MoMo  
+
+---
+
+## 🧪 Tài khoản test
+
+👤 Khách hàng
+- **Tài khoản:** 0825702210
+- **Mật khẩu:** thanh22@
+
+🛠️ Quản trị viên
+- **Tài khoản:** 0399999999
+- **Mật khẩu:** adminsv99@
 
 ---
 

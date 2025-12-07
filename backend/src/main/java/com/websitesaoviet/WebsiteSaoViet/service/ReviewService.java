@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,6 +50,7 @@ public class ReviewService {
         return reviewRepository.findAllByTourId(tourId);
     }
 
+    @Transactional
     public void deleteReview(String id, String customerId) {
         if (!reviewRepository.existsReviewByIdAndCustomerId(id, customerId)) {
             throw new AppException(ErrorCode.REVIEW_NOT_EXITED);

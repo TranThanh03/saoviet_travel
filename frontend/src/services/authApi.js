@@ -1,30 +1,37 @@
 import axiosInstance from "utils/axiosInstance";
-import axiosInstanceAdmin from "utils/axiosInstanceAdmin";
 
 const AuthApi = {
     login: (data) => {
         return axiosInstance.post("/api/v1/auth/login", data);
     },
 
-    introspect: () => {
-        return axiosInstance.get("/api/v1/auth/introspect");
+    introspect: (accessToken) => {
+        return axiosInstance.post("/api/v1/auth/introspect", accessToken);
     },
 
     logout: () => {
         return axiosInstance.post("/api/v1/auth/logout", {});
     },
 
-    loginAdmin: (data) => {
-        return axiosInstanceAdmin.post("/api/v1/auth/admin/login", data);
+    refreshAccessToken: () => {
+        return axiosInstance.post("/api/v1/auth/token/refresh", {});
     },
 
-    introspectAdmin: () => {
-        return axiosInstanceAdmin.get("/api/v1/auth/admin/introspect");
+    forgotPassword: (data) => {
+        return axiosInstance.post("/api/v1/auth/forgot-password", data);
     },
-    
-    logoutAdmin: () => {
-        return axiosInstanceAdmin.post("/api/v1/auth/admin/logout", {});
+
+    resendOTP: (data) => {
+        return axiosInstance.post("/api/v1/auth/forgot-password/resend", data);
     },
+
+    verifyOTP: (data) => {
+        return axiosInstance.post("/api/v1/auth/forgot-password/verify", data);
+    },
+
+    resetPassword: (data) => {
+        return axiosInstance.patch("/api/v1/auth/forgot-password/reset", data);
+    }
 };
 
 export default AuthApi;

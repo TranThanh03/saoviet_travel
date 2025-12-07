@@ -1,11 +1,9 @@
 //admin
 "phone": "0399999999",
-"email": "admin@gmail.com",
-"password": "admin123"
+"password": "adminsv99@"
 
 //user
 "phone": "0825702210",
-"email": "thanhhkh@gmail.com",
 "password": "thanh22@"
 
 //test momo

@@ -2,6 +2,7 @@ package com.websitesaoviet.WebsiteSaoViet.dto.request.admin;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +15,10 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PromotionUpdateRequest {
+    @NotBlank(message = "NOT_NULL")
     String title;
+
+    @NotBlank(message = "NOT_NULL")
     String description;
 
     @Min(value = 1, message = "DISCOUNT_INVALID")
@@ -28,6 +32,6 @@ public class PromotionUpdateRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate endDate;
 
-    @Min(value = 1, message = "QUANTITY_INVALID")
+    @Min(value = 0, message = "UPDATE_QUANTITY_INVALID")
     int quantity;
 }

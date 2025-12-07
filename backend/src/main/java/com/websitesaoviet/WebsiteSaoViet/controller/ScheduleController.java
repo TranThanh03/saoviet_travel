@@ -28,7 +28,6 @@ import java.util.List;
 @RequestMapping("/schedules")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class ScheduleController {
     ScheduleService scheduleService;
     BookingService bookingService;
@@ -50,8 +49,8 @@ public class ScheduleController {
     ResponseEntity<ApiResponse<Page<ScheduleListResponse>>> getSchedules(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<ScheduleListResponse>> apiResponse = ApiResponse.<Page<ScheduleListResponse>>builder()
@@ -73,7 +72,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/tour/{id}")
-    public ResponseEntity<ApiResponse<List<ScheduleSummaryResponse>>> getSchedulesByTourId(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<List<ScheduleSummaryResponse>>> getListSchedulesByTourId(@PathVariable String id) {
         ApiResponse<List<ScheduleSummaryResponse>> successResponse = ApiResponse.<List<ScheduleSummaryResponse>>builder()
                 .code(1603)
                 .result(scheduleService.getSchedulesByTourId(id))
@@ -92,11 +91,11 @@ public class ScheduleController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(
             @PathVariable String id,
-            @RequestParam int totalPeople) {
-
+            @RequestParam int totalPeople
+    ) {
         ApiResponse<ScheduleResponse> apiResponse = ApiResponse.<ScheduleResponse>builder()
                 .code(1605)
                 .result(scheduleService.updateSchedule(id, totalPeople))
@@ -122,7 +121,7 @@ public class ScheduleController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/start-date/{tourId}")
+    @GetMapping("/{tourId}/start-date")
     public ResponseEntity<ApiResponse<List<ScheduleStartDateResponse>>> getStartDateByTourId(@PathVariable String tourId) {
         ApiResponse<List<ScheduleStartDateResponse>> apiResponse = ApiResponse.<List<ScheduleStartDateResponse>>builder()
                 .code(1607)

@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
 import './style.scss';
 
 const Page404 = () => {
@@ -8,7 +7,7 @@ const Page404 = () => {
             <div className="main">
                 <p className="error-code">404</p>
                 <p className="error-message">Không tìm thấy trang bạn đang tìm kiếm!</p>
-                <Link to="/manage/dashboard" className="back-home">Quay lại trang chủ</Link>
+                <a href="/manage/dashboard" className="back-home">Về trang chủ</a>
             </div>
         </div>
     )

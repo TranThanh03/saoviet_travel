@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -21,6 +22,7 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class MomoService {
     @NonFinal
     @Value("${momo.partnerCode}")
@@ -34,13 +36,14 @@ public class MomoService {
     @Value("${momo.secretKey}")
     protected String secretKey;
 
-    public String createPayment(int amount, String orderId, String redirectUrl, String ipnUrl, String extraData) {
+    public String createMomoPayment(String orderId, int amount, String redirectUrl, String ipnUrl) {
         try {
             RestTemplate restTemplate = new RestTemplate();
             Random random = new Random();
             String requestId = System.currentTimeMillis() + "" + random.nextInt(1000);
             String orderInfo = "Thanh toán qua MoMo";
             String requestType = "payWithATM";
+            String extraData = String.format("Thanh toan don dat tour #%s.", orderId);
 
             String rawHash = "accessKey=" + accessKey +
                     "&amount=" + amount +
@@ -80,6 +83,7 @@ public class MomoService {
 
             return jsonResponse.getString("payUrl");
         } catch (Exception e) {
+            log.error("Payment MOMO failed: ", e);
             throw new AppException(ErrorCode.PAYMENT_MOMO_FAILED);
         }
     }
@@ -105,6 +109,7 @@ public class MomoService {
 
             return generatedSignature.equals(receivedSignature);
         } catch (Exception e) {
+            log.error("Payment MOMO failed: ", e);
             throw new AppException(ErrorCode.SIGNATURE_INVALID);
         }
     }
@@ -122,6 +127,7 @@ public class MomoService {
             }
             return hexString.toString();
         } catch (Exception e) {
+            log.error("Payment MOMO failed: ", e);
             throw new AppException(ErrorCode.PAYMENT_MOMO_FAILED);
         }
     }

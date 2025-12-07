@@ -2,12 +2,12 @@ package com.websitesaoviet.WebsiteSaoViet.dto.request.admin;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,8 +15,13 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PromotionCreationRequest {
+    @NotBlank(message = "NOT_NULL")
     String code;
+
+    @NotBlank(message = "NOT_NULL")
     String title;
+
+    @NotBlank(message = "NOT_NULL")
     String description;
 
     @Min(value = 1, message = "DISCOUNT_INVALID")

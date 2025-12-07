@@ -1,7 +1,7 @@
-import { memo, useState, useEffect, useContext } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import './detail.scss';
-import { AuthApi, TourApi } from 'services';
+import { TourApi } from 'services';
 import formaterCurrency from 'utils/formatCurrency';
 import { sanitizeHtml } from 'utils/sanitizeHtml';
 import { noImage } from 'assets';
@@ -9,9 +9,7 @@ import ReviewList from "components/users/review/index";
 import CalendarCustom from "components/users/calendar/index";
 import formatDatetime from 'utils/formatDatetime';
 import { ErrorToast } from 'components/notifi';
-import { ToastContainer } from 'react-toastify';
-import { AuthContext } from '../theme/masterLayout';
-
+import { useAuth } from 'utils/AuthContext';
 
 const TourDetailPage = () => {
     const { id } = useParams();
@@ -30,7 +28,7 @@ const TourDetailPage = () => {
         quantityPeople: 0,
         totalPeople: 0
     });
-    const { authenticated } = useContext(AuthContext);
+    const { authenticated } = useAuth();
 
     const handleDateSelect = (data) => {
         setData(data);
@@ -81,22 +79,13 @@ const TourDetailPage = () => {
         try {
             if (authenticated) {
                 if (data.startDate !== '' && data.id !== '') {
-                    const response = await AuthApi.introspect();
-
-                    if (response?.code === 9998 && response?.result) {
-                        navigate(`/booking/${data.id}`);
-                    } else {
-                        ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
-                    }
+                    navigate(`/booking/${data.id}`);
                 } else {
                     ErrorToast("Vui lòng chọn ngày khởi hành trước.");
                 }
             } else {
+                navigate("/auth/login");
                 ErrorToast("Vui lòng đăng nhập để đặt tour.");
-
-                setTimeout(() => {
-                    navigate("/auth/login");
-                }, 1500);
             }  
         } catch (error) {
             console.error("Failed to fetch schedule: ", error);
@@ -254,9 +243,7 @@ const TourDetailPage = () => {
                                                 Trẻ em: <span className="price">{formaterCurrency(data.childrenPrice)}</span>
                                             </li>
                                             <li>
-                                                Còn nhận: <span className="people">
-                                                            {data.totalPeople - data.quantityPeople}<i className="far fa-user ms-1"></i>
-                                                        </span>
+                                                Còn nhận: <span className="people"><i className="far fa-user me-1"></i>{data.quantityPeople}</span>
                                             </li>
                                         </ul>
                                         <button type="button" className="theme-btn style-two w-100 mt-25 mb-5" onClick={handleBooking}>
@@ -271,24 +258,24 @@ const TourDetailPage = () => {
                                         <h6 className="widget-title  fw-bold">Tours tương tự</h6>
                                         {similarTours.map((item, index) => (
                                             <div key={index} className="destination-item tour-grid style-three bgc-lighter">
-                                                <div>
-                                                    <img className="image-similar" src={item.image[0] || noImage} alt="Tour" />
-                                                </div>
-                                                <div className="content">
-                                                    <div className="destination-header">
-                                                        <span className="location">
-                                                            <i className="fal fa-map-marker-alt"></i>
-                                                            {item.destination}
-                                                        </span>
-                                                        <span className="location">
-                                                            <i className="far fa-clock me-1"></i>
-                                                            <span>{item.quantityDay ? `${item.quantityDay} ngày ${item.quantityDay-1} đêm` : ''}</span>
-                                                        </span>
+                                                <Link to={`/tour/detail/${item.id}`}>
+                                                    <div>
+                                                        <img className="image-similar" src={item.image[0] || noImage} alt="Tour" />
                                                     </div>
-                                                    <h6 className="fw-bold">
-                                                        <Link to={`/tour/detail/${item.id}`}>{item.name}</Link>
-                                                    </h6>
-                                                </div>
+                                                    <div className="content">
+                                                        <div className="destination-header">
+                                                            <span className="location">
+                                                                <i className="fal fa-map-marker-alt"></i>
+                                                                {item.destination}
+                                                            </span>
+                                                            <span className="location">
+                                                                <i className="far fa-clock me-1"></i>
+                                                                <span>{item.quantityDay ? `${item.quantityDay} ngày ${item.quantityDay-1} đêm` : ''}</span>
+                                                            </span>
+                                                        </div>
+                                                            <h6 className="fw-bold">{item.name}</h6>
+                                                    </div>
+                                                </Link>
                                             </div>
                                         ))}
                                     </div>
@@ -298,8 +285,6 @@ const TourDetailPage = () => {
                     </div>
                 </div>
             </section>
-
-            <ToastContainer />
         </div>
     )
 }

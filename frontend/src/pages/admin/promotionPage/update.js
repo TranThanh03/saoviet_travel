@@ -4,9 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./update.scss";
 import DatePicker from "react-datepicker";
-import { ToastContainer } from "react-toastify";
 import { ErrorToast, SuccessToast } from "components/notifi";
 import { pick } from "lodash";
+import getTodayUTC7 from "utils/getTodayUTC7";
 
 const PromotionUpdatePage = () => {
     const { id } = useParams();
@@ -15,12 +15,13 @@ const PromotionUpdatePage = () => {
         title: null,
         description: null,
         discount: null,
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0],
+        startDate: getTodayUTC7().toISOString().split('T')[0],
+        endDate: getTodayUTC7().toISOString().split('T')[0],
         quantity: null,
         status: null
     });
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchPromotion = async () => {
@@ -58,29 +59,27 @@ const PromotionUpdatePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        let updatedFormData = { ...formData };
-
-        if (formData.status === 'Đang diễn ra') {
-            const today = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(today.getDate() + 1);
-
-            const formatDate = (date) => date.toISOString().split('T')[0];
-
-            updatedFormData.startDate = formatDate(tomorrow);
-        }
+        setIsLoading(true);
 
         try {
-            const response = await PromotionApi.update(id, updatedFormData);
+            const response = await PromotionApi.update(id, formData);
 
             if (response?.code === 1704) {
                 SuccessToast("Cập nhật khuyến mãi thành công.");
+                setFormData(
+                    pick(
+                        response?.result,
+                        ["code", "title", "description", "discount", "startDate", "endDate", "quantity", "status"]
+                    )
+                );
             } else {
                 ErrorToast(response?.message || "Cập nhật khuyến mãi thất bại.");
             }
         } catch (error) {
             console.error("Failed to create promotion: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -109,7 +108,7 @@ const PromotionUpdatePage = () => {
 
                                 <div className="mb-3">
                                     <label className="form-label">Giảm giá:</label>
-                                    <input name="discount" type="number" min="1" required value={formData.discount || ""} onChange={handleChange} className="form-control" />
+                                    <input name="discount" type="number" min="1" disabled={formData.status !== 'Chưa diễn ra'} required value={formData.discount || ""} onChange={handleChange} className="form-control" />
                                 </div>
 
                                 <div className="mb-3">
@@ -137,7 +136,7 @@ const PromotionUpdatePage = () => {
 
                                 <div className="mb-3">
                                     <label className="form-label">Số lượng:</label>
-                                    <input name="quantity" type="number" min="1" required value={formData.quantity || ""} onChange={handleChange} className="form-control" />
+                                    <input name="quantity" type="number" min="0" required value={formData.quantity ?? ""} onChange={handleChange} className="form-control" />
                                 </div>
 
                                 <div className="d-flex justify-content-center gap-3">
@@ -149,15 +148,22 @@ const PromotionUpdatePage = () => {
                                         <FaArrowLeft size={18} color="black" />
                                     </button>
 
-                                    <button type="submit" className="btn btn-submit fw-bold">Cập nhật</button>
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="btn btn-submit fw-bold"
+                                    >
+                                        {isLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Cập nhật'
+                                        }
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>
     );
 };

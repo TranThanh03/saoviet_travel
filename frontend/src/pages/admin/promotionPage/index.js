@@ -5,7 +5,6 @@ import { PromotionApi } from "services";
 import { Link } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus, FaSearch } from "react-icons/fa";
 import { ErrorToast, SuccessToast } from "components/notifi";
-import { ToastContainer } from "react-toastify";
 import Pagination from "components/pagination";
 import formatCurrency from "utils/formatCurrency.js";
 import formatDatetime from "utils/formatDatetime.js";
@@ -21,8 +20,12 @@ const PromotionPage = () => {
         "Đang diễn ra": "ongoing",
         "Đã kết thúc": "ended"
     };
+    const [loadingId, setLoadingId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchPromotions = useCallback(async () => {
+        setIsLoading(true);
+
         try {
             const response = await PromotionApi.getAll({
                 keyword: search.trim(),
@@ -38,6 +41,8 @@ const PromotionPage = () => {
             }
         } catch (error) {
             console.error("Failed to fetch promotions: ", error);
+        } finally {
+            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -47,6 +52,7 @@ const PromotionPage = () => {
 
     const handleSearch = () => {
         setCurrentPage(0);
+        setTotalPages(1);
         fetchPromotions();
     };
 
@@ -61,6 +67,8 @@ const PromotionPage = () => {
         });
 
         if (confirm.isConfirmed) {
+            setLoadingId(id);
+
             try {
                 const response = await PromotionApi.delete(id);
 
@@ -74,6 +82,8 @@ const PromotionPage = () => {
             } catch (error) {
                 console.error("Failed to delete promotion: ", error);
                 ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.")
+            } finally {
+                setLoadingId(null);
             }
         }
     };
@@ -101,6 +111,12 @@ const PromotionPage = () => {
                                     placeholder="Nhập mã, ngày bắt đầu"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }
+                                    }}
                                 />
                                 <button type="button" onClick={handleSearch}>
                                     <FaSearch style={{ color: '#333', fontSize: '16px' }} />
@@ -126,32 +142,52 @@ const PromotionPage = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {promotions.length > 0 && promotions.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td> {index + 1} </td>
-                                                        <td> {item.code} </td>
-                                                        <td> {item.title} </td>
-                                                        <td> {item.startDate ? formatDatetime(item.startDate) : ''} </td>
-                                                        <td> {item.endDate ? formatDatetime(item.endDate) : ''} </td>
-                                                        <td className="color-red"> {item.discount ? formatCurrency(item.discount) : 0}</td>
-                                                        <td> {item.quantity} </td>
-                                                        <td className={statusClassMap[item.status] || ''}> 
-                                                            {item.status}
-                                                        </td>
-                                                        <td>
-                                                            {item.status !== 'Đã kết thúc' && (
-                                                                <Link to={`/manage/promotions/edit/${item.id}`}>
-                                                                    <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
-                                                                </Link>
-                                                            )}
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" onClick={() => handleDelete(item.id, item.code)}>
-                                                                <FaTrash style={{ color: 'red', fontSize: '18px' }} />
-                                                            </button>
+                                                {isLoading ? (
+                                                    <tr>
+                                                        <td colSpan="9" style={{height: '350px', verticalAlign: 'middle'}}>
+                                                            <span 
+                                                                className="spinner-border spinner-border-sm mx-3 my-3 text-info" 
+                                                                style={{ width: '30px', height: '30px'}} 
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                ) : (
+                                                    promotions.length > 0 && promotions.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td> {index + 1} </td>
+                                                            <td> {item.code} </td>
+                                                            <td> {item.title} </td>
+                                                            <td> {item.startDate ? formatDatetime(item.startDate) : ''} </td>
+                                                            <td> {item.endDate ? formatDatetime(item.endDate) : ''} </td>
+                                                            <td className="color-red"> {item.discount ? formatCurrency(item.discount) : 0}</td>
+                                                            <td> {item.quantity} </td>
+                                                            <td className={statusClassMap[item.status] || ''}> 
+                                                                {item.status}
+                                                            </td>
+                                                            <td>
+                                                                {item.status !== 'Đã kết thúc' && (
+                                                                    <Link to={`/manage/promotions/edit/${item.id}`}>
+                                                                        <FaEdit style={{ color: '#26B99A', fontSize: '20px' }} />
+                                                                    </Link>
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={loadingId === item.id}
+                                                                    onClick={() => handleDelete(item.id, item.code)}
+                                                                >
+                                                                    {loadingId === item.id ? 
+                                                                        <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                                                        : <FaTrash style={{ color: 'red', fontSize: '18px' }} />
+                                                                    }
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -167,8 +203,6 @@ const PromotionPage = () => {
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>   
     );
 };

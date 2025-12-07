@@ -78,6 +78,9 @@ public class Booking {
     @Column(name = "booking_time")
     LocalDateTime bookingTime;
 
+    @Column(name = "expired_time")
+    LocalDateTime expiredTime;
+
     @Column(name = "status")
     String status;
 

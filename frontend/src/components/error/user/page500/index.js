@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
 import './style.scss';
 
 const Page500 = () => {
@@ -7,8 +6,8 @@ const Page500 = () => {
         <div className="error-500-container">
             <div className="error-content">
                 <h1>500 - Internal Server Error</h1>
-                <p>Rất tiếc, có một sự cố xảy ra trên máy chủ của chúng tôi. Vui lòng thử lại sau!</p>
-                <Link to="/" className="back-link">Quay lại trang chủ</Link>
+                <p>Rất tiếc, có sự cố xảy ra trên máy chủ của chúng tôi. Vui lòng thử lại sau!</p>
+                <a href="/" className="back-home">Về trang chủ</a>
             </div>
         </div>
     )

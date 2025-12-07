@@ -42,6 +42,25 @@
         }
     }
 
+    .calendar {
+        .booking-count {
+            position: absolute;
+            top: 7px;
+            right: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: #fff;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+        }
+    }
+
     .dropdown-menu {
         margin-left: -88px;
         z-index: 1100;
@@ -62,5 +81,11 @@
 
     .navbar-header .navbar-toggle {
         float: left !important;
+    }
+
+    @media (min-width: '991px') {
+        .calendar .booking-count {
+            top: 11px;
+        }
     }
 }

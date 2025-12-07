@@ -20,7 +20,7 @@
         }
 
         .booking-header {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 24px;
             font-weight: 700;
         }
@@ -171,7 +171,7 @@
             top: 80px;
             z-index: 99;
 
-            .tour-infor {
+            .tour-info {
                 span {
                     float: right;
                 }
@@ -187,6 +187,8 @@
             margin: 20px 0;
             padding-bottom: 20px;
             border-bottom: 1px solid #d6d6d6;
+            display: flex;
+            align-items: center;
             
             #title {
                 padding: 10px;
@@ -198,6 +200,8 @@
                 display: inline-block;
                 height: 49px;
                 cursor: pointer;
+                font-size: 15px;
+                min-width: 105px;
             }
 
             input {
@@ -205,6 +209,14 @@
                 border: 1px solid #e2e4e5;
                 padding: 10px;
                 height: 50px;
+                font-size: 15px;
+            }
+
+            .btn-trash {
+                color: red;
+                cursor: pointer;
+                font-size: 23px;
+                margin-left: 10px;
             }
         }
 
@@ -229,7 +241,6 @@
 
     .order-coupon {
         position: relative;
-        max-width: 400px;
         margin: 20px auto;
 
         .input-coupon {
@@ -297,8 +308,12 @@
         }
 
         .voucher-code {
-            color: #9c9c9c;
-            font-size: 14px;
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+            margin-right: 10px;
+            overflow-wrap: break-word;
+            max-width: 100px;
         }
 
         .voucher-title {
@@ -318,6 +333,18 @@
         #voucher-qty {
             float: right;
         }
+
+        .inactive-trash {
+            color: rgb(241, 175, 175) !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    }
+
+    @media (min-width: 992px) and (max-width: 1200px) {
+        .booking-container .user_info {
+            display: block !important;
+        }
     }
 
     @media (max-width: 768px) {
@@ -332,6 +359,12 @@
         .booking-summary {
             width: 100% !important;
             margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .booking-container .user_info {
+            display: block !important;
         }
     }
 }

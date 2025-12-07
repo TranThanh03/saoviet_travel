@@ -30,31 +30,27 @@ public interface NewsRepository extends JpaRepository<News, String> {
             "n.id, n.title, n.image, n.summary, n.viewCount, n.timeStamp) " +
             "FROM News n " +
             "WHERE n.type = 'Nổi bật' " +
-            "ORDER BY n.timeStamp DESC " +
-            "LIMIT 1")
-    NewsSummaryResponse findOutstandingNews();
+            "ORDER BY n.timeStamp DESC, n.viewCount DESC")
+    List<NewsSummaryResponse> findTop1OutstandingNews();
 
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.NewsSummaryResponse(" +
             "n.id, n.title, n.image, n.summary, n.viewCount, n.timeStamp) " +
             "FROM News n " +
             "WHERE n.type = 'Thường' " +
-            "ORDER BY n.timeStamp DESC " +
-            "LIMIT 5")
-    List<NewsSummaryResponse> findTopNews();
+            "ORDER BY n.timeStamp DESC")
+    List<NewsSummaryResponse> findTopNews(Pageable pageable);
 
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.NewsSummaryResponse(" +
             "n.id, n.title, n.image, n.summary, n.viewCount, n.timeStamp) " +
             "FROM News n " +
-            "WHERE n.id != :id AND n.type = 'Nổi bật' " +
-            "ORDER BY n.timeStamp DESC " +
-            "LIMIT 10")
-    List<NewsSummaryResponse> findListOutstandingNews(@Param("id") String id);
+            "WHERE n.id <> :id AND n.type = 'Nổi bật' " +
+            "ORDER BY n.timeStamp DESC")
+    List<NewsSummaryResponse> findListOutstandingNews(@Param("id") String id, Pageable pageable);
 
     @Query("SELECT new com.websitesaoviet.WebsiteSaoViet.dto.response.user.NewsSummaryResponse(" +
             "n.id, n.title, n.image, n.summary, n.viewCount, n.timeStamp) " +
             "FROM News n " +
-            "WHERE n.id != :id AND n.type = 'Thường' " +
-            "ORDER BY n.timeStamp DESC " +
-            "LIMIT 10")
-    List<NewsSummaryResponse> findListTopNews(@Param("id") String id);
+            "WHERE n.id <> :id AND n.type = 'Thường' " +
+            "ORDER BY n.timeStamp DESC")
+    List<NewsSummaryResponse> findListTopNews(@Param("id") String id, Pageable pageable);
 }

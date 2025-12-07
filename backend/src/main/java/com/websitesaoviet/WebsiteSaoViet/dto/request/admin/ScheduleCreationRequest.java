@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ScheduleCreationRequest {
+    @NotBlank(message = "NOT_NULL")
     String tourId;
 
     @NotNull(message = "STARTDATE_NOT_NULL")

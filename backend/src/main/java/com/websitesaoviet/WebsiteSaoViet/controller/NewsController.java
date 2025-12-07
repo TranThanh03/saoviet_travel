@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/news")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class NewsController {
     NewsService newsService;
 
@@ -45,8 +44,8 @@ public class NewsController {
     ResponseEntity<ApiResponse<Page<NewsListResponse>>> getNews(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @RequestParam(defaultValue = "9") int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
         ApiResponse<Page<NewsListResponse>> apiResponse = ApiResponse.<Page<NewsListResponse>>builder()
@@ -68,7 +67,7 @@ public class NewsController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     ResponseEntity<ApiResponse<NewsResponse>> updateUser(@PathVariable String id, @RequestBody @Valid NewsUpdateRequest request) {
         ApiResponse<NewsResponse> apiResponse = ApiResponse.<NewsResponse>builder()
                 .code(2103)
@@ -93,7 +92,7 @@ public class NewsController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}/detail")
     ResponseEntity<ApiResponse<NewsResponse>> getNewsByIdAndAdmin(@PathVariable String id) {
         ApiResponse<NewsResponse> apiResponse = ApiResponse.<NewsResponse>builder()
                 .code(2105)
@@ -123,7 +122,7 @@ public class NewsController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/list-outstanding/{id}")
+    @GetMapping("/{id}/list-outstanding")
     ResponseEntity<ApiResponse<List<NewsSummaryResponse>>> getListOutstandingNews(@PathVariable String id) {
         ApiResponse<List<NewsSummaryResponse>> apiResponse = ApiResponse.<List<NewsSummaryResponse>>builder()
                 .code(2108)
@@ -133,7 +132,7 @@ public class NewsController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @GetMapping("/list-top-new/{id}")
+    @GetMapping("/{id}/list-top-new")
     ResponseEntity<ApiResponse<List<NewsSummaryResponse>>> getListTopNews(@PathVariable String id) {
         ApiResponse<List<NewsSummaryResponse>> apiResponse = ApiResponse.<List<NewsSummaryResponse>>builder()
                 .code(2109)

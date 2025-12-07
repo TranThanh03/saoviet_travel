@@ -1,6 +1,6 @@
 .register-page {
     .container {
-        div {
+        .form-register {
             max-width: 50% !important;
 
             .form-floating {
@@ -12,12 +12,13 @@
             }
 
             a {
-                text-decoration: none;
+                font-size: 15px !important;
                 color: blue !important;
+                text-decoration: none;
             }
 
-            #back {
-                float: right;
+            a:hover {
+                text-decoration: underline;
             }
         }
 
@@ -30,13 +31,13 @@
         }
 
         @media only screen and (max-width: 992px) {
-            div {
+            .form-register {
                 max-width: 65% !important;
             }
         }
 
         @media only screen and (max-width: 576px) {
-            div {
+            .form-register {
                 max-width: 90% !important;
             }
         }

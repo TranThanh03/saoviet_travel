@@ -5,6 +5,7 @@
 
     .calendar {
         max-height: 1400px;
+        padding-right: 5px !important;
         overflow-y: scroll;
 
         a {
@@ -12,57 +13,94 @@
             text-decoration: none !important;
         }
 
-        .destination-item {
-            height: auto !important;
+        .calendar-sub {
+            border: 1px solid #E9E9E9;
             margin-bottom: 30px;
+            height: auto !important;
+            border-radius: 20px;
+
+            .destination-item {
+                border-radius: 20px !important;
+            }
+
+            .booking-code {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .confirm {
+                background-color: green !important;
+                font-weight: bold;
+            }
+
+            .cancel {
+                background-color: red !important;
+                font-weight: bold;
+            }
+
+            .pending {
+                background-color: #e5af10 !important;
+                font-weight: bold;
+            }
+
+            .content {
+                width: 100%;
+            }
+
+            .sub-meta {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 3px;
+            }
+
+            .booking-info {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 1px;
+            }
+
+            .control {
+                display: flex;
+                justify-content: space-between;
+                flex: 1 1 50%;
+                min-width: 100%;
+            }
+
+            .destination-footer {
+                row-gap: 10px;
+            }
+
+            .notifi {
+                padding: 10px 20px;
+                border-radius: 20px 20px 0 0;
+            }
+
+            .success-notifi {
+                color: green;
+                border-bottom: 1px solid #43A047;
+                background-color: #E8F5E9;
+            }
+
+            .error-notifi {
+                color: red;
+                border-bottom: 1px solid #E53935;
+                background-color: #FFEBEE;
+            }
         }
 
-        .booking-code {
-            width: 100%;
-            margin-bottom: 5px;
+        .success-border {
+            border-color: #43A047 !important;
         }
 
-        .confirm {
-            background-color: green !important;
-            font-weight: bold;
+        .error-border {
+            border-color: #E53935;
         }
 
-        .cancel {
-            background-color: red !important;
-            font-weight: bold;
-        }
-
-        .pending {
-            background-color: #e5af10 !important;
-            font-weight: bold;
-        }
-
-        .content {
-            width: 100%;
-        }
-
-        .sub-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-        }
-
-        .booking-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 1px;
-        }
-
-        .control {
-            display: flex;
-            justify-content: space-between;
-            flex: 1 1 50%;
-            min-width: 100%;
-        }
-
-        .destination-footer {
-            row-gap: 10px;
+        .inactive-cancel {
+            background-color: rgb(241, 175, 175) !important;
+            cursor: not-allowed;
+            pointer-events: none;
         }
     }
 

@@ -5,14 +5,14 @@ import formatCurrency from "utils/formatCurrency.js";
 import formatDatetime from "utils/formatDatetime.js";
 import { Link } from "react-router-dom";
 import { FaEye, FaSearch } from "react-icons/fa";
-import { ToastContainer } from "react-toastify";
 import Pagination from "components/pagination";
 
 const CalendarPage = () => {
-    const [calendars, setCalendars] = useState([]);
+    const [bookings, setBookings] = useState([]);
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
     const pageSize = 9;
 
     const paymentClassMap = {
@@ -26,6 +26,8 @@ const CalendarPage = () => {
     };
 
     const fetchCalendars = useCallback(async () => {
+        setIsLoading(true);
+        
         try {
             const response = await BookingApi.getAll({
                 keyword: search.trim(),
@@ -33,13 +35,14 @@ const CalendarPage = () => {
                 size: pageSize,
             });
 
-            if (response?.code === 1807) {
-                setCalendars(response.result.content);
+            if (response?.code === 1810) {
+                setBookings(response.result.content);
                 setTotalPages(response.result.totalPages);
             }
-        }
-        catch (error) {
-            console.error("Failed to fetch calendars: ", error);
+        } catch (error) {
+            console.error("Failed to fetch bookings: ", error);
+        } finally {
+            setIsLoading(false);
         }
     }, [search, currentPage, pageSize]);
 
@@ -49,6 +52,7 @@ const CalendarPage = () => {
 
     const handleSearch = () => {
         setCurrentPage(0);
+        setTotalPages(1);
         fetchCalendars();
     };
 
@@ -68,6 +72,12 @@ const CalendarPage = () => {
                                     placeholder="Nhập mã đơn, khách hàng, tour, lịch trình"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleSearch();
+                                        }
+                                    }}
                                 />
                                 <button type="button" onClick={handleSearch}>
                                     <FaSearch style={{ color: '#333', fontSize: '16px' }} />
@@ -82,40 +92,53 @@ const CalendarPage = () => {
                                             <thead>
                                                 <tr>
                                                     <th>STT</th>
-                                                    <th>Mã đơn</th>
+                                                    <th>Mã lịch đặt</th>
                                                     <th>Mã khách hàng</th>
                                                     <th>Mã tour</th>
                                                     <th>Mã lịch trình</th>
                                                     <th>Tổng tiền</th>
                                                     <th>Thời gian đặt</th>
                                                     <th>Thanh toán</th>
-                                                    <th>Trạng thái đơn</th>
+                                                    <th>Trạng thái</th>
                                                     <th>Thao tác</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {calendars.length > 0 && calendars.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td> {index + 1} </td>
-                                                        <td> {item.code} </td>
-                                                        <td> {item.customerCode} </td>
-                                                        <td> {item.tourCode} </td>
-                                                        <td> {item.scheduleCode} </td>
-                                                        <td className="color-red"> {item.totalPrice ? formatCurrency(item.totalPrice) : 0} </td>
-                                                        <td> {item.bookingTime ? formatDatetime(item.bookingTime) : ''} </td>
-                                                        <td className={paymentClassMap[item.paymentStatus] || ""}> 
-                                                            {item.paymentStatus}
-                                                        </td>
-                                                        <td className={statusClassMap[item.status] || ""}>
-                                                            {item.status}
-                                                        </td>
-                                                        <td>
-                                                            <Link to={`/manage/calendars/detail/${item.id}`}>
-                                                                <FaEye style={{ color: '#ffc107', fontSize: '20px' }} />
-                                                            </Link>
+                                                {isLoading ? (
+                                                    <tr>
+                                                        <td colSpan="10" style={{height: '350px', verticalAlign: 'middle'}}>
+                                                            <span 
+                                                                className="spinner-border spinner-border-sm mx-3 my-3 text-info" 
+                                                                style={{ width: '30px', height: '30px'}} 
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                            ></span>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                ) : (
+                                                    bookings.length > 0 && bookings.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td> {index + 1} </td>
+                                                            <td> {item.code} </td>
+                                                            <td> {item.customerCode} </td>
+                                                            <td> {item.tourCode} </td>
+                                                            <td> {item.scheduleCode} </td>
+                                                            <td className="color-red"> {item.totalPrice ? formatCurrency(item.totalPrice) : 0} </td>
+                                                            <td> {item.bookingTime ? formatDatetime(item.bookingTime) : ''} </td>
+                                                            <td className={paymentClassMap[item.paymentStatus] || ""}> 
+                                                                {item.paymentStatus}
+                                                            </td>
+                                                            <td className={statusClassMap[item.status] || ""}>
+                                                                {item.status}
+                                                            </td>
+                                                            <td>
+                                                                <Link to={`/manage/calendars/detail/${item.id}`}>
+                                                                    <FaEye style={{ color: '#ffc107', fontSize: '20px' }} />
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -131,8 +154,6 @@ const CalendarPage = () => {
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>
     );
 };

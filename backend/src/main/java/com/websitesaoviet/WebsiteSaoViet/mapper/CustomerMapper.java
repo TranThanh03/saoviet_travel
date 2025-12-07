@@ -3,7 +3,6 @@ package com.websitesaoviet.WebsiteSaoViet.mapper;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerCreationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.CustomerUpdateRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.CustomerResponse;
-import com.websitesaoviet.WebsiteSaoViet.dto.response.user.CustomerCreateResponse;
 import com.websitesaoviet.WebsiteSaoViet.entity.Customer;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -11,8 +10,6 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
     Customer createCustomer(CustomerCreationRequest request);
-
-    CustomerCreateResponse toCustomerCreateResponse(Customer customer);
 
     CustomerResponse toCustomerResponse(Customer customer);
 

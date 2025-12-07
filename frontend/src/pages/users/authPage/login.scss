@@ -36,20 +36,27 @@
                     width: 100%;
                     border-radius: 7px !important;
                 }
+
+                .forgot-password {
+                    float: right;
+                    font-style: italic;
+                }
             }
 
             .bottom-group {
                 small {
                     font-size: 1.05rem !important;
                 }
-
-                a {
-                    text-decoration: none;
-                }
             }
 
             a {
+                font-size: 15px !important;
                 color: blue !important;
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
             }
         }
 

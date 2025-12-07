@@ -1,9 +1,11 @@
-import { ROUTERS } from "@utils/router.js";
+import { ROUTERS } from "utils/router.js";
 import { Routes, Route, createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import * as usersPage from "@pages/users";
-import * as adminPage from "@pages/admin";
-import * as errorPage from "@components/error/index.js";
+import * as usersPage from "pages/users";
+import * as adminPage from "pages/admin";
+import * as errorPage from "components/error/index.js";
+import { AuthProvider } from "utils/AuthContext";
+import { AdminAuthProvider } from "utils/AdminAuthContext";
 
 const NotFoundRedirect = () => {
     const navigate = useNavigate();
@@ -28,7 +30,7 @@ const NotFoundManageRedirect = () => {
 const RenderRouter = () => {
     const customRouters = [
         {
-            path: ROUTERS.USER.HOME,
+            path: ROUTERS.USER.HOMEPAGE,
             component: <usersPage.HomePage />
         },
         {
@@ -36,72 +38,80 @@ const RenderRouter = () => {
             component: <usersPage.LoginPage />
         },
         {
+            path: ROUTERS.USER.FORGOTPASSWORDPAGE,
+            component: <usersPage.ForgotPasswordPage />
+        },
+        {
             path: ROUTERS.USER.REGISTERPAGE,
             component: <usersPage.RegisterPage />
         },
         {
-            path: ROUTERS.USER.PROFILE,
+            path: ROUTERS.USER.PROFILEPAGE,
             component: <usersPage.ProfilePage />
         },
         {
-            path: ROUTERS.USER.PASSWORD,
+            path: ROUTERS.USER.PASSWORDPAGE,
             component: <usersPage.PasswordPage />
         },
         {
-            path: ROUTERS.USER.NEWS,
+            path: ROUTERS.USER.NEWSPAGE,
             component: <usersPage.NewsPage />
         },
         {
-            path: ROUTERS.USER.NEWSDETAIL,
+            path: ROUTERS.USER.NEWSDETAILPAGE,
             component: <usersPage.NewsDetailPage />
         },
         {
-            path: ROUTERS.USER.TOUR,
+            path: ROUTERS.USER.TOURPAGE,
             component: <usersPage.TourPage />
         },
         {
-            path: ROUTERS.USER.TOURDETAIL,
+            path: ROUTERS.USER.TOURDETAILPAGE,
             component: <usersPage.TourDetailPage />
         },
         {
-            path: ROUTERS.USER.BOOKING,
+            path: ROUTERS.USER.BOOKINGPAGE,
             component: <usersPage.BookingPage />
         },
         {
-            path: ROUTERS.USER.CALENDAR,
+            path: ROUTERS.USER.CALENDARPAGE,
             component: <usersPage.CalendarPage />
         },
         {
-            path: ROUTERS.USER.CALENDARDETAIL,
+            path: ROUTERS.USER.CALENDARDETAILPAGE,
             component: <usersPage.CalendarDetailPage />
         },
         {
-            path: ROUTERS.USER.BOOKINGMESSAGE,
+            path: ROUTERS.USER.BOOKINGMESSAGEPAGE,
             component: <usersPage.MessagePage />
         },
         {
-            path: ROUTERS.USER.SEARCH,
+            path: ROUTERS.USER.SEARCHPAGE,
             component: <usersPage.SearchPage />
         },
         {
-            path: ROUTERS.USER.SEARCHDESTINATION,
+            path: ROUTERS.USER.SEARCHDESTINATIONPAGE,
             component: <usersPage.SearchDestinationPage />
         },
         {
-            path: ROUTERS.USER.ACTIVATE,
+            path: ROUTERS.USER.ACTIVATEPAGE,
             component: <usersPage.ActivatePage />
         },
         {
-            path: ROUTERS.USER.ABOUT,
+            path: ROUTERS.USER.ABOUTPAGE,
             component: <usersPage.AboutPage />
         },
         {
-            path: ROUTERS.USER.DESTINATIONS,
+            path: ROUTERS.USER.DESTINATIONSPAGE,
             component: <usersPage.DestinationsPage />
         },
         {
             path: ROUTERS.ADMIN.LOGINPAGE,
             component: <adminPage.LoginPage />
+        },
+        {
+            path: ROUTERS.ADMIN.FORGOTPASSWORDPAGE,
+            component: <adminPage.ForgotPasswordPage />
         },
         {
             path: ROUTERS.ADMIN.CUSTOMERPAGE,
@@ -172,11 +182,11 @@ const RenderRouter = () => {
             component: <adminPage.NewsUpdatePage />
         },
         {
-            path: ROUTERS.ERROR.ERROR500,
+            path: ROUTERS.ERROR.ERROR500PAGE,
             component: <errorPage.Page500 />
         },
         {
-            path: ROUTERS.ERROR.MANAGEERROR500,
+            path: ROUTERS.ERROR.MANAGEERROR500PAGE,
             component: <errorPage.ManagePage500 />
         }
     ];
@@ -185,27 +195,31 @@ const RenderRouter = () => {
 
     return (
         isAdminRoute ? (
-            <adminPage.MasterLayout>
-                <Routes>
-                    {customRouters
-                        .filter(route => route.path.startsWith("/manage"))
-                        .map((item, key) => (
-                            <Route key={key} path={item.path} element={item.component} />
-                        ))}
-                    <Route path="*" element={<NotFoundManageRedirect />} />
-                </Routes>
-            </adminPage.MasterLayout>
+            <AdminAuthProvider>
+                <adminPage.MasterLayout>
+                    <Routes>
+                        {customRouters
+                            .filter(route => route.path.startsWith("/manage"))
+                            .map((item, key) => (
+                                <Route key={key} path={item.path} element={item.component} />
+                            ))}
+                        <Route path="*" element={<NotFoundManageRedirect />} />
+                    </Routes>
+                </adminPage.MasterLayout>
+            </AdminAuthProvider>
         ) : (
-            <usersPage.MasterLayout>
-                <Routes>
-                    {customRouters
-                        .filter(route => !route.path.startsWith("/manage"))
-                        .map((item, key) => (
-                            <Route key={key} path={item.path} element={item.component} />
-                        ))}
-                    <Route path="*" element={<NotFoundRedirect />} />
-                </Routes>
-            </usersPage.MasterLayout>
+            <AuthProvider>
+                <usersPage.MasterLayout>
+                    <Routes>
+                        {customRouters
+                            .filter(route => !route.path.startsWith("/manage"))
+                            .map((item, key) => (
+                                <Route key={key} path={item.path} element={item.component} />
+                            ))}
+                        <Route path="*" element={<NotFoundRedirect />} />
+                    </Routes>
+                </usersPage.MasterLayout>
+            </AuthProvider>
         )
     );
 };

@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./insert.scss";
 import DatePicker from "react-datepicker";
-import { ToastContainer } from "react-toastify";
 import { ErrorToast, SuccessToast } from "components/notifi";
+import getTodayUTC7 from "utils/getTodayUTC7";
 
 const PromotionInsertPage = () => {
     const [formData, setFormData] = useState({
@@ -13,11 +13,12 @@ const PromotionInsertPage = () => {
         title: null,
         description: null,
         discount: null,
-        startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0],
+        startDate: getTodayUTC7().toISOString().split('T')[0],
+        endDate: getTodayUTC7().toISOString().split('T')[0],
         quantity: null
     });
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -31,6 +32,8 @@ const PromotionInsertPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setIsLoading(true);
+
         try {
             const response = await PromotionApi.create(formData);
 
@@ -41,8 +44,8 @@ const PromotionInsertPage = () => {
                     title: null,
                     description: null,
                     discount: null,
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: new Date().toISOString().split('T')[0],
+                    startDate: getTodayUTC7().toISOString().split('T')[0],
+                    endDate: getTodayUTC7().toISOString().split('T')[0],
                     quantity: null
                 });
             } else {
@@ -51,6 +54,8 @@ const PromotionInsertPage = () => {
         } catch (error) {
             console.error("Failed to create promotion: ", error);
             ErrorToast("Đã xảy ra lỗi không xác định! Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -118,15 +123,22 @@ const PromotionInsertPage = () => {
                                         <FaArrowLeft size={18} color="black" />
                                     </button>
 
-                                    <button type="submit" className="btn btn-submit fw-bold">Thêm</button>
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="btn btn-submit fw-bold"
+                                    >
+                                        {isLoading ? 
+                                            <span className="spinner-border spinner-border-sm mx-2" role="status" aria-hidden="true"></span>
+                                            : 'Thêm'
+                                        }
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <ToastContainer />
         </div>    
     );
 };

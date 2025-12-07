@@ -7,7 +7,7 @@ import com.websitesaoviet.WebsiteSaoViet.dto.request.user.FilterToursRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.SearchToursDestinationRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.request.user.SearchToursRequest;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ListToursResponse;
-import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ToursSummaryResponse;
+import com.websitesaoviet.WebsiteSaoViet.dto.response.admin.ListTourSummaryResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.common.TourResponse;
 import com.websitesaoviet.WebsiteSaoViet.dto.response.user.*;
 import com.websitesaoviet.WebsiteSaoViet.entity.Tour;
@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -55,12 +56,12 @@ public class TourService {
         return tourMapper.toTourResponse(tourRepository.save(tour));
     }
 
-    public Page<ToursSummaryResponse> getTours(String keyword, Pageable pageable) {
+    public Page<ListTourSummaryResponse> getTours(String keyword, Pageable pageable) {
         String normalizedKeyword = normalize(keyword == null ? "" : keyword);
 
         List<Tour> tours = tourRepository.findAll();
 
-        List<ToursSummaryResponse> filtered = tours.stream()
+        List<ListTourSummaryResponse> filtered = tours.stream()
                 .filter(tour -> {
                     String code = normalize(tour.getCode());
                     String name = normalize(tour.getName());
@@ -68,7 +69,7 @@ public class TourService {
 
                     return code.contains(normalizedKeyword) || name.contains(normalizedKeyword) || destination.contains(normalizedKeyword);
                 })
-                .map(tour -> new ToursSummaryResponse(
+                .map(tour -> new ListTourSummaryResponse(
                         tour.getId(),
                         tour.getCode(),
                         tour.getName(),
@@ -83,7 +84,7 @@ public class TourService {
 
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), filtered.size());
-        List<ToursSummaryResponse> pageContent = filtered.subList(start, end);
+        List<ListTourSummaryResponse> pageContent = filtered.subList(start, end);
 
         return new PageImpl<>(pageContent, pageable, filtered.size());
     }
@@ -91,6 +92,16 @@ public class TourService {
     public TourResponse getTourById(String id) {
         return tourMapper.toTourResponse(tourRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.TOUR_NOT_EXITED)));
+    }
+
+    public TourSummaryResponse getTourSummary(String id) {
+        var tourSummary = tourRepository.findTourSummaryById(id);
+
+        if (tourSummary == null) {
+            throw new AppException(ErrorCode.TOUR_NOT_EXITED);
+        }
+
+        return tourSummary;
     }
 
     public TourResponse updateTour(String id, TourUpdateRequest request) {
@@ -105,6 +116,7 @@ public class TourService {
         return tourMapper.toTourResponse(tourRepository.save(tour));
     }
 
+    @Transactional
     public void deleteTour(String id) {
         if (!tourRepository.existsById(id)) {
             throw new AppException(ErrorCode.TOUR_NOT_EXITED);
@@ -188,13 +200,14 @@ public class TourService {
     }
 
     public List<PopularToursResponse> getPopularTours() {
-        List<PopularToursResponse> listTours = tourRepository.findPopularTours()
+        Pageable pageable = Pageable.ofSize(5);
+        List<PopularToursResponse> listTours = tourRepository.findPopularTours(pageable)
                                                         .stream()
                                                         .map(tourMapper::toPopularToursResponse)
                                                         .collect(Collectors.toList());
 
         if (listTours.isEmpty()) {
-            listTours = tourRepository.find5PopularTours()
+            listTours = tourRepository.find5PopularTours(pageable)
                     .stream().map(tourMapper::to5PopularToursResponse)
                     .collect(Collectors.toList());
         }
@@ -515,19 +528,31 @@ public class TourService {
             switch (sortKey) {
                 case "high-to-low" -> comparator = Comparator.comparingDouble(o -> -((Number) o[5]).doubleValue());
                 case "low-to-high" -> comparator = Comparator.comparingDouble(o -> ((Number) o[5]).doubleValue());
-                case "new" -> comparator = Comparator.comparing(o -> ((Date) o[9]));
-                case "old" -> comparator = Comparator.comparing(o -> ((Date) o[9]));
+                case "new" -> comparator = Comparator.comparing(o -> toLocalDate(o[9]), Comparator.nullsLast(Comparator.reverseOrder()));
+                case "old" -> comparator = Comparator.comparing(o -> toLocalDate(o[9]), Comparator.nullsLast(Comparator.naturalOrder()));
             }
         }
 
         if (startDate != null) {
             comparator = comparator == null
-                    ? Comparator.comparing(o -> (Date) o[6])
-                    : comparator.thenComparing(o -> (Date) o[6]);
+                    ? Comparator.comparing(
+                    o -> toLocalDate(o[6]),
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            )
+                    : comparator.thenComparing(
+                    o -> toLocalDate(o[6]),
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            );
         } else if (endDate != null) {
             comparator = comparator == null
-                    ? Comparator.comparing((Object[] o) -> (Date) o[7]).reversed()
-                    : comparator.thenComparing((Object[] o) -> (Date) o[7], Comparator.reverseOrder());
+                    ? Comparator.comparing(
+                    (Object[] o) -> toLocalDate(o[7]),
+                    Comparator.nullsLast(Comparator.reverseOrder())
+            )
+                    : comparator.thenComparing(
+                    (Object[] o) -> toLocalDate(o[7]),
+                    Comparator.nullsLast(Comparator.reverseOrder())
+            );
         }
 
         if (map.get("destination") != null) {
@@ -563,8 +588,8 @@ public class TourService {
                                 (String) obj[3],
                                 ((Number) obj[4]).intValue(),
                                 ((Number) obj[5]).doubleValue(),
-                                ((Date) obj[6]).toLocalDate(),
-                                ((Date) obj[7]).toLocalDate(),
+                                toLocalDate(obj[6]),
+                                toLocalDate(obj[7]),
                                 ((Number) obj[8]).intValue()
                         );
                     })

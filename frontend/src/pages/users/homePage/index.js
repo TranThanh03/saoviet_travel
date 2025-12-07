@@ -70,43 +70,42 @@ const HomePage = () => {
                         {hotTours.length > 0 && 
                             hotTours.map((item, index) => (
                                 <div key={index} className="col-xxl-3 col-xl-4 col-md-6">
-                                    <div className="destination-item block_tours" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                                        <div className="image">
-                                            <span className="badge">HOT</span>
-                                            <img src={item.image ? item.image : noImage} alt="tour-image" />
-                                        </div>
+                                    <Link to={`/tour/detail/${item.id}`}>
+                                        <div className="destination-item block_tours" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
+                                            <div className="image">
+                                                <span className="badge">HOT</span>
+                                                <img src={item.image ? item.image : noImage} alt="tour-image" />
+                                            </div>
 
-                                        <div className="content equal-content-fix">
-                                            <div className="destination-header">
-                                                <span className="location">
-                                                    <i className="fal fa-map-marker-alt"></i> {item.destination}
-                                                </span>
+                                            <div className="content equal-content-fix">
+                                                <div className="destination-header">
+                                                    <span className="location">
+                                                        <i className="fal fa-map-marker-alt"></i> {item.destination}
+                                                    </span>
 
-                                                <div className="ratting">
-                                                    {[...Array(5)].map((_, i) =>
-                                                        i < item.rating ? (
-                                                            <i key={i} className="fas fa-star"></i>
-                                                        ) : (
-                                                            <i key={i} className="far fa-star"></i>
-                                                        )
-                                                    )}
+                                                    <div className="ratting">
+                                                        {[...Array(5)].map((_, i) =>
+                                                            i < item.rating ? (
+                                                                <i key={i} className="fas fa-star"></i>
+                                                            ) : (
+                                                                <i key={i} className="far fa-star"></i>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <h6 className="fw-bold mb-2">{item.name}</h6>
+                                                <ul className="blog-meta">
+                                                    <li><i className="far fa-clock"></i> {item.quantityDay} ngày {item.quantityDay-1} đêm</li>
+                                                    <li><i className="far fa-user"></i> {item.people}</li>
+                                                </ul>
+                                                <div className="destination-footer">
+                                                    <span className="price">
+                                                        <span>{formatCurrency(item.adultPrice)}</span> / người
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <h6 className="fw-bold mb-2">{item.name}</h6>
-                                            <ul className="blog-meta">
-                                                <li><i className="far fa-clock"></i> {item.quantityDay} ngày {item.quantityDay-1} đêm</li>
-                                                <li><i className="far fa-user"></i> {item.people}</li>
-                                            </ul>
-                                            <div className="destination-footer">
-                                                <span className="price">
-                                                    <span>{formatCurrency(item.adultPrice)}</span> / người
-                                                </span>
-                                                <Link to={`/tour/detail/${item.id}`} className="theme-btn style-two style-three" style={{ color: "white"}}>
-                                                    <i className="fal fa-arrow-right ms-0"></i>
-                                                </Link>
-                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </div>
                             )
                         )}
@@ -181,7 +180,7 @@ const HomePage = () => {
 
             <section className="popular-destinations-area rel z-1">
                 <div className="container-fluid">
-                    <div className="popular-destinations-wrap br-20 bgc-lighter pt-100 pb-70">
+                    <div className="popular-destinations-wrap br-20 bgc-lighter pt-70 pb-70">
                         <div className="row justify-content-center">
                             <div className="col-lg-12">
                                 <div className="section-title text-center counter-text-wrap mb-70" data-aos="fade-up"

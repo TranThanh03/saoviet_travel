@@ -26,6 +26,9 @@ public class Checkout {
     @Column(name = "booking_id")
     String bookingId;
 
+    @Column(name = "order_id")
+    String orderId;
+
     @Column(name = "method")
     String method;
 
