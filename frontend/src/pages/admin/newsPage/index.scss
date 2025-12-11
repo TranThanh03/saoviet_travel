@@ -65,4 +65,15 @@
         object-fit: contain;
         margin: 5px 0;
     }
+
+    @media (max-width: 576px) {
+        .form-search {
+            width: 100%;
+            text-align: right;
+
+            input {
+                max-width: 80%;
+            }
+        }
+    }
 }

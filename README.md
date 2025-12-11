@@ -5,6 +5,8 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 
 🔗 **Truy cập website:** [https://saoviettravel.site](https://saoviettravel.site)
 
+🔗 **Trang quản trị:** [https://saoviettravel.site/manage/dashboard](https://saoviettravel.site/manage/dashboard)
+
 ---
 
 ## ✨ Tính năng
@@ -53,6 +55,9 @@ Website được xây dựng với mục tiêu mang lại trải nghiệm thuậ
 
 - **Caching:**  
   - [Redis](https://redis.io/)  
+
+- **Message Queue:**  
+  - [RabbitMQ](https://www.rabbitmq.com/)  
 
 - **Thanh toán demo:**  
   - VNPay, MoMo  

@@ -70,4 +70,15 @@
     .ended {
         color: red;
     }
+
+    @media (max-width: 576px) {
+        .form-search {
+            width: 100%;
+            text-align: right;
+
+            input {
+                max-width: 80%;
+            }
+        }
+    }
 }

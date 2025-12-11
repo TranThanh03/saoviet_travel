@@ -62,14 +62,15 @@ const CalendarPage = () => {
                 <div className="col-md-12 col-sm-12 ">
                     <div className="x_panel">
                         <div className="x_title">
-                            <h2>Danh sách lịch đặt</h2>
+                            <h2 className="w-100">Danh sách lịch đặt</h2>
                             <div className="clearfix"></div>
                         </div>
                         <div className="x_content">
                             <div className="form-search">
                                 <input
-                                    type="search"
-                                    placeholder="Nhập mã đơn, khách hàng, tour, lịch trình"
+                                    className="mb-1"
+                                    type="text"
+                                    placeholder="Nhập mã đơn, KH, tour, lịch trình"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyDown={(e) => {

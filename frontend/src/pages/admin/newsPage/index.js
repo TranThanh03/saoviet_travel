@@ -100,7 +100,8 @@ const NewsPage = () => {
                         <div className="x_content">
                             <div className="form-search">
                                 <input
-                                    type="search"
+                                    className="mb-1"
+                                    type="text"
                                     placeholder="Nhập mã, tiêu đề"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
