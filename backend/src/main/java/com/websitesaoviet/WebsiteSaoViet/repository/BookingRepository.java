@@ -165,8 +165,11 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
 
     @Query("SELECT COUNT(b) " +
             "FROM Booking b " +
-            "WHERE b.customerId = :customerId AND b.expiredTime > CURRENT_TIMESTAMP")
-    Integer findPaymentPendingCount(@Param("customerId") String customerId);
+            "WHERE b.customerId = :customerId AND b.expiredTime > :now")
+    Integer findPaymentPendingCount(
+            @Param("customerId") String customerId,
+            @Param("now") LocalDateTime now
+    );
 
     @Transactional
     @Modifying

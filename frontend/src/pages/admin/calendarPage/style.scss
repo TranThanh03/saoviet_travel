@@ -72,4 +72,15 @@
     .unpaid {
         color: rgb(173, 0, 0);
     }
+
+    @media (max-width: 576px) {
+        .form-search {
+            width: 100%;
+            text-align: right;
+
+            input {
+                max-width: 80%;
+            }
+        }
+    }
 }

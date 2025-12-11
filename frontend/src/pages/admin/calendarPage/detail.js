@@ -329,8 +329,8 @@ const CalendarDetailPage = () => {
                                                         <td> {booking.adultPrice ? formatCurrency(booking.adultPrice) : 0} </td>
                                                         <td className="color-red"> {booking.adultPrice ? formatCurrency(booking.quantityAdult * booking.adultPrice) : 0} </td>
                                                     </tr>
-                                                    <tr>
-                                                        <td>Trẻ em</td>
+                                                    <tr class="align-middle">
+                                                        <td>Trẻ em<br />(≤ 10 tuổi)</td>
                                                         <td> {booking.quantityChildren} </td>
                                                         <td> {booking.childrenPrice ? formatCurrency(booking.childrenPrice) : 0} </td>
                                                         <td className="color-red"> {booking.childrenPrice ? formatCurrency(booking.quantityChildren * booking.childrenPrice) : 0} </td>

@@ -545,7 +545,7 @@ public class BookingService {
     }
 
     public int getPaymentPendingCount(String customerId) {
-        Integer count = bookingRepository.findPaymentPendingCount(customerId);
+        Integer count = bookingRepository.findPaymentPendingCount(customerId, LocalDateTime.now());
 
         if (count == null) {
             return 0;

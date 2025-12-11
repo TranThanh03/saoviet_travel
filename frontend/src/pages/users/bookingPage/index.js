@@ -256,7 +256,11 @@ const BookingPage = () => {
                         </div>
 
                         <div className="form-group quantity-selector">
-                            <label>Trẻ em</label>
+                            <label>
+                                <span className="ms-2 ms-sm-0">Trẻ em</span>
+                                <span className="d-none d-sm-inline"> (≤ 10 tuổi)</span>
+                                <span className="d-inline d-sm-none"><br />(≤ 10 tuổi)</span>
+                            </label>
                             <div className="input__quanlity">
                                 <button type="button" className="quantity-btn" onClick={handleDecreaseChildren}>-</button>
                                 <input type="number" className="quantity-input" value={quantityChildren} min="0" readOnly />

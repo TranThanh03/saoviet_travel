@@ -155,8 +155,9 @@ const SchedulePage = () => {
                         <div className="x_content">
                             <div className="form-search">
                                 <input
-                                    type="search"
-                                    placeholder="Nhập mã lịch, mã tour, ngày khởi hành"
+                                    className="mb-1"
+                                    type="text"
+                                    placeholder="Nhập mã lịch, tour, ngày khởi hành"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyDown={(e) => {

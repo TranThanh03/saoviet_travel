@@ -200,13 +200,14 @@ const CustomerPage = () => {
                 <div className="col-md-12 col-sm-12 ">
                     <div className="x_panel">
                         <div className="x_title">
-                            <h2>Danh sách khách hàng</h2>
+                            <h2 className="w-100">Danh sách khách hàng</h2>
                             <div className="clearfix"></div>
                         </div>
                         <div className="x_content">
                             <div className="form-search">
                                 <input
-                                    type="search"
+                                    className="mb-1"
+                                    type="text"
                                     placeholder="Nhập mã, tên, email, sđt"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}

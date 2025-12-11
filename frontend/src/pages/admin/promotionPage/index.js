@@ -107,7 +107,8 @@ const PromotionPage = () => {
                         <div className="x_content">
                             <div className="form-search">
                                 <input
-                                    type="search"
+                                    className="mb-1"
+                                    type="text"
                                     placeholder="Nhập mã, ngày bắt đầu"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
